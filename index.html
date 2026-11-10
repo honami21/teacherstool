@@ -497,6 +497,32 @@ div.thumb { display: grid; place-items: center; font-family: var(--font-data); f
 .stage-msg { color: var(--muted); padding: 24px 16px; text-align: center; }
 #mOut { display: block; max-width: 100%; border-radius: var(--r); border: 1px solid var(--line); }
 
+/* Video frame capture */
+.v-why strong { display: block; margin-bottom: 4px; }
+.v-why ul { margin: 0; padding-left: 1.2em; }
+.v-why li + li { margin-top: 2px; }
+.v-why b { font-weight: 700; margin-right: 6px; }
+.v-stage { background: #0e0f14; min-height: 120px; }
+#vVideo { display: block; max-width: 100%; max-height: 62vh; width: auto; height: auto; background: #0e0f14; cursor: pointer; }
+.v-seek { display: flex; align-items: center; gap: 12px; }
+.v-seek input[type="range"] { flex: 1; width: auto; min-width: 0; }
+.v-time { font-family: var(--font-data); font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.v-ctrl { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.v-num { width: 72px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-family: var(--font-data); }
+.chip.wide { width: 104px; height: 64px; }
+.chip .t {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 12, 20, .6); color: #fff;
+  font-size: 10px; line-height: 16px; text-align: center;
+}
+#vOut { display: block; max-width: 100%; margin-top: 12px; border-radius: var(--r); border: 1px solid var(--line); }
+@media (max-width: 560px) {
+  .v-seek { flex-direction: column; align-items: stretch; gap: 4px; }
+  .v-time { text-align: right; }
+  .v-ctrl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .v-ctrl .btn { padding: 8px 2px; font-size: 13px; }
+}
+
 /* Signature pad */
 .sig-pad {
   position: relative;
@@ -1186,6 +1212,82 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     </ul>
   </section>
 
+  <!-- ===== Video frame capture ===== -->
+  <section class="panel" id="panel-capture" hidden>
+    <div>
+      <p class="eyebrow">영상</p>
+      <h2>영상 장면 캡처</h2>
+      <p class="sub">영상에서 원하는 순간을 골라 사진으로 저장합니다.</p>
+    </div>
+    <div class="note v-why">
+      <strong>스크린샷과 다른 점</strong>
+      <ul>
+        <li><b>원본 크기 그대로</b> 화면 크기와 상관없이 영상의 원래 해상도로 저장합니다.</li>
+        <li><b>장면만 깔끔하게</b> 재생 막대, 버튼, 검은 여백이 함께 찍히지 않습니다.</li>
+        <li><b>한 장면씩 골라서</b> 앞뒤로 한 장면씩 넘기며 가장 잘 나온 순간을 고릅니다.</li>
+        <li><b>여러 장 한꺼번에</b> 정한 간격마다 자동으로 뽑아 한 번에 저장합니다.</li>
+      </ul>
+    </div>
+    <div class="drop" id="vDrop" role="group" aria-label="장면을 뽑을 영상 파일 올리기">
+      <strong>영상 파일을 여기에 끌어다 놓으세요</strong>
+      <span>MP4, MOV, WEBM 등 한 번에 한 개씩 작업합니다</span>
+      <button type="button" class="pick" id="vPick">파일 선택</button>
+      <input type="file" id="vInput" accept="video/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp" hidden>
+    </div>
+    <div id="vWork" class="panel" hidden>
+      <div class="stage v-stage">
+        <video id="vVideo" playsinline preload="auto" aria-label="장면을 고를 영상"></video>
+      </div>
+      <div class="v-seek">
+        <input type="range" id="vSeek" min="0" max="1000" step="1" value="0" aria-label="영상 위치">
+        <span class="v-time" id="vTime">00:00.00 / 00:00.00</span>
+      </div>
+      <div class="v-ctrl">
+        <button type="button" class="btn" id="vBack1" disabled title="1초 뒤로 (Shift + ←)">−1초</button>
+        <button type="button" class="btn" id="vPrev" disabled title="한 장면 뒤로 (←)">◀ 한 장면</button>
+        <button type="button" class="btn" id="vPlay" disabled title="재생 / 멈춤 (스페이스)">▶ 재생</button>
+        <button type="button" class="btn" id="vNext" disabled title="한 장면 앞으로 (→)">한 장면 ▶</button>
+        <button type="button" class="btn" id="vFwd1" disabled title="1초 앞으로 (Shift + →)">+1초</button>
+      </div>
+      <div class="bar">
+        <div class="count" id="vInfo" aria-live="polite"></div>
+        <button type="button" class="btn primary" id="vGrab" disabled>이 장면 담기</button>
+      </div>
+      <div class="settings">
+        <div class="field">
+          <span class="label" id="vFmtLabel">저장 형식</span>
+          <div class="seg mono" role="radiogroup" aria-labelledby="vFmtLabel">
+            <label><input type="radio" name="vfmt" id="vfmtJpg" value="jpg" checked><span>JPG</span></label>
+            <label><input type="radio" name="vfmt" id="vfmtPng" value="png"><span>PNG</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="vEvery">자동으로 뽑기</label>
+          <input type="number" id="vEvery" class="v-num" min="0.5" max="600" step="0.5" value="2" inputmode="decimal">
+          <span class="label">초마다</span>
+          <button type="button" class="btn small" id="vBatch">처음부터 끝까지 뽑기</button>
+        </div>
+      </div>
+      <div id="vListWrap" hidden>
+        <div class="strip-scroll"><div class="strip" id="vStrip"></div></div>
+        <div class="bar">
+          <div class="count" id="vCount" aria-live="polite"></div>
+          <button type="button" class="btn ghost" id="vClear">모두 비우기</button>
+          <button type="button" class="btn ghost" id="vRemove">이 사진 빼기</button>
+          <button type="button" class="btn" id="vSave">이 사진 저장</button>
+          <button type="button" class="btn primary" id="vSaveAll">모두 저장 (ZIP)</button>
+        </div>
+        <img id="vOut" alt="담은 장면 사진" hidden>
+      </div>
+    </div>
+    <ul class="foot">
+      <li>사진은 영상의 원래 해상도로 저장되고, 화면에 작게 보여도 결과는 같습니다. 원본 영상은 바뀌지 않습니다.</li>
+      <li>키보드로는 ← → 로 한 장면씩, Shift를 함께 누르면 1초씩 움직이고, 스페이스로 재생과 멈춤을 합니다.</li>
+      <li>휴대폰과 아이폰으로 찍은 영상(MP4, MOV)은 대부분 됩니다. 아이폰 고화질(HEVC) 영상은 크롬이나 파이어폭스에서 안 열릴 수 있으니 사파리나 엣지로 열어 보세요.</li>
+      <li>아이폰 HDR 영상은 사진의 색이 화면보다 조금 옅게 나올 수 있습니다. 유튜브 같은 사이트의 영상은 안 되고, 기기에 있는 영상 파일만 됩니다.</li>
+    </ul>
+  </section>
+
   <!-- ===== Mosaic ===== -->
   <section class="panel" id="panel-mosaic" hidden>
     <div>
@@ -1402,7 +1504,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   var MAX_AREA = isIOS ? 16777216 : 200000000;
 
   /* ================= shared ================= */
-  var settings = { fmt: "jpg", q: 0.92, preset: "mid", shape: "rect", strength: 3, afmt: "mp3" };
+  var settings = { fmt: "jpg", q: 0.92, preset: "mid", shape: "rect", strength: 3, afmt: "mp3", vfmt: "jpg" };
   try {
     var stored = JSON.parse(localStorage.getItem("toolbox-settings") || "null");
     if (stored && typeof stored === "object") {
@@ -1412,6 +1514,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       if (stored.shape === "rect" || stored.shape === "ellipse") settings.shape = stored.shape;
       if (stored.strength >= 1 && stored.strength <= 8) settings.strength = stored.strength;
       if (stored.afmt === "mp3" || stored.afmt === "wav") settings.afmt = stored.afmt;
+      if (stored.vfmt === "jpg" || stored.vfmt === "png") settings.vfmt = stored.vfmt;
     }
   } catch (e) {}
   function saveSettings() {
@@ -3405,6 +3508,391 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     pRefresh();
   });
 
+  /* ================= Video frame capture ================= */
+  // The browser's own video player decodes the file; each capture copies one decoded frame onto a canvas
+  // at the video's own size (videoWidth x videoHeight), so the picture never depends on the screen size.
+  var V = { file: null, url: null, items: [], active: null, seq: 0, busy: false, batch: false, stopBatch: false,
+            fd: 1 / 30, samples: [], lastMt: -1, lastPf: -1, ready: false, watch: 0, clearArm: 0 };
+  var V_MAX_ITEMS = 300;
+  var V_DATA_MAX = 157286400;                                 // 150MB: largest file tried as a data: URL fallback
+  var vid = $("vVideo");
+  if (settings.vfmt === "png") $("vfmtPng").checked = true;
+
+  function vStamp(t) {
+    t = Math.max(0, t);
+    var h = Math.floor(t / 3600), m = Math.floor((t - h * 3600) / 60), s = t - h * 3600 - m * 60;
+    var ss = s.toFixed(2); if (s < 10) ss = "0" + ss;
+    var mm = (m < 10 ? "0" : "") + m;
+    return (h ? h + "시간" : "") + mm + "분" + ss + "초";
+  }
+  function vClock(t) {
+    if (!isFinite(t)) t = 0;
+    var h = Math.floor(t / 3600);
+    return (h ? h + ":" : "") + fmtTime(t - h * 3600);
+  }
+  function vName(it) { return it.base + "_" + vStamp(it.t) + "." + it.ext; }
+  function vDur() { return isFinite(vid.duration) ? vid.duration : 0; }
+  function vLock() { return !V.ready || V.busy || V.batch; }
+
+  function vRefresh() {
+    if (!V.file) return;
+    var dur = vDur(), t = vid.currentTime || 0;
+    $("vTime").textContent = vClock(t) + " / " + vClock(dur);
+    if (!V.seeking) $("vSeek").value = dur ? Math.round(t / dur * 1000) : 0;
+    $("vPlay").textContent = vid.paused ? "▶ 재생" : "■ 멈춤";
+    var lock = vLock();
+    ["vBack1", "vPrev", "vNext", "vFwd1", "vPlay", "vGrab", "vSeek"].forEach(function (id) { $(id).disabled = lock; });
+    $("vBatch").disabled = !V.ready || V.busy;
+    $("vBatch").textContent = V.batch ? "그만 뽑기" : "처음부터 끝까지 뽑기";
+    if (V.ready && !V.batch) {
+      $("vInfo").textContent = V.file.name + " · " + vid.videoWidth + "×" + vid.videoHeight + " · " + vClock(dur);
+    }
+  }
+  function vRenderList() {
+    var strip = $("vStrip");
+    strip.textContent = "";
+    V.items.forEach(function (it, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip wide";
+      b.setAttribute("aria-pressed", it === V.active ? "true" : "false");
+      b.setAttribute("aria-label", (i + 1) + "번째 장면, " + vClock(it.t));
+      var img = document.createElement("img");
+      img.alt = ""; img.src = it.thumb;
+      var lab = document.createElement("span");
+      lab.className = "t"; lab.textContent = vClock(it.t);
+      b.appendChild(img); b.appendChild(lab);
+      b.addEventListener("click", function () {
+        V.active = it;
+        $("vOut").hidden = true;
+        vRenderList();
+        if (!V.batch && V.ready) { vid.pause(); vSeekTo(it.t); }
+      });
+      strip.appendChild(b);
+    });
+    var n = V.items.length;
+    $("vListWrap").hidden = !n;
+    var size = 0;
+    V.items.forEach(function (it) { size += it.blob.size; });
+    $("vCount").textContent = n ? "담은 사진 " + n + "장 · " + fmtSize(size) : "";
+    $("vSave").disabled = !V.active;
+    $("vRemove").disabled = !V.active || V.batch;
+    $("vClear").disabled = V.batch;
+    $("vSaveAll").hidden = manual;
+    $("vSaveAll").disabled = V.batch;
+    $("vSave").textContent = manual ? "사진 크게 보기" : "이 사진 저장";
+  }
+  manualHooks.push(function () { if (V.items.length) vRenderList(); });
+
+  function stopCapture() {
+    if (V.batch) V.stopBatch = true;
+    if (!vid.paused) vid.pause();
+  }
+
+  // Seeks and resolves once the new frame is on screen (or after a short wait where that cannot be told).
+  function vSeekTo(t) {
+    return new Promise(function (res) {
+      var done = false, seeked = false, framed = !vid.requestVideoFrameCallback;
+      function fin() {
+        if (done) return;
+        done = true; clearTimeout(to);
+        vid.removeEventListener("seeked", onSeeked);
+        vRefresh();
+        res();
+      }
+      function onSeeked() { seeked = true; if (framed) fin(); else setTimeout(fin, 300); }
+      if (vid.requestVideoFrameCallback) vid.requestVideoFrameCallback(function () { framed = true; if (seeked) fin(); });
+      vid.addEventListener("seeked", onSeeked);
+      var to = setTimeout(fin, 5000);
+      var dur = vDur();
+      vid.currentTime = Math.max(0, dur ? Math.min(t, dur - 0.001) : t);
+    });
+  }
+
+  // Frame length: measured from the frames the browser shows while playing; 1/30 s until then.
+  function vWatchFrames() {
+    if (!vid.requestVideoFrameCallback) return;
+    var token = ++V.watch;
+    vid.requestVideoFrameCallback(function cb(now, meta) {
+      if (token !== V.watch) return;
+      if (V.lastPf >= 0 && meta.presentedFrames - V.lastPf === 1) {
+        var d = meta.mediaTime - V.lastMt;
+        if (d > 1 / 250 && d < 1 / 10) {
+          V.samples.push(d);
+          if (V.samples.length > 40) V.samples.shift();
+          var s = V.samples.slice().sort(function (a, b) { return a - b; });
+          V.fd = s[Math.floor(s.length / 2)];
+        }
+      }
+      V.lastPf = meta.presentedFrames; V.lastMt = meta.mediaTime;
+      vid.requestVideoFrameCallback(cb);
+    });
+  }
+  vid.addEventListener("play", function () { V.lastPf = -1; vRefresh(); });
+  vid.addEventListener("pause", vRefresh);
+  vid.addEventListener("timeupdate", vRefresh);
+  vid.addEventListener("ended", vRefresh);
+  vid.addEventListener("click", function () { if (!vLock()) $("vPlay").click(); });
+
+  function vStep(dir) {
+    if (vLock()) return;
+    vid.pause();
+    var fd = V.fd, idx = Math.floor(vid.currentTime / fd + 0.001);
+    vSeekTo(Math.max(0, (idx + dir) * fd + fd * 0.5));
+  }
+  function vJump(sec) {
+    if (vLock()) return;
+    vid.pause();
+    vSeekTo(Math.max(0, vid.currentTime + sec));
+  }
+
+  function vLoadSrc(src) {
+    return new Promise(function (res, rej) {
+      function ok() { off(); res(); }
+      function bad() { off(); rej(new Error("video")); }
+      function off() { vid.removeEventListener("loadeddata", ok); vid.removeEventListener("error", bad); }
+      vid.addEventListener("loadeddata", ok);
+      vid.addEventListener("error", bad);
+      vid.src = src;
+      vid.load();
+    });
+  }
+  // Some recordings (MediaRecorder WebM) report no length until the end has been reached once.
+  function vFixDuration() {
+    if (isFinite(vid.duration) && vid.duration > 0) return Promise.resolve();
+    return new Promise(function (res) {
+      var to = setTimeout(done, 4000);
+      function done() { clearTimeout(to); vid.removeEventListener("durationchange", chk); res(); }
+      function chk() { if (isFinite(vid.duration)) { vid.currentTime = 0; done(); } }
+      vid.addEventListener("durationchange", chk);
+      vid.currentTime = 1e101;
+    });
+  }
+  // A brief silent play measures the frame length and makes some phones draw the first frame.
+  async function vWarmUp() {
+    if (!vid.requestVideoFrameCallback) return;
+    vid.muted = true;
+    try {
+      await vid.play();
+      await new Promise(function (r) { setTimeout(r, 450); });
+    } catch (e) {}
+    vid.pause();
+    vid.muted = false;
+    await vSeekTo(0);
+  }
+
+  async function openCapture(fileList) {
+    var file = fileList && fileList[0];
+    if (!file || V.busy) return;
+    if (V.batch) { toast("자동으로 뽑는 중에는 다른 영상을 열 수 없습니다."); return; }
+    stopCapture();
+    V.busy = true; V.ready = false;
+    if (V.file) vRefresh();
+    toast("영상을 여는 중…");
+    if (V.url) { URL.revokeObjectURL(V.url); V.url = null; }
+    V.fd = 1 / 30; V.samples = []; V.lastPf = -1;
+    var opened = false;
+    try {
+      V.url = URL.createObjectURL(file);
+      await vLoadSrc(V.url);
+      opened = true;
+    } catch (e) {
+      // Where blob: links are blocked, read the file into the page instead (only for moderate sizes).
+      if (file.size <= V_DATA_MAX) {
+        try {
+          await vLoadSrc(await blobToDataUrl(file));
+          opened = true;
+        } catch (e2) {}
+      }
+    }
+    if (!opened || !vid.videoWidth) {
+      V.busy = false;
+      vid.removeAttribute("src"); vid.load();
+      if (V.url) { URL.revokeObjectURL(V.url); V.url = null; }
+      V.file = null;
+      $("vWork").hidden = !V.items.length;
+      vRefresh();
+      if (!opened && file.size > V_DATA_MAX) toast("영상을 열지 못했습니다. 이 화면에서는 150MB 이하 영상만 열리거나, 브라우저가 읽지 못하는 형식입니다.");
+      else toast("영상을 열지 못했습니다. 화면이 없는 파일이거나 이 브라우저가 읽지 못하는 형식입니다.");
+      return;
+    }
+    V.file = file;
+    $("vWork").hidden = false;
+    vWatchFrames();
+    await vFixDuration();
+    await vWarmUp();
+    V.busy = false; V.ready = true;
+    vRefresh();
+    vRenderList();
+    toast("영상을 열었습니다. 원하는 장면에서 \"이 장면 담기\"를 누르세요.");
+  }
+  wireDrop($("vDrop"), $("vInput"), $("vPick"), openCapture);
+  document.querySelectorAll('input[name="vfmt"]').forEach(function (r) {
+    r.addEventListener("change", function () { settings.vfmt = r.value; saveSettings(); });
+  });
+
+  // Copies the frame on screen at the video's own size.
+  async function vCapture() {
+    var w = vid.videoWidth, h = vid.videoHeight;
+    var k = Math.min(1, Math.sqrt(MAX_AREA / (w * h)));
+    var c = document.createElement("canvas");
+    c.width = Math.round(w * k); c.height = Math.round(h * k);
+    var ctx = c.getContext("2d");
+    ctx.drawImage(vid, 0, 0, c.width, c.height);
+    var png = $("vfmtPng").checked;
+    var blob = await canvasBlob(c, png ? "image/png" : "image/jpeg", 0.92);
+    if (!blob) throw new Error("encode");
+    var tc = document.createElement("canvas");
+    var tk = 208 / c.width;
+    tc.width = 208; tc.height = Math.max(1, Math.round(c.height * tk));
+    tc.getContext("2d").drawImage(c, 0, 0, tc.width, tc.height);
+    var it = { id: ++V.seq, base: baseName(V.file.name), t: vid.currentTime, blob: blob, ext: png ? "png" : "jpg",
+               thumb: tc.toDataURL("image/jpeg", 0.75), w: c.width, h: c.height };
+    c.width = c.height = 1;
+    return it;
+  }
+
+  $("vPlay").addEventListener("click", function () {
+    if (vLock()) return;
+    if (vid.paused) { if (vid.ended) vid.currentTime = 0; vid.play().catch(function () {}); }
+    else vid.pause();
+  });
+  $("vPrev").addEventListener("click", function () { vStep(-1); });
+  $("vNext").addEventListener("click", function () { vStep(1); });
+  $("vBack1").addEventListener("click", function () { vJump(-1); });
+  $("vFwd1").addEventListener("click", function () { vJump(1); });
+  $("vSeek").addEventListener("input", function () {
+    if (vLock()) return;
+    V.seeking = true;
+    vid.pause();
+    var dur = vDur();
+    if (dur) vid.currentTime = Math.min(dur - 0.001, this.value / 1000 * dur);
+  });
+  $("vSeek").addEventListener("change", function () { V.seeking = false; vRefresh(); });
+
+  $("vGrab").addEventListener("click", async function () {
+    if (vLock()) return;
+    if (V.items.length >= V_MAX_ITEMS) { toast("한 번에 " + V_MAX_ITEMS + "장까지 담을 수 있습니다. 저장한 뒤 비워 주세요."); return; }
+    var wasPlaying = !vid.paused;
+    vid.pause();
+    if (wasPlaying) await vSeekTo(vid.currentTime);
+    try {
+      var it = await vCapture();
+      V.items.push(it); V.active = it;
+      $("vOut").hidden = true;
+      vRenderList();
+      $("vStrip").lastChild.scrollIntoView({ block: "nearest", inline: "nearest" });
+      toast(vClock(it.t) + " 장면을 담았습니다 (" + it.w + "×" + it.h + ")");
+    } catch (e) {
+      toast("이 장면을 사진으로 만들지 못했습니다.");
+    }
+  });
+
+  $("vBatch").addEventListener("click", async function () {
+    if (!V.ready || V.busy) return;
+    if (V.batch) { V.stopBatch = true; return; }
+    var every = Number(String($("vEvery").value).replace(",", "."));
+    if (!(every >= 0.5)) { toast("간격은 0.5초 이상으로 적어 주세요."); return; }
+    var dur = vDur();
+    if (!dur) { toast("영상 길이를 알 수 없어 자동으로 뽑지 못합니다."); return; }
+    var times = [];
+    for (var t = 0; t < dur - 0.01; t += every) times.push(t);
+    var room = V_MAX_ITEMS - V.items.length;
+    if (times.length > room) {
+      var need = Math.ceil(dur / Math.max(1, room) * 2) / 2;
+      toast(room <= 0 ? "이미 " + V_MAX_ITEMS + "장을 담았습니다. 저장한 뒤 비워 주세요."
+        : times.length + "장이 되어 너무 많습니다. " + need + "초 이상으로 늘려 주세요.");
+      return;
+    }
+    vid.pause();
+    V.batch = true; V.stopBatch = false;
+    vRefresh(); vRenderList();
+    var got = 0, failed = 0;
+    for (var i = 0; i < times.length && !V.stopBatch; i++) {
+      $("vInfo").textContent = "자동으로 뽑는 중… " + (i + 1) + " / " + times.length;
+      await vSeekTo(times[i] + Math.min(0.02, V.fd / 2));
+      try {
+        var it = await vCapture();
+        V.items.push(it); V.active = it; got++;
+        vRenderList();
+      } catch (e) { failed++; }
+    }
+    var stopped = V.stopBatch;
+    V.batch = false; V.stopBatch = false;
+    vRefresh(); vRenderList();
+    toast((stopped ? "중간에 멈췄습니다. " : "") + got + "장을 담았습니다." + (failed ? " " + failed + "장은 만들지 못했습니다." : ""));
+  });
+
+  $("vSave").addEventListener("click", async function () {
+    var it = V.active;
+    if (!it) return;
+    try {
+      if (manual) {
+        var out = $("vOut");
+        out.src = await blobToDataUrl(it.blob);
+        out.hidden = false;
+        out.scrollIntoView({ block: "nearest" });
+        return;
+      }
+      await saveFile(vName(it), it.blob);
+    } catch (e) {
+      toast("이 사진은 저장하지 못했습니다.");
+    }
+  });
+  $("vSaveAll").addEventListener("click", async function () {
+    var btn = $("vSaveAll");
+    if (!V.items.length || btn.disabled) return;
+    btn.disabled = true;
+    try {
+      var entries = V.items.map(function (it) { return { name: vName(it), blob: it.blob }; });
+      if (entries.length === 1) await saveFile(entries[0].name, entries[0].blob);
+      else {
+        var one = V.items.every(function (it) { return it.base === V.items[0].base; });
+        await saveZip(entries, (one ? V.items[0].base + "_" : "") + "장면.zip");
+      }
+    } catch (e) {
+      toast("ZIP으로 묶지 못했습니다. 한 장씩 저장해 주세요.");
+    }
+    btn.disabled = false;
+  });
+  $("vRemove").addEventListener("click", function () {
+    var i = V.items.indexOf(V.active);
+    if (i < 0 || V.batch) return;
+    V.items.splice(i, 1);
+    V.active = V.items[Math.min(i, V.items.length - 1)] || null;
+    $("vOut").hidden = true;
+    vRenderList();
+  });
+  $("vClear").addEventListener("click", function () {
+    if (V.batch || !V.items.length) return;
+    // Asks for a second press instead of a dialog, which some views of the page do not show.
+    if (Date.now() - V.clearArm > 3000) {
+      V.clearArm = Date.now();
+      this.textContent = "한 번 더 누르면 비웁니다";
+      var btn = this;
+      setTimeout(function () { btn.textContent = "모두 비우기"; }, 3000);
+      return;
+    }
+    V.clearArm = 0;
+    this.textContent = "모두 비우기";
+    V.items = []; V.active = null;
+    $("vOut").hidden = true;
+    vRenderList();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (current !== "capture" || vLock()) return;
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      var dir = e.key === "ArrowLeft" ? -1 : 1;
+      if (e.shiftKey) vJump(dir); else vStep(dir);
+    } else if (e.key === " " && tag !== "BUTTON") {
+      e.preventDefault();
+      $("vPlay").click();
+    }
+  });
+
   /* ================= Standard document converter (download only) ================= */
   $("cDownload").addEventListener("click", async function () {
     try {
@@ -4506,6 +4994,8 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       keywords: "qr 큐알 링크 주소" },
     { id: "extract", name: "영상에서 음원 추출", desc: "영상 속 소리만 MP3로", category: "video",  tint: "purple", icon: "extract", short: "음원 추출", ready: true,
       keywords: "영상 동영상 비디오 음원 소리 오디오 추출 뽑기 꺼내기 분리 배경음악 bgm 녹화 mp4 mov m4v webm mp3 wav" },
+    { id: "capture", name: "영상 장면 캡처", desc: "원하는 순간을 사진으로", category: "video", tint: "blue", icon: "capture", short: "장면 캡처", ready: true,
+      keywords: "영상 동영상 비디오 장면 캡처 캡쳐 스크린샷 스샷 화면 사진 이미지 프레임 정지 화면 썸네일 저장 원본 고화질 jpg png mp4 mov" },
     { id: "video-compress", name: "동영상 압축", desc: "용량 줄이고 공유하기",   category: "video",    tint: "pink",   icon: "video",   ready: false, keywords: "영상 동영상 압축 mp4" },
     { id: "groups",  name: "모둠 편성",       desc: "조건에 맞게 모둠 나누기",   category: "class",    tint: "teal",   icon: "users",   ready: false, keywords: "모둠 조 편성 학생" },
     { id: "seat",    name: "자리 배치",       desc: "학급 자리 간편하게",        category: "class",    tint: "lilac",  icon: "layout",  ready: false, keywords: "자리 좌석 배치 학생" }
@@ -4520,6 +5010,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     overlap: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
     qr: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zm7 0v3m-7 4h3m4-2v2h-2"/>',
     video: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4Z"/>',
+    capture: '<path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><circle cx="12" cy="12" r="3.5"/>',
     extract: '<rect x="2" y="5" width="13" height="14" rx="2"/><path d="m7 9.5 4 2.5-4 2.5Z"/><path d="M18.5 9v6M21.5 7v10"/>',
     users: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M18 11a3 3 0 0 0 0-6m1 10a5 5 0 0 1 3 5"/>',
     layout: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
@@ -4646,6 +5137,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (current !== "merge") stopMerge();
     if (current !== "pitch") stopPitch();
     if (current !== "extract") stopExtract();
+    if (current !== "capture") stopCapture();
     if (current === "ladder") ldLayout();
     if (current === "roulette") rlLayout();
     if (ldFull() && !$("panel-" + current).contains(ldFull())) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
@@ -4739,6 +5231,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "merge") addMerge(files);
     else if (current === "pitch") openPitch(files);
     else if (current === "extract") openExtract(files);
+    else if (current === "capture") openCapture(files);
     else if (current === "home" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette") return;
     else addMosaic(files);
   });
