@@ -540,6 +540,74 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   .row { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 10px; }
   .thumb { width: 48px; height: 48px; }
 }
+/* Ladder game */
+.stepper { display: inline-flex; align-items: center; gap: 6px; }
+.stepper .btn { width: 34px; height: 34px; padding: 0; font-size: 18px; line-height: 1; }
+.stepper .val { min-width: 3.2em; text-align: center; color: var(--fg); font-weight: 700; font-family: var(--font-text); font-size: 15px; }
+.ld-fill { display: flex; flex-direction: column; gap: 12px; }
+.ld-paste summary { cursor: pointer; font-weight: 700; font-size: 14px; color: var(--accent-dark); width: max-content; max-width: 100%; }
+.ld-paste textarea {
+  display: block; width: 100%; margin-top: 8px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  font: inherit; font-size: 14px; resize: vertical;
+}
+.ld-paste-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 8px; font-size: 13px; color: var(--muted); }
+.ld-win { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+.ld-win input { width: 4em; padding: 5px 6px; }
+.ld-stage { display: flex; flex-direction: column; gap: 14px; }
+.ld-scroll { overflow-x: auto; padding: 16px 12px 14px; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius-card); }
+.ld-board { margin-inline: auto; }
+.ld-row { display: grid; }
+.ld-row > * { margin: 0 4px; min-width: 0; }
+.ld-in {
+  width: calc(100% - 8px); padding: 9px 3px;
+  border: 1px solid var(--line); border-radius: 9px; background: var(--surface);
+  text-align: center; font-size: 14px; font-weight: 700;
+}
+.ld-in:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.ld-in::placeholder { color: #a3aaba; font-weight: 500; }
+.ld-name, .ld-res {
+  display: grid; place-items: center; min-height: 46px; padding: 6px 3px;
+  border: 2px solid var(--line); border-radius: 10px; background: var(--surface);
+  font-size: 14px; font-weight: 800; line-height: 1.25; text-align: center; overflow-wrap: anywhere;
+}
+.ld-name { cursor: pointer; color: var(--fg); transition: border-color .15s, transform .15s; }
+.ld-name:hover { border-color: var(--accent); transform: translateY(-1px); }
+.ld-name.is-on { border-color: var(--c); color: var(--c); background: #fff; background: color-mix(in srgb, var(--c) 9%, #fff); }
+.ld-res { border-style: dashed; color: var(--fg); }
+.ld-res.is-hidden { color: var(--subtle); font-size: 18px; }
+.ld-res.is-on { border-style: solid; border-color: var(--c); background: var(--c); color: #fff; animation: ld-pop .4s ease-out; }
+@keyframes ld-pop { 0% { transform: scale(.7); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.ld-board.is-narrow .ld-row > * { margin: 0 2px; }
+.ld-board.is-narrow .ld-in { width: calc(100% - 4px); }
+.ld-board.is-narrow .ld-name, .ld-board.is-narrow .ld-res, .ld-board.is-narrow .ld-in { font-size: 13px; padding-inline: 1px; letter-spacing: -0.3px; }
+.ld-svg { display: block; overflow: visible; }
+.ld-rail, .ld-rung { stroke: #c3c9d8; stroke-width: 4; stroke-linecap: round; }
+.ld-path { fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.ld-head { stroke: #fff; stroke-width: 3; }
+.ld-stage .bar { border-top: 0; padding-top: 0; }
+.ld-stage.is-full { background: #fff; padding: 28px; overflow: auto; justify-content: center; }
+.ld-stage.is-full .ld-name, .ld-stage.is-full .ld-res { min-height: 64px; font-size: 21px; }
+.ld-stage.is-full .ld-res.is-hidden { font-size: 26px; }
+.ld-stage.is-full .bar .count { font-size: 20px; }
+.ld-summary { padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius-card); box-shadow: var(--shadow-soft); }
+.ld-summary-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.ld-summary-head strong { font-size: 16px; }
+.ld-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 18px; }
+.ld-list li { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.ld-list i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+.ld-list b { font-weight: 700; overflow-wrap: anywhere; }
+.ld-list span { margin-left: auto; padding-left: 8px; font-weight: 700; color: var(--c); text-align: right; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { .ld-res.is-on { animation: none; } }
+/* Audio key change */
+.key-box { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 8px 0 4px; }
+.key-step { width: 56px; height: 56px; padding: 0; border-radius: 50%; font-size: 26px; line-height: 1; justify-content: center; }
+.key-val { min-width: 150px; text-align: center; }
+.key-val strong { display: block; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+.key-val small { display: block; margin-top: 2px; color: var(--muted); font-size: 14px; }
+.key-range { max-width: 460px; width: 100%; margin: 0 auto; }
+.key-range input[type="range"] { width: 100%; }
+.key-ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 0 2px; }
 </style>
 </head>
 <body>
@@ -904,6 +972,57 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     </ul>
   </section>
 
+  <!-- ===== Audio key change ===== -->
+  <section class="panel" id="panel-pitch" hidden>
+    <div>
+      <p class="eyebrow">음원</p>
+      <h2>음원 키 변경</h2>
+      <p class="sub">빠르기와 길이는 그대로 두고, 음높이만 반음 단위로 올리거나 내립니다. 노래 키를 반주에 맞추거나 아이들 목소리에 맞게 낮출 때 씁니다.</p>
+    </div>
+    <div class="drop" id="kDrop" role="group" aria-label="키를 바꿀 음원 파일 올리기">
+      <strong>음원 파일을 여기에 끌어다 놓으세요</strong>
+      <span>MP3, M4A, WAV 등 한 번에 한 곡씩 작업합니다</span>
+      <button type="button" class="pick" id="kPick">파일 선택</button>
+      <input type="file" id="kInput" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.flac" hidden>
+    </div>
+    <div id="kWork" class="panel" hidden>
+      <div class="key-box">
+        <button type="button" class="btn key-step" id="kDown" aria-label="반음 내리기">−</button>
+        <div class="key-val">
+          <strong id="kVal" aria-live="polite">원래 키</strong>
+          <small id="kValSub">반음 0</small>
+        </div>
+        <button type="button" class="btn key-step" id="kUp" aria-label="반음 올리기">+</button>
+      </div>
+      <div class="key-range">
+        <input type="range" id="kRange" min="-12" max="12" step="1" value="0" aria-label="반음 수 (-12부터 +12까지)">
+        <div class="key-ticks" aria-hidden="true"><span>−12</span><span>−6</span><span>0</span><span>+6</span><span>+12</span></div>
+      </div>
+      <div class="settings">
+        <div class="field">
+          <span class="label" id="kFmtLabel">저장 형식</span>
+          <div class="seg mono" role="radiogroup" aria-labelledby="kFmtLabel">
+            <label><input type="radio" name="kfmt" id="kfmtMp3" value="mp3" checked><span>MP3</span></label>
+            <label><input type="radio" name="kfmt" id="kfmtWav" value="wav"><span>WAV</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="kCount" aria-live="polite"></div>
+        <button type="button" class="btn" id="kOrig">▶ 원곡 듣기</button>
+        <button type="button" class="btn" id="kPlay">▶ 바뀐 키로 듣기</button>
+        <button type="button" class="btn primary" id="kExport">저장하기</button>
+      </div>
+      <div class="note" id="kZipNote" hidden>Claude 화면에서는 음원 파일을 바로 저장할 수 없어서, 결과를 ZIP 파일에 담아 저장합니다. ZIP을 풀면 음원 파일이 들어 있습니다.</div>
+    </div>
+    <ul class="foot">
+      <li>반음 1칸은 피아노 건반 한 칸입니다. +2는 "도"를 "레"로, −12는 한 옥타브 아래로 바꿉니다.</li>
+      <li>±3 안쪽은 자연스럽게 들리지만, 많이 바꿀수록 목소리가 어색해집니다. 올리면 가늘게, 내리면 굵게 변하고, 북이나 박수 같은 소리는 조금 뭉개질 수 있습니다.</li>
+      <li>바꾸는 계산은 이 기기에서 합니다. 4분짜리 곡은 컴퓨터에서 보통 20초 안팎이 걸리고, 휴대폰은 더 걸릴 수 있습니다.</li>
+      <li>MP3는 192kbps로 저장되고, WAV는 음질 손실이 없지만 용량이 큽니다.</li>
+    </ul>
+  </section>
+
   <!-- ===== Mosaic ===== -->
   <section class="panel" id="panel-mosaic" hidden>
     <div>
@@ -952,6 +1071,66 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <li>저장되는 사진은 <span class="ext">.jpg</span>이고 원본 크기 그대로입니다. 원본 파일은 바뀌지 않습니다.</li>
       <li>"모두 저장"은 모자이크를 넣지 않은 사진까지 올린 사진 전부를 ZIP 하나로 묶습니다.</li>
       <li>작은 얼굴은 굵기를 올려야 알아볼 수 없게 가려집니다. 저장 전에 확대해서 확인하세요.</li>
+    </ul>
+  </section>
+  <!-- Ladder game -->
+  <section class="panel" id="panel-ladder" hidden>
+    <div>
+      <p class="eyebrow">학급 도구</p>
+      <h2>사다리타기</h2>
+      <p class="sub">위 칸에 참가자, 아래 칸에 결과를 적고 사다리를 시작하세요. 이름을 누르면 사다리를 따라 내려가 결과가 나옵니다. 발표 순서, 청소 당번, 역할 정하기에 쓰기 좋습니다.</p>
+    </div>
+    <div class="settings">
+      <div class="field">
+        <span class="label" id="ldCountLabel">인원</span>
+        <div class="stepper" role="group" aria-labelledby="ldCountLabel">
+          <button type="button" class="btn" id="ldMinus" aria-label="한 명 줄이기">−</button>
+          <span class="val" id="ldCount" aria-live="polite">6명</span>
+          <button type="button" class="btn" id="ldPlus" aria-label="한 명 늘리기">+</button>
+        </div>
+      </div>
+      <div class="field"><label class="check"><input type="checkbox" id="ldHideRes" checked> 결과 가리기</label></div>
+      <div class="field"><label class="check"><input type="checkbox" id="ldHideLad"> 사다리 가리기</label></div>
+    </div>
+    <div class="ld-fill">
+      <details class="ld-paste">
+        <summary>이름 한꺼번에 넣기</summary>
+        <textarea id="ldPaste" rows="4" placeholder="명렬표나 엑셀에서 이름을 복사해 붙여 넣으세요.&#10;줄바꿈, 쉼표, 띄어쓰기 어느 것으로 나뉘어 있어도 됩니다."></textarea>
+        <div class="ld-paste-bar"><span id="ldPasteInfo"></span><button type="button" class="btn small primary" id="ldPasteApply">이름 넣기</button></div>
+      </details>
+      <div class="field">
+        <span class="label">결과 채우기</span>
+        <span class="ld-win">당첨 <input type="number" class="time-in" id="ldWin" min="1" max="30" value="1" aria-label="당첨 개수"> 개</span>
+        <button type="button" class="btn small" id="ldFillWin">당첨과 꽝으로</button>
+        <button type="button" class="btn small" id="ldFillNum">1번째부터 순서로</button>
+        <button type="button" class="btn small ghost" id="ldFillClear">결과 비우기</button>
+      </div>
+    </div>
+    <div class="ld-stage" id="ldStage">
+      <div class="ld-scroll" id="ldScroll">
+        <div class="ld-board" id="ldBoard">
+          <div class="ld-row" id="ldNames"></div>
+          <svg class="ld-svg" id="ldSvg" aria-hidden="true"></svg>
+          <div class="ld-row" id="ldResults"></div>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="ldStatus" aria-live="polite"></div>
+        <button type="button" class="btn ghost" id="ldEdit" hidden>다시 입력</button>
+        <button type="button" class="btn ghost" id="ldShuffle" hidden>사다리 다시 섞기</button>
+        <button type="button" class="btn ghost" id="ldFull">크게 보기</button>
+        <button type="button" class="btn" id="ldAll" hidden>모두 결과 보기</button>
+        <button type="button" class="btn primary" id="ldStart">사다리 시작</button>
+      </div>
+    </div>
+    <div class="ld-summary" id="ldSummary" hidden>
+      <div class="ld-summary-head"><strong>결과</strong><button type="button" class="btn small" id="ldCopy">결과 복사</button></div>
+      <ol class="ld-list" id="ldList"></ol>
+    </div>
+    <ul class="foot">
+      <li>사다리는 시작할 때마다 새로 만들어집니다. 가로줄은 이웃한 두 줄 사이마다 최소 두 개씩 놓여서 한쪽으로 몰리지 않습니다.</li>
+      <li>"결과 가리기"를 켜 두면 길이 도착할 때까지 결과가 ?로 보이고, "사다리 가리기"를 켜면 가로줄도 지나간 길만 보입니다.</li>
+      <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 사다리만 꽉 차게 띄울 수 있습니다. 2명부터 30명까지 할 수 있고, 적은 이름은 이 기기에만 저장됩니다.</li>
     </ul>
   </section>
   </main>
@@ -2384,6 +2563,284 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     mgRefresh();
   });
 
+  /* ---- pitch shift: phase-vocoder time stretch (identity phase locking), then resample back to the original length ---- */
+  var PV_N = 4096, PV_HS = 1024;
+  var pvFFT = (function () {
+    var n = PV_N, rev = new Uint32Array(n), cs = new Float64Array(n / 2), sn = new Float64Array(n / 2), bits = Math.round(Math.log(n) / Math.LN2);
+    for (var i = 0; i < n; i++) { var r = 0; for (var b = 0; b < bits; b++) r = (r << 1) | ((i >> b) & 1); rev[i] = r; }
+    for (var k = 0; k < n / 2; k++) { cs[k] = Math.cos(2 * Math.PI * k / n); sn[k] = -Math.sin(2 * Math.PI * k / n); }
+    // in-place complex FFT; inv uses conjugate twiddles and does not scale
+    return function (re, im, inv) {
+      for (var i = 0; i < n; i++) { var j = rev[i]; if (j > i) { var t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; } }
+      for (var size = 2; size <= n; size <<= 1) {
+        var half = size >> 1, step = n / size;
+        for (var s = 0; s < n; s += size) {
+          for (var q = 0, w = 0; q < half; q++, w += step) {
+            var wr = cs[w], wi = inv ? -sn[w] : sn[w], a = s + q, c = a + half;
+            var xr = re[c] * wr - im[c] * wi, xi = re[c] * wi + im[c] * wr;
+            re[c] = re[a] - xr; im[c] = im[a] - xi; re[a] += xr; im[a] += xi;
+          }
+        }
+      }
+    };
+  })();
+  function pvWrap(p) { return p - 2 * Math.PI * Math.round(p / (2 * Math.PI)); }
+
+  // Makes each channel about alpha times longer without changing its pitch. Two channels share one complex FFT.
+  async function pvStretch(xs, alpha, tick) {
+    var N = PV_N, Hs = PV_HS, bins = N / 2 + 1, pad = N, nch = xs.length, i, c;
+    var padded = xs.map(function (x) { var p = new Float32Array(x.length + 2 * pad); p.set(x, pad); return p; });
+    var plen = padded[0].length;
+    var frames = Math.floor((plen - N) * alpha / Hs) + 1;
+    var outs = xs.map(function () { return new Float32Array(frames * Hs + N); });
+    var win = new Float64Array(N);
+    for (i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+    var re = new Float64Array(N), im = new Float64Array(N);
+    // per channel: this frame's spectrum (sr, si), the previous analysis spectrum (pr, pi) and previous output spectrum (yr, yi)
+    var st = xs.map(function () {
+      var f = function () { return new Float64Array(bins); };
+      return { sr: f(), si: f(), pr: f(), pi: f(), yr: f(), yi: f(), mag: f(), rr: f(), ri: f() };
+    });
+    var peakOf = new Int32Array(bins), peaks = new Int32Array(bins);
+    var norm = 1 / (N * 1.5); // inverse-FFT scale and the hann-squared overlap at 75%
+    var prevTa = 0;
+    for (var k = 0; k < frames; k++) {
+      var ta = Math.min(plen - N, Math.round(k * Hs / alpha));
+      var p0 = padded[0], p1 = nch > 1 ? padded[1] : null;
+      for (i = 0; i < N; i++) { re[i] = p0[ta + i] * win[i]; im[i] = p1 ? p1[ta + i] * win[i] : 0; }
+      pvFFT(re, im, false);
+      // split the packed spectrum into each channel's own spectrum
+      for (i = 0; i < bins; i++) {
+        var m = (N - i) & (N - 1);
+        if (p1) {
+          st[0].sr[i] = (re[i] + re[m]) / 2; st[0].si[i] = (im[i] - im[m]) / 2;
+          st[1].sr[i] = (im[i] + im[m]) / 2; st[1].si[i] = (re[m] - re[i]) / 2;
+        } else { st[0].sr[i] = re[i]; st[0].si[i] = im[i]; }
+      }
+      var ha = ta - prevTa;
+      for (c = 0; c < nch; c++) {
+        var S = st[c], xr = S.sr, xi = S.si, mag = S.mag, rr = S.rr, ri = S.ri;
+        if (k === 0 || ha <= 0) {
+          for (i = 0; i < bins; i++) { S.yr[i] = xr[i]; S.yi[i] = xi[i]; }
+        } else {
+          for (i = 0; i < bins; i++) mag[i] = xr[i] * xr[i] + xi[i] * xi[i];
+          var np = 0;
+          for (i = 2; i < bins - 2; i++) if (mag[i] > mag[i - 1] && mag[i] >= mag[i + 1] && mag[i] > mag[i - 2] && mag[i] >= mag[i + 2]) peaks[np++] = i;
+          if (!np) peaks[np++] = 1;
+          // each peak advances at its measured frequency; (rr, ri) is the rotation from its input phase to its new phase
+          for (var p = 0; p < np; p++) {
+            var q = peaks[p], omega = 2 * Math.PI * q / N;
+            var dphi = Math.atan2(xi[q] * S.pr[q] - xr[q] * S.pi[q], xr[q] * S.pr[q] + xi[q] * S.pi[q]);
+            var ph = Math.atan2(S.yi[q], S.yr[q]) + omega * Hs + pvWrap(dphi - omega * ha) * Hs / ha;
+            var am = Math.sqrt(mag[q]);
+            if (am > 1e-12) {
+              var cr = Math.cos(ph), ci = Math.sin(ph);
+              rr[q] = (cr * xr[q] + ci * xi[q]) / am; ri[q] = (ci * xr[q] - cr * xi[q]) / am;
+            } else { rr[q] = 1; ri[q] = 0; }
+          }
+          // every other bin turns by the same rotation as its nearest peak, keeping the shape around the peak
+          var lo = 0;
+          for (p = 0; p < np; p++) {
+            var hi = p + 1 < np ? (peaks[p] + peaks[p + 1]) >> 1 : bins - 1;
+            for (i = lo; i <= hi; i++) peakOf[i] = peaks[p];
+            lo = hi + 1;
+          }
+          for (i = 0; i < bins; i++) {
+            var g0 = peakOf[i], a0 = rr[g0], b0 = ri[g0];
+            S.yr[i] = xr[i] * a0 - xi[i] * b0; S.yi[i] = xr[i] * b0 + xi[i] * a0;
+          }
+        }
+        for (i = 0; i < bins; i++) { S.pr[i] = xr[i]; S.pi[i] = xi[i]; xr[i] = S.yr[i]; xi[i] = S.yi[i]; }
+      }
+      // pack again (left + i * right) over the full spectrum, then one inverse FFT
+      var A = st[0], B = nch > 1 ? st[1] : null;
+      for (i = 0; i < bins; i++) {
+        re[i] = A.sr[i] - (B ? B.si[i] : 0); im[i] = A.si[i] + (B ? B.sr[i] : 0);
+        if (i > 0 && i < N / 2) { re[N - i] = A.sr[i] + (B ? B.si[i] : 0); im[N - i] = -A.si[i] + (B ? B.sr[i] : 0); }
+      }
+      pvFFT(re, im, true);
+      var o = k * Hs, o0 = outs[0], o1 = nch > 1 ? outs[1] : null;
+      for (i = 0; i < N; i++) { var g = win[i] * norm; o0[o + i] += re[i] * g; if (o1) o1[o + i] += im[i] * g; }
+      prevTa = ta;
+      if ((k & 15) === 15) await tick(k / frames);
+    }
+    return { data: outs, offset: pad * alpha };
+  }
+  // Reads y at offset + i * step for i < len with windowed-sinc interpolation; the cutoff drops below 1 when step > 1 so nothing aliases.
+  async function pvResample(y, offset, step, len, tick) {
+    var out = new Float32Array(len), cut = Math.min(1, 1 / step), half = Math.ceil(12 / cut), width = 2 * half, TAB = 256;
+    // tab[f * width + j]: weight of sample base - half + 1 + j for fractional position f / TAB
+    var tab = new Float32Array((TAB + 1) * width);
+    for (var f = 0; f <= TAB; f++) for (var j = 0; j < width; j++) {
+      var d = (j - half + 1) - f / TAB, ad = Math.abs(d), x = Math.PI * d * cut;
+      tab[f * width + j] = ad >= half ? 0 : cut * (ad < 1e-9 ? 1 : Math.sin(x) / x) * (0.5 + 0.5 * Math.cos(Math.PI * d / half));
+    }
+    var yp = new Float32Array(y.length + 2 * width);
+    yp.set(y, width);
+    for (var i = 0; i < len; i++) {
+      var pos = offset + i * step, base = Math.floor(pos), fi = Math.round((pos - base) * TAB);
+      var t0 = fi * width, s0 = base - half + 1 + width, acc = 0;
+      for (j = 0; j < width; j++) acc += yp[s0 + j] * tab[t0 + j];
+      out[i] = acc;
+      if ((i & 262143) === 262143) await tick(i / len);
+    }
+    return out;
+  }
+  // chans: one or two Float32Arrays. Returns channels of the same length, semis semitones higher (negative = lower).
+  async function pitchShift(chans, semis, progress) {
+    var alpha = Math.pow(2, semis / 12), pause = function () { return new Promise(function (r) { setTimeout(r, 0); }); };
+    var st = await pvStretch(chans, alpha, function (f) { progress(f * 0.85); return pause(); });
+    var out = [];
+    for (var c = 0; c < chans.length; c++) {
+      out.push(await pvResample(st.data[c], st.offset, alpha, chans[c].length, function (f) { progress(0.85 + (c + f) / chans.length * 0.15); return pause(); }));
+    }
+    progress(1);
+    return out;
+  }
+
+  /* ================= Audio key change ================= */
+  // Reuses audioCtx(), decodeFile(), wireDrop(), encodeWav() and encodeMp3() from the audio tools above.
+  var P = { file: null, buf: null, semis: 0, cache: null, token: 0, busy: false, saving: false, src: null, playing: "" };
+  if (settings.afmt === "wav") $("kfmtWav").checked = true;
+  if (inViewer) $("kZipNote").hidden = false;
+
+  function pLabel(n) {
+    if (!n) return { main: "원래 키", sub: "반음 0" };
+    var up = n > 0, a = Math.abs(n);
+    var words = a === 12 ? "한 옥타브 " : "반음 " + a + "개 ";
+    return { main: (up ? "+" : "−") + a, sub: words + (up ? "올림" : "내림") };
+  }
+  function pChannels() {
+    var nch = Math.min(2, P.buf.numberOfChannels), out = [];
+    for (var c = 0; c < nch; c++) out.push(P.buf.getChannelData(c));
+    return out;
+  }
+  function pRefresh(msg) {
+    var l = pLabel(P.semis);
+    $("kVal").textContent = l.main;
+    $("kValSub").textContent = l.sub;
+    $("kRange").value = P.semis;
+    $("kDown").disabled = P.semis <= -12;
+    $("kUp").disabled = P.semis >= 12;
+    if (!P.buf) return;
+    var lock = P.busy || P.saving;
+    $("kCount").textContent = msg || (P.file.name + " · " + fmtTime(P.buf.duration));
+    $("kOrig").textContent = P.playing === "orig" ? "■ 멈춤" : "▶ 원곡 듣기";
+    $("kPlay").textContent = P.playing === "key" ? "■ 멈춤" : "▶ 바뀐 키로 듣기";
+    $("kPlay").disabled = !P.semis || lock;
+    $("kOrig").disabled = lock;
+    $("kExport").disabled = !P.semis || lock;
+  }
+  function stopPitch() {
+    if (P.src) { P.src.onended = null; try { P.src.stop(); } catch (e) {} P.src = null; }
+    if (P.playing) { P.playing = ""; pRefresh(); }
+  }
+  function pSetSemis(n) {
+    n = Math.max(-12, Math.min(12, Math.round(n)));
+    if (n === P.semis) return;
+    stopPitch();
+    P.semis = n;
+    P.token++;           // a calculation still running for the old value stops at its next step
+    P.busy = false;
+    pRefresh();
+  }
+  $("kDown").addEventListener("click", function () { pSetSemis(P.semis - 1); });
+  $("kUp").addEventListener("click", function () { pSetSemis(P.semis + 1); });
+  $("kRange").addEventListener("input", function () { pSetSemis(Number($("kRange").value)); });
+  document.querySelectorAll('input[name="kfmt"]').forEach(function (r) {
+    r.addEventListener("change", function () { settings.afmt = r.value; saveSettings(); });
+  });
+
+  async function openPitch(fileList) {
+    var file = fileList && fileList[0];
+    if (!file) return;
+    stopPitch();
+    P.token++; P.busy = false; P.cache = null;
+    toast("음원을 여는 중…");
+    try {
+      var buf = await decodeFile(file);
+      P.file = file; P.buf = buf;
+      $("kWork").hidden = false;
+      pRefresh();
+    } catch (e) {
+      toast("이 파일은 음원으로 열 수 없습니다.");
+    }
+  }
+  wireDrop($("kDrop"), $("kInput"), $("kPick"), openPitch);
+
+  // The shifted channels for the current value, calculated once and kept until the file or the value changes.
+  async function pResult() {
+    if (P.cache && P.cache.buf === P.buf && P.cache.semis === P.semis) return P.cache.chans;
+    var token = ++P.token, semis = P.semis, buf = P.buf;
+    P.busy = true;
+    pRefresh("키를 바꾸는 중… 0%");
+    try {
+      var chans = await pitchShift(pChannels(), semis, function (f) {
+        if (token !== P.token) throw new Error("cancel");
+        pRefresh("키를 바꾸는 중… " + Math.round(f * 100) + "%");
+      });
+      P.cache = { buf: buf, semis: semis, chans: chans };
+      return chans;
+    } finally {
+      if (token === P.token) { P.busy = false; pRefresh(); }
+    }
+  }
+  function pPlayChans(chans, kind) {
+    var ctx = audioCtx();
+    if (ctx.state === "suspended") ctx.resume();
+    var ab = ctx.createBuffer(chans.length, chans[0].length, P.buf.sampleRate);
+    chans.forEach(function (d, c) { ab.getChannelData(c).set(d); });
+    var src = ctx.createBufferSource();
+    src.buffer = ab;
+    src.connect(ctx.destination);
+    src.onended = function () { if (P.src === src) { P.src = null; P.playing = ""; pRefresh(); } };
+    src.start();
+    P.src = src; P.playing = kind;
+    pRefresh();
+  }
+  $("kOrig").addEventListener("click", function () {
+    if (!P.buf) return;
+    var was = P.playing;
+    stopPitch();
+    if (was !== "orig") pPlayChans(pChannels(), "orig");
+  });
+  $("kPlay").addEventListener("click", async function () {
+    if (!P.buf || !P.semis) return;
+    var was = P.playing;
+    stopPitch();
+    if (was === "key") return;
+    try {
+      var chans = await pResult();
+      pPlayChans(chans, "key");
+    } catch (e) {
+      if (e && e.message !== "cancel") toast("키를 바꾸지 못했습니다.");
+    }
+  });
+  $("kExport").addEventListener("click", async function () {
+    if (!P.buf || !P.semis || P.busy || P.saving) return;
+    stopPitch();
+    var fmt = $("kfmtWav").checked ? "wav" : "mp3", semis = P.semis, file = P.file;
+    var chans;
+    try { chans = await pResult(); } catch (e) {
+      if (e && e.message !== "cancel") toast("키를 바꾸지 못했습니다.");
+      return;
+    }
+    P.saving = true; pRefresh("저장할 파일을 만드는 중…");
+    try {
+      var res = { chans: chans, sr: P.buf.sampleRate, len: chans[0].length }, blob;
+      if (fmt === "mp3") blob = await encodeMp3(res, function (pct) { pRefresh("MP3로 만드는 중… " + pct + "%"); });
+      else blob = encodeWav(res);
+      var base = baseName(file.name) + "_키" + (semis > 0 ? "+" : "-") + Math.abs(semis);
+      if (inViewer) await saveZip([{ name: base + "." + fmt, blob: blob }], base + ".zip");
+      else await saveFile(base + "." + fmt, blob);
+    } catch (e) {
+      toast(fmt === "mp3" ? "MP3로 만들지 못했습니다. 저장 형식을 WAV로 바꿔 다시 해 보세요." : "음원을 만들지 못했습니다.");
+    }
+    P.saving = false;
+    pRefresh();
+  });
+  pRefresh();
+
   /* ================= Standard document converter (download only) ================= */
   $("cDownload").addEventListener("click", async function () {
     try {
@@ -2588,6 +3045,374 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     }, "image/png");
   });
 
+  /* ================= ladder game ================= */
+  // The ladder is a set of rungs {g: gap index between rail g and g+1, y: 0..1}. Following a rail
+  // downward and crossing every rung it meets always gives each person a different result.
+  var LD_MIN = 2, LD_MAX = 30;
+  var LD_COLORS = ["#5b45f2", "#e6428c", "#0c9f62", "#f07d16", "#2575e8", "#9346f2", "#14919e", "#d23c3c",
+    "#b8860b", "#3d7f2c", "#b04fc4", "#4a5a78"];
+  var ld = { n: 6, names: [], results: [], rungs: [], mode: "setup", paths: {}, order: [], raf: 0, colW: 80, H: 340 };
+  var ldReduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  (function () {
+    for (var i = 0; i < LD_MAX; i++) { ld.names.push(""); ld.results.push(""); }
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem("toolbox-ladder") || "null"); } catch (err) { s = null; }
+    if (s && typeof s === "object") {
+      if (s.n >= LD_MIN && s.n <= LD_MAX) ld.n = s.n | 0;
+      if (Array.isArray(s.names)) s.names.slice(0, LD_MAX).forEach(function (v, i) { ld.names[i] = String(v || "").slice(0, 20); });
+      if (Array.isArray(s.results)) s.results.slice(0, LD_MAX).forEach(function (v, i) { ld.results[i] = String(v || "").slice(0, 20); });
+      if (typeof s.hideRes === "boolean") $("ldHideRes").checked = s.hideRes;
+      if (typeof s.hideLad === "boolean") $("ldHideLad").checked = s.hideLad;
+    } else {
+      ld.results[2] = "당첨";
+      for (var k = 0; k < ld.n; k++) if (!ld.results[k]) ld.results[k] = "꽝";
+    }
+  })();
+  function ldSave() {
+    try {
+      localStorage.setItem("toolbox-ladder", JSON.stringify({ n: ld.n, names: ld.names, results: ld.results,
+        hideRes: $("ldHideRes").checked, hideLad: $("ldHideLad").checked }));
+    } catch (err) { /* private window: settings simply aren't remembered */ }
+  }
+  function ldName(i) { return ld.names[i].trim() || (i + 1) + "번"; }
+  function ldResult(i) { return ld.results[i].trim() || "—"; }
+  function ldColor(c) { return LD_COLORS[c % LD_COLORS.length]; }
+
+  function ldGenerate() {
+    var n = ld.n, gaps = n - 1, slots = Math.max(9, Math.min(16, n + 5)), grid = [], s, g;
+    for (s = 0; s < slots; s++) {
+      var row = [];
+      for (g = 0; g < gaps; g++) row.push(!row[g - 1] && Math.random() < 0.42);
+      grid.push(row);
+    }
+    // every neighbouring pair of rails gets at least two rungs, so nobody is stuck near their own column
+    for (g = 0; g < gaps; g++) {
+      var count = 0;
+      for (s = 0; s < slots; s++) if (grid[s][g]) count++;
+      for (var tries = 0; count < 2 && tries < 80; tries++) {
+        s = Math.floor(Math.random() * slots);
+        if (grid[s][g] || grid[s][g - 1] || grid[s][g + 1]) continue;
+        grid[s][g] = true; count++;
+      }
+    }
+    ld.rungs = [];
+    for (s = 0; s < slots; s++) for (g = 0; g < gaps; g++) {
+      if (grid[s][g]) ld.rungs.push({ g: g, y: 0.06 + 0.88 * (s + 0.5 + (Math.random() - 0.5) * 0.5) / slots });
+    }
+    ld.rungs.sort(function (a, b) { return a.y - b.y; });
+  }
+  function ldTrace(start) {
+    var c = start, pts = [[c, 0]];
+    ld.rungs.forEach(function (r) {
+      if (r.g === c) { pts.push([c, r.y], [c + 1, r.y]); c++; }
+      else if (r.g === c - 1) { pts.push([c, r.y], [c - 1, r.y]); c--; }
+    });
+    pts.push([c, 1]);
+    return { pts: pts, end: c };
+  }
+  function ldPx(p) { return [(p[0] + 0.5) * ld.colW, p[1] * ld.H]; }
+  function ldLength(pts) {
+    var len = 0;
+    for (var i = 1; i < pts.length; i++) len += Math.abs(pts[i][0] - pts[i - 1][0]) + Math.abs(pts[i][1] - pts[i - 1][1]);
+    return len;
+  }
+
+  /* ---- drawing ---- */
+  function ldFull() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function ldRows() {
+    var n = ld.n, names = "", results = "";
+    for (var i = 0; i < n; i++) {
+      if (ld.mode === "setup") {
+        names += '<input class="ld-in" data-ld="name" data-i="' + i + '" maxlength="20" placeholder="' + (i + 1) + '번" value="' + esc(ld.names[i]) + '" aria-label="' + (i + 1) + '번째 참가자">';
+        results += '<input class="ld-in" data-ld="result" data-i="' + i + '" maxlength="20" placeholder="결과" value="' + esc(ld.results[i]) + '" aria-label="' + (i + 1) + '번째 결과">';
+      } else {
+        var P = ld.paths[i];
+        names += '<button type="button" class="ld-name' + (P ? " is-on" : "") + '" data-ld="play" data-i="' + i + '" style="--c:' + ldColor(i) + '">' + esc(ldName(i)) + "</button>";
+        results += '<div class="ld-res" data-r="' + i + '"></div>';
+      }
+    }
+    $("ldNames").innerHTML = names;
+    $("ldResults").innerHTML = results;
+    if (ld.mode === "play") for (var r = 0; r < n; r++) ldShowResult(r, false);
+  }
+  function ldShowResult(r, pop) {
+    var el = document.querySelector('#ldResults [data-r="' + r + '"]');
+    if (!el) return;
+    var by = null;
+    for (var k in ld.paths) if (ld.paths[k].end === r && ld.paths[k].done) by = ld.paths[k];
+    var hide = $("ldHideRes").checked && !by;
+    el.textContent = hide ? "?" : ldResult(r);
+    el.className = "ld-res" + (hide ? " is-hidden" : "") + (by ? " is-on" : "");
+    if (by) el.style.setProperty("--c", ldColor(by.c)); else el.style.removeProperty("--c");
+    if (by && !pop) el.style.animation = "none"; else el.style.animation = "";
+  }
+  function ldLayout() {
+    if (current !== "ladder") return;
+    var n = ld.n, full = !!ldFull();
+    var avail = $("ldScroll").clientWidth - 24;
+    ld.colW = Math.max(full ? 72 : 50, Math.floor(avail / n));
+    if (!full) ld.colW = Math.min(ld.colW, 150);
+    var W = ld.colW * n;
+    $("ldBoard").style.width = W + "px";
+    $("ldBoard").classList.toggle("is-narrow", ld.colW < 64);
+    var cols = "repeat(" + n + ", " + ld.colW + "px)";
+    $("ldNames").style.gridTemplateColumns = cols;
+    $("ldResults").style.gridTemplateColumns = cols;
+    if (full) {
+      var other = $("ldNames").offsetHeight + $("ldResults").offsetHeight + $("ldStage").querySelector(".bar").offsetHeight;
+      ld.H = Math.max(220, window.innerHeight - other - 120);
+    } else {
+      ld.H = n > 14 ? 400 : 340;
+    }
+    var svg = $("ldSvg");
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", ld.H + 24);
+    svg.setAttribute("viewBox", "0 -12 " + W + " " + (ld.H + 24));
+    ldDraw();
+  }
+  function ldDraw() {
+    var n = ld.n, svg = "", i;
+    for (i = 0; i < n; i++) {
+      var x = (i + 0.5) * ld.colW;
+      svg += '<line class="ld-rail" x1="' + x + '" y1="0" x2="' + x + '" y2="' + ld.H + '"/>';
+    }
+    var allDone = ld.order.length === n;
+    if (ld.mode === "play" && (!$("ldHideLad").checked || allDone)) {
+      ld.rungs.forEach(function (r) {
+        var y = r.y * ld.H;
+        svg += '<line class="ld-rung" x1="' + (r.g + 0.5) * ld.colW + '" y1="' + y + '" x2="' + (r.g + 1.5) * ld.colW + '" y2="' + y + '"/>';
+      });
+    }
+    for (var k in ld.paths) {
+      svg += '<polyline class="ld-path" data-p="' + k + '" stroke="' + ldColor(+k) + '" points=""/>' +
+        '<circle class="ld-head" data-h="' + k + '" r="9" fill="' + ldColor(+k) + '"/>';
+    }
+    $("ldSvg").innerHTML = svg;
+    for (var j in ld.paths) ldPaint(ld.paths[j]);
+  }
+  function ldPaint(P) {
+    var pts = P.trace.pts.map(ldPx), total = 0, i;
+    for (i = 1; i < pts.length; i++) total += Math.abs(pts[i][0] - pts[i - 1][0]) + Math.abs(pts[i][1] - pts[i - 1][1]);
+    var left = total * P.p, out = [pts[0]];
+    for (i = 1; i < pts.length && left > 0; i++) {
+      var seg = Math.abs(pts[i][0] - pts[i - 1][0]) + Math.abs(pts[i][1] - pts[i - 1][1]);
+      if (seg <= left) { out.push(pts[i]); left -= seg; continue; }
+      var t = left / seg;
+      out.push([pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * t, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * t]);
+      left = 0;
+    }
+    var line = $("ldSvg").querySelector('[data-p="' + P.c + '"]');
+    var head = $("ldSvg").querySelector('[data-h="' + P.c + '"]');
+    if (!line || !head) return;
+    line.setAttribute("points", out.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "));
+    var tip = out[out.length - 1];
+    head.setAttribute("cx", tip[0]); head.setAttribute("cy", tip[1]);
+    head.style.display = P.p > 0 && P.p < 1 ? "" : "none";
+  }
+
+  /* ---- playing ---- */
+  function ldTick(now) {
+    var running = false;
+    for (var k in ld.paths) {
+      var P = ld.paths[k];
+      if (P.done) continue;
+      if (P.t0 == null) P.t0 = now + P.delay;
+      P.p = Math.max(0, Math.min(1, (now - P.t0) / P.dur));
+      ldPaint(P);
+      if (P.p >= 1) ldArrive(P); else running = true;
+    }
+    ld.raf = running ? requestAnimationFrame(ldTick) : 0;
+  }
+  function ldPlay(c, delay) {
+    if (ld.mode !== "play" || ld.paths[c]) return;
+    var trace = ldTrace(c);
+    var px = ldLength(trace.pts.map(ldPx));
+    ld.paths[c] = { c: c, trace: trace, end: trace.end, p: 0, t0: null, delay: delay || 0, done: false,
+      dur: ldReduce ? 200 : Math.max(1600, Math.min(4200, px / 0.32)) };
+    var btn = document.querySelector('#ldNames [data-i="' + c + '"]');
+    if (btn) btn.classList.add("is-on");
+    ldDraw();
+    if (!ld.raf) ld.raf = requestAnimationFrame(ldTick);
+  }
+  function ldArrive(P) {
+    P.done = true;
+    ld.order.push(P.c);
+    ldShowResult(P.end, true);
+    $("ldStatus").textContent = ldName(P.c) + " → " + ldResult(P.end) + "  (" + ld.order.length + "/" + ld.n + "명)";
+    if (ld.order.length === ld.n) {
+      ldDraw();
+      $("ldAll").hidden = true;
+      $("ldStatus").textContent = ldFull() ? "모두 결과가 나왔습니다." : "모두 결과가 나왔습니다. 아래에서 결과를 복사할 수 있어요.";
+    }
+    ldSummary();
+  }
+  function ldSummary() {
+    $("ldSummary").hidden = !ld.order.length;
+    $("ldList").innerHTML = ld.order.map(function (c) {
+      return '<li style="--c:' + ldColor(c) + '"><i></i><b>' + esc(ldName(c)) + "</b><span>" + esc(ldResult(ld.paths[c].end)) + "</span></li>";
+    }).join("");
+  }
+  function ldReset() {
+    if (ld.raf) cancelAnimationFrame(ld.raf);
+    ld.raf = 0; ld.paths = {}; ld.order = [];
+    ldSummary();
+  }
+  function ldRender() {
+    var play = ld.mode === "play";
+    $("ldCount").textContent = ld.n + "명";
+    $("ldMinus").disabled = ld.n <= LD_MIN;
+    $("ldPlus").disabled = ld.n >= LD_MAX;
+    $("ldStart").hidden = play;
+    $("ldEdit").hidden = !play;
+    $("ldShuffle").hidden = !play;
+    $("ldAll").hidden = !play || ld.order.length === ld.n;
+    $("ldStatus").textContent = play ? "이름을 누르면 사다리를 탑니다." : "참가자 " + ld.n + "명. 이름과 결과를 적고 시작하세요.";
+    ldRows();
+    ldLayout();
+  }
+  function ldSetCount(n) {
+    n = Math.max(LD_MIN, Math.min(LD_MAX, n));
+    if (n === ld.n) return;
+    // a new column continues the result pattern already in use (꽝, or 1번째 2번째 ...)
+    var shown = ld.results.slice(0, ld.n), numbered = shown.length > 0 && shown.every(function (v, i) { return v === (i + 1) + "번째"; });
+    for (var i = ld.n; i < n; i++) {
+      if (ld.results[i].trim()) continue;
+      if (numbered) ld.results[i] = (i + 1) + "번째";
+      else if (shown.indexOf("꽝") !== -1) ld.results[i] = "꽝";
+    }
+    ld.n = n;
+    ld.mode = "setup";
+    ldReset();
+    ldRender();
+    ldSave();
+  }
+  function ldStart() {
+    var any = false;
+    for (var i = 0; i < ld.n; i++) if (ld.results[i].trim()) any = true;
+    if (!any) { toast("아래 결과 칸을 먼저 채워 주세요. \"결과 채우기\"를 쓰면 빠릅니다."); return; }
+    ldGenerate();
+    ldReset();
+    ld.mode = "play";
+    ldRender();
+  }
+  function ldSplit(text) {
+    var parts = /[\n\r,\t;]/.test(text) ? text.split(/[\n\r,\t;]+/) : text.split(/\s+/);
+    return parts.map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+
+  $("ldMinus").addEventListener("click", function () { ldSetCount(ld.n - 1); });
+  $("ldPlus").addEventListener("click", function () { ldSetCount(ld.n + 1); });
+  $("ldStart").addEventListener("click", ldStart);
+  $("ldEdit").addEventListener("click", function () { ld.mode = "setup"; ldReset(); ldRender(); });
+  $("ldShuffle").addEventListener("click", function () { ldGenerate(); ldReset(); ldRender(); toast("사다리를 새로 만들었습니다."); });
+  $("ldAll").addEventListener("click", function () {
+    var wait = 0;
+    for (var i = 0; i < ld.n; i++) if (!ld.paths[i]) { ldPlay(i, wait); wait += ldReduce ? 0 : 180; }
+  });
+  $("ldHideRes").addEventListener("change", function () { if (ld.mode === "play") for (var r = 0; r < ld.n; r++) ldShowResult(r, false); ldSave(); });
+  $("ldHideLad").addEventListener("change", function () { if (ld.mode === "play") ldDraw(); ldSave(); });
+  $("ldNames").addEventListener("click", function (e) {
+    var b = e.target.closest('[data-ld="play"]');
+    if (b) ldPlay(+b.dataset.i, 0);
+  });
+  $("panel-ladder").addEventListener("input", function (e) {
+    var t = e.target;
+    if (t.dataset.ld === "name") ld.names[+t.dataset.i] = t.value;
+    else if (t.dataset.ld === "result") ld.results[+t.dataset.i] = t.value;
+    else return;
+    ldSave();
+  });
+  $("panel-ladder").addEventListener("keydown", function (e) {
+    // Enter moves to the next box, so a class list can be typed without the mouse
+    var t = e.target;
+    if (e.key !== "Enter" || !t.dataset || (t.dataset.ld !== "name" && t.dataset.ld !== "result")) return;
+    e.preventDefault();
+    var next = document.querySelector('[data-ld="' + t.dataset.ld + '"][data-i="' + (+t.dataset.i + 1) + '"]');
+    if (next) next.focus(); else if (t.dataset.ld === "name") { var r0 = document.querySelector('[data-ld="result"][data-i="0"]'); if (r0) r0.focus(); }
+  });
+  $("ldPaste").addEventListener("input", function () {
+    var n = ldSplit(this.value).length;
+    $("ldPasteInfo").textContent = n ? n + "명" + (n > LD_MAX ? " (" + LD_MAX + "명까지만 넣습니다)" : "") : "";
+  });
+  $("ldPasteApply").addEventListener("click", function () {
+    var list = ldSplit($("ldPaste").value);
+    if (list.length < LD_MIN) { toast("이름을 두 명 이상 넣어 주세요."); return; }
+    if (list.length > LD_MAX) toast(LD_MAX + "명까지만 넣었습니다.");
+    list = list.slice(0, LD_MAX);
+    for (var i = 0; i < LD_MAX; i++) ld.names[i] = (list[i] || "").slice(0, 20);
+    ld.n = 0;
+    ldSetCount(list.length);
+    $("ldPaste").value = "";
+    $("ldPasteInfo").textContent = "";
+    $("ldPaste").closest("details").open = false;
+  });
+  function ldFill(values) {
+    for (var i = 0; i < ld.n; i++) ld.results[i] = values[i];
+    if (ld.mode !== "setup") { ld.mode = "setup"; ldReset(); }
+    ldRender();
+    ldSave();
+  }
+  $("ldFillWin").addEventListener("click", function () {
+    var k = Math.max(1, Math.min(ld.n, parseInt($("ldWin").value, 10) || 1));
+    $("ldWin").value = k;
+    var v = [];
+    for (var i = 0; i < ld.n; i++) v.push(i < k ? "당첨" : "꽝");
+    for (var j = v.length - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)), tmp = v[j]; v[j] = v[r]; v[r] = tmp; }
+    ldFill(v);
+  });
+  $("ldFillNum").addEventListener("click", function () {
+    var v = [];
+    for (var i = 0; i < ld.n; i++) v.push((i + 1) + "번째");
+    ldFill(v);
+  });
+  $("ldFillClear").addEventListener("click", function () {
+    var v = [];
+    for (var i = 0; i < ld.n; i++) v.push("");
+    ldFill(v);
+  });
+  $("ldCopy").addEventListener("click", function () {
+    var text = ld.order.map(function (c) { return ldName(c) + "\t" + ldResult(ld.paths[c].end); }).join("\n");
+    function done() { toast("결과를 복사했습니다. 엑셀이나 한글에 붙여 넣으세요."); }
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      document.body.removeChild(ta);
+      if (ok) done(); else toast("복사하지 못했습니다. 결과 목록을 직접 선택해 복사해 주세요.");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+  });
+  (function () {
+    var stage = $("ldStage");
+    var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (!req) { $("ldFull").hidden = true; return; }
+    $("ldFull").addEventListener("click", function () {
+      if (ldFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+      try {
+        var p = req.call(stage);
+        if (p && p.catch) p.catch(function () { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); });
+      } catch (err) { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); }
+    });
+    function changed() {
+      var on = ldFull() === stage;
+      stage.classList.toggle("is-full", on);
+      $("ldFull").textContent = on ? "크게 보기 닫기" : "크게 보기";
+      ldLayout();
+    }
+    document.addEventListener("fullscreenchange", changed);
+    document.addEventListener("webkitfullscreenchange", changed);
+  })();
+  var ldResizeQueued = false;
+  window.addEventListener("resize", function () {
+    if (ldResizeQueued) return;
+    ldResizeQueued = true;
+    requestAnimationFrame(function () { ldResizeQueued = false; ldLayout(); });
+  });
+  ldRender();
+
   /* ================= site: tool data, header, home, routing ================= */
   /*
    * To add a tool:
@@ -2616,10 +3441,14 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       popular: "음원 자르기", keywords: "음원 음악 소리 오디오 자르기 편집 페이드 mp3 m4a wav" },
     { id: "merge",   name: "음원 합치기",     desc: "여러 곡을 하나로",          category: "audio",    tint: "lilac",  icon: "merge",   short: "합치기", ready: true,  featured: true,
       keywords: "음원 음악 소리 오디오 합치기 병합 이어 붙이기 연결 크로스페이드 mp3 m4a wav" },
+    { id: "pitch",   name: "음원 키 변경",    desc: "빠르기는 그대로, 음높이만",  category: "audio",    tint: "pink",   icon: "pitch",   short: "키 변경", ready: true,
+      keywords: "음원 음악 노래 키 변경 조옮김 음높이 피치 반음 옥타브 반주 mr mp3 m4a wav" },
     { id: "convert", name: "표준문서 변환",   desc: "HWP DOC를 표준 형식으로",   category: "document", tint: "pink",   icon: "overlap", short: "표준문서", ready: true,  featured: true,
       keywords: "문서 변환 표준 hwp hwpx doc docx xls xlsx ppt pptx 한글 워드 엑셀 파워포인트 윈도우" },
     { id: "sign",    name: "서명 만들기",     desc: "투명 배경 서명 PNG",        category: "document", tint: "sky",    icon: "pen",     short: "서명", ready: true,
       keywords: "서명 사인 싸인 전자서명 도장 손글씨 그리기 투명 배경 png" },
+    { id: "ladder",  name: "사다리타기",      desc: "순서와 당번 공정하게",      category: "class",    tint: "teal",   icon: "ladder",  short: "사다리", ready: true,
+      keywords: "사다리 사다리타기 사다리게임 제비뽑기 추첨 뽑기 순서 당번 역할 발표 학생 학급 랜덤" },
     { id: "qr",      name: "QR코드 생성",     desc: "링크를 간편하게",           category: "other",    tint: "sky",    icon: "qr",      ready: false,
       keywords: "qr 큐알 링크 주소" },
     { id: "video-compress", name: "동영상 압축", desc: "용량 줄이고 공유하기",   category: "video",    tint: "pink",   icon: "video",   ready: false, keywords: "영상 동영상 압축 mp4" },
@@ -2640,7 +3469,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     layout: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
     grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     merge: '<path d="M4 6c6 0 7 6 12 6M4 18c6 0 7-6 12-6h4"/><path d="m17 9 3 3-3 3"/>',
+    pitch: '<path d="M9 18V5l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/>',
     pen: '<path d="M15 4.5a2.1 2.1 0 0 1 3 3L8.5 17 5 18l1-3.5Z"/><path d="M3 21.5c2.5-1.2 4.5-1.2 6 0s3.5 1.2 6 0 4-1 6 0"/>',
+    ladder: '<path d="M6 3v18M12 3v18M18 3v18M6 7h6M12 11h6M6 15h6M12 19h6"/>',
     chev: '<path d="m6 9 6 6 6-6"/>',
     arrow: '<path d="m9 6 6 6-6 6"/>'
   };
@@ -2755,6 +3586,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (current === "audio") drawWave(); else stopAudio();
     if (current === "sign") sResize();
     if (current !== "merge") stopMerge();
+    if (current !== "pitch") stopPitch();
+    if (current === "ladder") ldLayout();
+    else if (ldFull()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     markActive(name);
     closeMenus();
     if (scrollToTools && current === "home" && name !== "home") $("tools").scrollIntoView({ block: "start" });
@@ -2842,7 +3676,8 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "pdf") addPdfs(files);
     else if (current === "audio") loadAudio(files[0]);
     else if (current === "merge") addMerge(files);
-    else if (current === "home" || current === "convert" || current === "sign") return;
+    else if (current === "pitch") openPitch(files);
+    else if (current === "home" || current === "convert" || current === "sign" || current === "ladder") return;
     else addMosaic(files);
   });
 })();
