@@ -523,6 +523,13 @@ div.thumb { display: grid; place-items: center; font-family: var(--font-data); f
   .v-ctrl .btn { padding: 8px 2px; font-size: 13px; }
 }
 
+/* Video trim */
+#vcVideo { display: block; max-width: 100%; max-height: 62vh; width: auto; height: auto; background: #0e0f14; cursor: pointer; }
+.vc-track { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; padding-bottom: 6px; }
+.vc-track input[type="range"] { position: relative; flex: 1; width: auto; min-width: 0; margin: 0; }
+.vc-sel { position: absolute; bottom: 0; height: 4px; left: 0; width: 0; border-radius: 2px; background: var(--accent); opacity: .55; pointer-events: none; }
+.vc-marks { flex-wrap: wrap; }
+
 /* Signature pad */
 .sig-pad {
   position: relative;
@@ -1216,19 +1223,19 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   <section class="panel" id="panel-capture" hidden>
     <div>
       <p class="eyebrow">영상</p>
-      <h2>영상 장면 캡처</h2>
+      <h2>영상 프레임 캡처</h2>
       <p class="sub">영상에서 원하는 순간을 골라 사진으로 저장합니다.</p>
     </div>
     <div class="note v-why">
       <strong>스크린샷과 다른 점</strong>
       <ul>
         <li><b>원본 크기 그대로</b> 화면 크기와 상관없이 영상의 원래 해상도로 저장합니다.</li>
-        <li><b>장면만 깔끔하게</b> 재생 막대, 버튼, 검은 여백이 함께 찍히지 않습니다.</li>
-        <li><b>한 장면씩 골라서</b> 앞뒤로 한 장면씩 넘기며 가장 잘 나온 순간을 고릅니다.</li>
+        <li><b>프레임만 깔끔하게</b> 재생 막대, 버튼, 검은 여백이 함께 찍히지 않습니다.</li>
+        <li><b>한 프레임씩 골라서</b> 앞뒤로 한 프레임씩 넘기며 가장 잘 나온 순간을 고릅니다.</li>
         <li><b>여러 장 한꺼번에</b> 정한 간격마다 자동으로 뽑아 한 번에 저장합니다.</li>
       </ul>
     </div>
-    <div class="drop" id="vDrop" role="group" aria-label="장면을 뽑을 영상 파일 올리기">
+    <div class="drop" id="vDrop" role="group" aria-label="프레임을 뽑을 영상 파일 올리기">
       <strong>영상 파일을 여기에 끌어다 놓으세요</strong>
       <span>MP4, MOV, WEBM 등 한 번에 한 개씩 작업합니다</span>
       <button type="button" class="pick" id="vPick">파일 선택</button>
@@ -1236,7 +1243,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     </div>
     <div id="vWork" class="panel" hidden>
       <div class="stage v-stage">
-        <video id="vVideo" playsinline preload="auto" aria-label="장면을 고를 영상"></video>
+        <video id="vVideo" playsinline preload="auto" aria-label="프레임을 고를 영상"></video>
       </div>
       <div class="v-seek">
         <input type="range" id="vSeek" min="0" max="1000" step="1" value="0" aria-label="영상 위치">
@@ -1244,14 +1251,14 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       </div>
       <div class="v-ctrl">
         <button type="button" class="btn" id="vBack1" disabled title="1초 뒤로 (Shift + ←)">−1초</button>
-        <button type="button" class="btn" id="vPrev" disabled title="한 장면 뒤로 (←)">◀ 한 장면</button>
+        <button type="button" class="btn" id="vPrev" disabled title="한 프레임 뒤로 (←)">◀ 한 프레임</button>
         <button type="button" class="btn" id="vPlay" disabled title="재생 / 멈춤 (스페이스)">▶ 재생</button>
-        <button type="button" class="btn" id="vNext" disabled title="한 장면 앞으로 (→)">한 장면 ▶</button>
+        <button type="button" class="btn" id="vNext" disabled title="한 프레임 앞으로 (→)">한 프레임 ▶</button>
         <button type="button" class="btn" id="vFwd1" disabled title="1초 앞으로 (Shift + →)">+1초</button>
       </div>
       <div class="bar">
         <div class="count" id="vInfo" aria-live="polite"></div>
-        <button type="button" class="btn primary" id="vGrab" disabled>이 장면 담기</button>
+        <button type="button" class="btn primary" id="vGrab" disabled>이 프레임 담기</button>
       </div>
       <div class="settings">
         <div class="field">
@@ -1277,14 +1284,80 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
           <button type="button" class="btn" id="vSave">이 사진 저장</button>
           <button type="button" class="btn primary" id="vSaveAll">모두 저장 (ZIP)</button>
         </div>
-        <img id="vOut" alt="담은 장면 사진" hidden>
+        <img id="vOut" alt="담은 프레임 사진" hidden>
       </div>
     </div>
     <ul class="foot">
       <li>사진은 영상의 원래 해상도로 저장되고, 화면에 작게 보여도 결과는 같습니다. 원본 영상은 바뀌지 않습니다.</li>
-      <li>키보드로는 ← → 로 한 장면씩, Shift를 함께 누르면 1초씩 움직이고, 스페이스로 재생과 멈춤을 합니다.</li>
+      <li>키보드로는 ← → 로 한 프레임씩, Shift를 함께 누르면 1초씩 움직이고, 스페이스로 재생과 멈춤을 합니다.</li>
       <li>휴대폰과 아이폰으로 찍은 영상(MP4, MOV)은 대부분 됩니다. 아이폰 고화질(HEVC) 영상은 크롬이나 파이어폭스에서 안 열릴 수 있으니 사파리나 엣지로 열어 보세요.</li>
       <li>아이폰 HDR 영상은 사진의 색이 화면보다 조금 옅게 나올 수 있습니다. 유튜브 같은 사이트의 영상은 안 되고, 기기에 있는 영상 파일만 됩니다.</li>
+    </ul>
+  </section>
+
+  <!-- ===== Video trim ===== -->
+  <section class="panel" id="panel-vcut" hidden>
+    <div>
+      <p class="eyebrow">영상</p>
+      <h2>영상 자르기</h2>
+      <p class="sub">필요한 구간만 남겨 새 영상으로 저장합니다. 다시 만들지 않고 원본을 그대로 떼어 내서 화질이 그대로입니다.</p>
+    </div>
+    <div class="drop" id="vcDrop" role="group" aria-label="자를 영상 파일 올리기">
+      <strong>영상 파일을 여기에 끌어다 놓으세요</strong>
+      <span>MP4, MOV, WEBM, MKV 중 한 번에 한 개씩 작업합니다</span>
+      <button type="button" class="pick" id="vcPick">파일 선택</button>
+      <input type="file" id="vcInput" accept="video/*,.mp4,.m4v,.mov,.webm,.mkv" hidden>
+    </div>
+    <div id="vcWork" class="panel" hidden>
+      <div class="stage v-stage" id="vcStage">
+        <video id="vcVideo" playsinline preload="auto" aria-label="자를 영상"></video>
+      </div>
+      <div class="note" id="vcNoView" hidden>이 브라우저는 이 영상을 화면에 보여 주지 못합니다. 자르기는 되니 시간을 직접 적어 주세요.</div>
+      <div id="vcViewCtrl">
+        <div class="v-seek">
+          <div class="vc-track">
+            <div class="vc-sel" id="vcSel"></div>
+            <input type="range" id="vcSeek" min="0" max="1000" step="1" value="0" aria-label="영상 위치">
+          </div>
+          <span class="v-time" id="vcTime">00:00.00 / 00:00.00</span>
+        </div>
+        <div class="v-ctrl">
+          <button type="button" class="btn" id="vcBack1" title="1초 뒤로 (Shift + ←)">−1초</button>
+          <button type="button" class="btn" id="vcPrev" title="한 프레임 뒤로 (←)">◀ 한 프레임</button>
+          <button type="button" class="btn" id="vcPlay" title="재생 / 멈춤 (스페이스)">▶ 재생</button>
+          <button type="button" class="btn" id="vcNext" title="한 프레임 앞으로 (→)">한 프레임 ▶</button>
+          <button type="button" class="btn" id="vcFwd1" title="1초 앞으로 (Shift + →)">+1초</button>
+        </div>
+      </div>
+      <div class="settings">
+        <div class="field">
+          <label class="label" for="vcStart">구간</label>
+          <input type="text" class="time-in" id="vcStart" inputmode="decimal" aria-label="구간 시작 (분:초)">
+          <span class="label">부터</span>
+          <input type="text" class="time-in" id="vcEnd" inputmode="decimal" aria-label="구간 끝 (분:초)">
+          <span class="label">까지</span>
+        </div>
+        <div class="field vc-marks">
+          <button type="button" class="btn small" id="vcMarkS">지금을 시작으로</button>
+          <button type="button" class="btn small" id="vcMarkE">지금을 끝으로</button>
+          <button type="button" class="btn small" id="vcTry">▶ 구간 미리 보기</button>
+        </div>
+        <div class="field">
+          <label class="check"><input type="checkbox" id="vcMute"> 소리 빼기</label>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="vcInfo" aria-live="polite"></div>
+        <button type="button" class="btn primary" id="vcExport" disabled>잘라서 저장</button>
+      </div>
+      <div class="note" id="vcZipNote" hidden>Claude 화면에서는 영상 파일을 바로 저장할 수 없어서, 결과를 ZIP 파일에 담아 저장합니다. ZIP을 풀면 영상 파일이 들어 있습니다.</div>
+    </div>
+    <ul class="foot">
+      <li>영상을 다시 만들지 않으니 화질과 음질이 원본과 같고, 4K나 긴 영상도 금방 끝납니다. 결과는 원본과 같은 형식으로 저장됩니다.</li>
+      <li>MP4와 MOV는 정한 순간부터 재생됩니다. 다만 일부 편집 프로그램에서는 시작 앞쪽 1~2초가 더 보일 수 있고, WEBM과 MKV는 시작이 최대 몇 초 앞당겨질 수 있습니다.</li>
+      <li>원본은 필요한 부분만 읽어서 큰 파일도 열 수 있지만, 잘라 낸 결과는 이 기기 메모리에 담습니다. 결과가 컴퓨터는 1GB, 휴대폰은 300MB 안팎을 넘으면 멈출 수 있으니 구간을 나눠 저장하세요.</li>
+      <li>처음 쓸 때 영상 처리 도구(약 0.7MB)를 인터넷에서 받아 옵니다. 영상 파일은 이 기기 밖으로 나가지 않습니다.</li>
+      <li>아이폰 고화질(HEVC) 영상은 크롬에서 화면이 안 보일 수 있지만, 시간을 적으면 자를 수 있습니다. AVI, WMV처럼 오래된 형식은 자를 수 없습니다.</li>
     </ul>
   </section>
 
@@ -3556,7 +3629,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       b.type = "button";
       b.className = "chip wide";
       b.setAttribute("aria-pressed", it === V.active ? "true" : "false");
-      b.setAttribute("aria-label", (i + 1) + "번째 장면, " + vClock(it.t));
+      b.setAttribute("aria-label", (i + 1) + "번째 프레임, " + vClock(it.t));
       var img = document.createElement("img");
       img.alt = ""; img.src = it.thumb;
       var lab = document.createElement("span");
@@ -3724,7 +3797,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     V.busy = false; V.ready = true;
     vRefresh();
     vRenderList();
-    toast("영상을 열었습니다. 원하는 장면에서 \"이 장면 담기\"를 누르세요.");
+    toast("영상을 열었습니다. 원하는 프레임에서 \"이 프레임 담기\"를 누르세요.");
   }
   wireDrop($("vDrop"), $("vInput"), $("vPick"), openCapture);
   document.querySelectorAll('input[name="vfmt"]').forEach(function (r) {
@@ -3782,9 +3855,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       $("vOut").hidden = true;
       vRenderList();
       $("vStrip").lastChild.scrollIntoView({ block: "nearest", inline: "nearest" });
-      toast(vClock(it.t) + " 장면을 담았습니다 (" + it.w + "×" + it.h + ")");
+      toast(vClock(it.t) + " 프레임을 담았습니다 (" + it.w + "×" + it.h + ")");
     } catch (e) {
-      toast("이 장면을 사진으로 만들지 못했습니다.");
+      toast("이 프레임을 사진으로 만들지 못했습니다.");
     }
   });
 
@@ -3848,7 +3921,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       if (entries.length === 1) await saveFile(entries[0].name, entries[0].blob);
       else {
         var one = V.items.every(function (it) { return it.base === V.items[0].base; });
-        await saveZip(entries, (one ? V.items[0].base + "_" : "") + "장면.zip");
+        await saveZip(entries, (one ? V.items[0].base + "_" : "") + "프레임.zip");
       }
     } catch (e) {
       toast("ZIP으로 묶지 못했습니다. 한 장씩 저장해 주세요.");
@@ -3890,6 +3963,324 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     } else if (e.key === " " && tag !== "BUTTON") {
       e.preventDefault();
       $("vPlay").click();
+    }
+  });
+
+  /* ================= Video trim ================= */
+  // Cuts without re-encoding: mediabunny copies the original packets between the two points into a new file
+  // of the same kind. In MP4/MOV the lead-in back to the previous key frame is kept but hidden by an edit list,
+  // so players start on the chosen frame; WebM/MKV have no such list and start at that key frame instead.
+  var MEDIABUNNY = "https://cdn.jsdelivr.net/npm/mediabunny@1.62.1/dist/bundles/mediabunny.min.mjs";
+  var VC = { file: null, url: null, view: false, ready: false, busy: false, dur: 0, s: 0, e: 0, fd: 1 / 30,
+             kind: "mp4", stopAt: -1, seeking: false, token: 0 };
+  var vcv = $("vcVideo");
+  var mbP = null;
+  if (inViewer) $("vcZipNote").hidden = false;
+  function loadMB() {
+    if (!mbP) mbP = import(MEDIABUNNY).catch(function (e) { mbP = null; throw e; });
+    return mbP;
+  }
+  function vcLock() { return !VC.ready || VC.busy; }
+  function vcClamp() {
+    VC.s = Math.max(0, Math.min(VC.s, VC.dur));
+    VC.e = Math.max(0, Math.min(VC.e, VC.dur));
+  }
+  function vcRefresh() {
+    if (!VC.file) return;
+    var dur = VC.dur, t = vcv.currentTime || 0, lock = vcLock();
+    $("vcTime").textContent = vClock(t) + " / " + vClock(dur);
+    if (!VC.seeking) $("vcSeek").value = dur ? Math.round(t / dur * 1000) : 0;
+    $("vcPlay").textContent = vcv.paused ? "▶ 재생" : "■ 멈춤";
+    $("vcTry").textContent = !vcv.paused && VC.stopAt >= 0 ? "■ 미리 보기 멈춤" : "▶ 구간 미리 보기";
+    ["vcBack1", "vcPrev", "vcNext", "vcFwd1", "vcPlay", "vcSeek", "vcMarkS", "vcMarkE", "vcTry"].forEach(function (id) {
+      $(id).disabled = lock || !VC.view;
+    });
+    ["vcStart", "vcEnd", "vcMute"].forEach(function (id) { $(id).disabled = lock; });
+    var len = VC.e - VC.s, okLen = len >= 0.1;
+    $("vcExport").disabled = lock || !okLen;
+    var sel = $("vcSel");
+    sel.style.left = (dur ? VC.s / dur * 100 : 0) + "%";
+    sel.style.width = (dur && okLen ? len / dur * 100 : 0) + "%";
+    if (VC.busy) return;
+    if (!VC.ready) { $("vcInfo").textContent = "영상을 여는 중…"; return; }
+    $("vcInfo").textContent = okLen
+      ? "남길 길이 " + vClock(len) + " · 약 " + fmtSize(VC.file.size * len / Math.max(dur, 0.001))
+      : "끝이 시작보다 뒤에 오도록 구간을 정해 주세요.";
+  }
+  function vcSetInputs() {
+    $("vcStart").value = vClock(VC.s);
+    $("vcEnd").value = vClock(VC.e);
+  }
+  function stopVcut() {
+    VC.stopAt = -1;
+    if (!vcv.paused) vcv.pause();
+  }
+
+  function vcSeekTo(t) {
+    return new Promise(function (res) {
+      var done = false, seeked = false, framed = !vcv.requestVideoFrameCallback;
+      function fin() {
+        if (done) return;
+        done = true; clearTimeout(to);
+        vcv.removeEventListener("seeked", onSeeked);
+        vcRefresh();
+        res();
+      }
+      function onSeeked() { seeked = true; if (framed) fin(); else setTimeout(fin, 300); }
+      if (vcv.requestVideoFrameCallback) vcv.requestVideoFrameCallback(function () { framed = true; if (seeked) fin(); });
+      vcv.addEventListener("seeked", onSeeked);
+      var to = setTimeout(fin, 5000);
+      vcv.currentTime = Math.max(0, VC.dur ? Math.min(t, VC.dur - 0.001) : t);
+    });
+  }
+  function vcStep(dir) {
+    if (vcLock() || !VC.view) return;
+    stopVcut();
+    var fd = VC.fd, idx = Math.floor(vcv.currentTime / fd + 0.001);
+    vcSeekTo(Math.max(0, (idx + dir) * fd + fd * 0.5));
+  }
+  function vcJump(sec) {
+    if (vcLock() || !VC.view) return;
+    stopVcut();
+    vcSeekTo(Math.max(0, vcv.currentTime + sec));
+  }
+  // Stops the range preview at the end point, checking every drawn frame where the browser allows it.
+  function vcWatchStop() {
+    function chk() {
+      if (VC.stopAt < 0 || vcv.paused) return;
+      if (vcv.currentTime >= VC.stopAt) { var at = VC.stopAt; stopVcut(); vcv.currentTime = at; vcRefresh(); return; }
+      if (vcv.requestVideoFrameCallback) vcv.requestVideoFrameCallback(chk); else setTimeout(chk, 40);
+    }
+    chk();
+  }
+  vcv.addEventListener("play", vcRefresh);
+  vcv.addEventListener("pause", vcRefresh);
+  vcv.addEventListener("timeupdate", function () {
+    if (VC.stopAt >= 0 && vcv.currentTime >= VC.stopAt) { var at = VC.stopAt; stopVcut(); vcv.currentTime = at; }
+    vcRefresh();
+  });
+  vcv.addEventListener("ended", function () { VC.stopAt = -1; vcRefresh(); });
+  vcv.addEventListener("click", function () { if (!vcLock()) $("vcPlay").click(); });
+
+  function vcLoadSrc(src) {
+    return new Promise(function (res, rej) {
+      var to = setTimeout(bad, 20000);
+      function ok() { off(); res(); }
+      function bad() { off(); rej(new Error("video")); }
+      function off() { clearTimeout(to); vcv.removeEventListener("loadeddata", ok); vcv.removeEventListener("error", bad); }
+      vcv.addEventListener("loadeddata", ok);
+      vcv.addEventListener("error", bad);
+      vcv.src = src;
+      vcv.load();
+    });
+  }
+  // Shows the video in the browser's own player; false when this browser cannot draw it.
+  async function vcOpenView(file) {
+    try {
+      VC.url = URL.createObjectURL(file);
+      await vcLoadSrc(VC.url);
+      if (vcv.videoWidth) return true;
+    } catch (e) {}
+    if (file.size <= V_DATA_MAX) {
+      try {
+        await vcLoadSrc(await blobToDataUrl(file));
+        if (vcv.videoWidth) return true;
+      } catch (e2) {}
+    }
+    vcv.removeAttribute("src"); vcv.load();
+    return false;
+  }
+  // Reads the file's layout (container, tracks, length) without loading the whole file.
+  async function vcProbe(MB, file) {
+    var input = new MB.Input({ source: new MB.BlobSource(file), formats: MB.ALL_FORMATS });
+    try {
+      var fmt = await input.getFormat();
+      var video = await input.getPrimaryVideoTrack();
+      if (!video) throw new Error("novideo");
+      var info = { kind: fmt === MB.QTFF ? "mov" : fmt === MB.WEBM ? "webm" : fmt === MB.MATROSKA ? "mkv" : "mp4",
+                   dur: await input.computeDuration(), fd: 1 / 30,
+                   w: await video.getDisplayWidth(), h: await video.getDisplayHeight() };
+      try {
+        var st = await video.computePacketStats(120);
+        if (st.averagePacketRate > 5 && st.averagePacketRate < 250) info.fd = 1 / st.averagePacketRate;
+      } catch (e) {}
+      return info;
+    } finally {
+      input.dispose();
+    }
+  }
+
+  async function openVcut(fileList) {
+    var file = fileList && fileList[0];
+    if (!file || VC.busy) return;
+    stopVcut();
+    var token = ++VC.token;
+    VC.busy = true; VC.ready = false;
+    vcRefresh();
+    toast("영상을 여는 중…");
+    if (VC.url) { URL.revokeObjectURL(VC.url); VC.url = null; }
+    var MB, info;
+    try {
+      MB = await loadMB();
+    } catch (e) {
+      VC.busy = false; vcRefresh();
+      toast("영상 처리 도구를 불러오지 못했습니다. 인터넷 연결을 확인하고 다시 해 보세요.");
+      return;
+    }
+    try {
+      info = await vcProbe(MB, file);
+    } catch (e) {
+      VC.busy = false; vcRefresh();
+      toast(e && e.message === "novideo" ? "화면이 들어 있지 않은 파일입니다."
+        : "이 파일은 자를 수 없습니다. MP4, MOV, WEBM, MKV 영상만 됩니다.");
+      return;
+    }
+    if (token !== VC.token) return;
+    VC.file = file;
+    VC.kind = info.kind; VC.fd = info.fd;
+    $("vcWork").hidden = false;
+    $("vcInfo").textContent = "영상을 여는 중…";
+    var view = await vcOpenView(file);
+    VC.view = view;
+    $("vcStage").hidden = !view;
+    $("vcViewCtrl").hidden = !view;
+    $("vcNoView").hidden = view;
+    VC.dur = info.dur > 0 ? info.dur : (view && isFinite(vcv.duration) ? vcv.duration : 0);
+    VC.s = 0; VC.e = VC.dur;
+    vcSetInputs();
+    VC.busy = false; VC.ready = VC.dur > 0;
+    vcRefresh();
+    if (!VC.ready) { toast("영상 길이를 알 수 없어 자를 수 없습니다."); return; }
+    toast(view ? "영상을 열었습니다. 시작과 끝을 정한 뒤 \"잘라서 저장\"을 누르세요."
+      : "화면은 볼 수 없지만, 시간을 적어 자를 수 있습니다.");
+  }
+  wireDrop($("vcDrop"), $("vcInput"), $("vcPick"), openVcut);
+
+  function vcReadInput(el, isEnd) {
+    var t = parseTime(el.value);
+    if (!isFinite(t)) { vcSetInputs(); toast("시간은 1:23.5처럼 분:초로 적어 주세요."); return; }
+    if (isEnd) VC.e = t; else VC.s = t;
+    vcClamp();
+    vcSetInputs();
+    vcRefresh();
+  }
+  $("vcStart").addEventListener("change", function () { vcReadInput(this, false); });
+  $("vcEnd").addEventListener("change", function () { vcReadInput(this, true); });
+  $("vcMarkS").addEventListener("click", function () {
+    if (vcLock()) return;
+    VC.s = vcv.currentTime || 0;
+    if (VC.e <= VC.s) VC.e = VC.dur;
+    vcClamp(); vcSetInputs(); vcRefresh();
+  });
+  $("vcMarkE").addEventListener("click", function () {
+    if (vcLock()) return;
+    VC.e = vcv.currentTime || 0;
+    if (VC.e <= VC.s) VC.s = 0;
+    vcClamp(); vcSetInputs(); vcRefresh();
+  });
+  $("vcPlay").addEventListener("click", function () {
+    if (vcLock() || !VC.view) return;
+    VC.stopAt = -1;
+    if (vcv.paused) { if (vcv.ended) vcv.currentTime = 0; vcv.play().catch(function () {}); }
+    else vcv.pause();
+  });
+  $("vcTry").addEventListener("click", async function () {
+    if (vcLock() || !VC.view) return;
+    if (!vcv.paused && VC.stopAt >= 0) { stopVcut(); return; }
+    if (VC.e - VC.s < 0.1) return;
+    vcv.pause();
+    await vcSeekTo(VC.s);
+    VC.stopAt = VC.e;
+    vcv.play().then(vcWatchStop).catch(function () { VC.stopAt = -1; });
+    vcRefresh();
+  });
+  $("vcPrev").addEventListener("click", function () { vcStep(-1); });
+  $("vcNext").addEventListener("click", function () { vcStep(1); });
+  $("vcBack1").addEventListener("click", function () { vcJump(-1); });
+  $("vcFwd1").addEventListener("click", function () { vcJump(1); });
+  $("vcSeek").addEventListener("input", function () {
+    if (vcLock()) return;
+    VC.seeking = true;
+    stopVcut();
+    if (VC.dur) vcv.currentTime = Math.min(VC.dur - 0.001, this.value / 1000 * VC.dur);
+  });
+  $("vcSeek").addEventListener("change", function () { VC.seeking = false; vcRefresh(); });
+
+  $("vcExport").addEventListener("click", async function () {
+    if (vcLock() || VC.e - VC.s < 0.1) return;
+    stopVcut();
+    var btn = $("vcExport");
+    VC.busy = true;
+    vcRefresh();
+    btn.textContent = "자르는 중…";
+    var lostAudio = false, blob = null, kind = VC.kind, start = VC.s;
+    try {
+      var MB = await loadMB();
+      var input = new MB.Input({ source: new MB.BlobSource(VC.file), formats: MB.ALL_FORMATS });
+      var format = kind === "mov" ? new MB.MovOutputFormat({ fastStart: "in-memory" })
+        : kind === "webm" ? new MB.WebMOutputFormat()
+        : kind === "mkv" ? new MB.MkvOutputFormat()
+        : new MB.Mp4OutputFormat({ fastStart: "in-memory" });
+      var output = new MB.Output({ format: format, target: new MB.BufferTarget() });
+      // WebM/MKV cannot hide a lead-in, so the start moves back to the key frame at or before it.
+      if (kind === "webm" || kind === "mkv") {
+        try {
+          var key = await new MB.EncodedPacketSink(await input.getPrimaryVideoTrack()).getKeyPacket(VC.s);
+          if (key && key.timestamp < VC.s) start = Math.max(0, key.timestamp);
+        } catch (e) {}
+      }
+      var conv = await MB.Conversion.init({
+        input: input, output: output,
+        trim: { start: start, end: VC.e },
+        audio: $("vcMute").checked ? { discard: true } : {},
+        copy: { mode: "forced" },
+        showWarnings: false
+      });
+      conv.discardedTracks.forEach(function (d) {
+        if (d.track.type === "audio" && d.reason !== "discarded_by_user") lostAudio = true;
+      });
+      var hasVideo = conv.utilizedTracks.some(function (t) { return t.type === "video"; });
+      if (!conv.isValid || !hasVideo) throw new Error("copy");
+      conv.onProgress = function (p) { btn.textContent = "자르는 중… " + Math.round(p * 100) + "%"; };
+      await conv.execute();
+      input.dispose();
+      blob = new Blob([output.target.buffer], { type: format.mimeType });
+    } catch (e) {
+      var big = e instanceof RangeError || /memory|allocation|array buffer/i.test(String(e && e.message));
+      toast(big ? "결과가 너무 커서 만들지 못했습니다. 구간을 짧게 나눠 저장해 주세요."
+        : e && e.message === "copy" ? "이 영상은 다시 만들지 않고는 자를 수 없는 형식입니다."
+        : "영상을 자르지 못했습니다.");
+    }
+    btn.textContent = "잘라서 저장";
+    if (blob) {
+      var ext = kind === "mov" ? "mov" : kind === "webm" ? "webm" : kind === "mkv" ? "mkv" : "mp4";
+      var base = baseName(VC.file.name) + "_자르기";
+      try {
+        // The Claude viewer cannot save video files directly, so there the result goes inside a ZIP.
+        if (inViewer) await saveZip([{ name: base + "." + ext, blob: blob }], base + ".zip");
+        else await saveFile(base + "." + ext, blob);
+        var later = [];
+        if (start < VC.s - 0.01) later.push("이 형식은 시작 지점이 앞쪽 프레임(" + vClock(start) + ")에 맞춰졌습니다.");
+        if (lostAudio) later.push("소리는 이 형식에 그대로 담을 수 없어 빼고 저장했습니다.");
+        if (later.length) setTimeout(function () { toast(later.join(" ")); }, 3300);
+      } catch (e) {
+        toast("파일을 저장하지 못했습니다.");
+      }
+    }
+    VC.busy = false;
+    vcRefresh();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (current !== "vcut" || vcLock() || !VC.view) return;
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      var dir = e.key === "ArrowLeft" ? -1 : 1;
+      if (e.shiftKey) vcJump(dir); else vcStep(dir);
+    } else if (e.key === " " && tag !== "BUTTON") {
+      e.preventDefault();
+      $("vcPlay").click();
     }
   });
 
@@ -4994,8 +5385,10 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       keywords: "qr 큐알 링크 주소" },
     { id: "extract", name: "영상에서 음원 추출", desc: "영상 속 소리만 MP3로", category: "video",  tint: "purple", icon: "extract", short: "음원 추출", ready: true,
       keywords: "영상 동영상 비디오 음원 소리 오디오 추출 뽑기 꺼내기 분리 배경음악 bgm 녹화 mp4 mov m4v webm mp3 wav" },
-    { id: "capture", name: "영상 장면 캡처", desc: "원하는 순간을 사진으로", category: "video", tint: "blue", icon: "capture", short: "장면 캡처", ready: true,
-      keywords: "영상 동영상 비디오 장면 캡처 캡쳐 스크린샷 스샷 화면 사진 이미지 프레임 정지 화면 썸네일 저장 원본 고화질 jpg png mp4 mov" },
+    { id: "capture", name: "영상 프레임 캡처", desc: "원하는 순간을 사진으로", category: "video", tint: "blue", icon: "capture", short: "프레임 캡처", ready: true,
+      keywords: "영상 동영상 비디오 프레임 캡처 장면 캡쳐 스크린샷 스샷 화면 사진 이미지 프레임 정지 화면 썸네일 저장 원본 고화질 jpg png mp4 mov" },
+    { id: "vcut", name: "영상 자르기", desc: "필요한 구간만 화질 그대로", category: "video", tint: "green", icon: "scissors", short: "영상 자르기", ready: true,
+      keywords: "영상 동영상 비디오 자르기 잘라내기 컷 편집 구간 부분 일부 앞뒤 트림 trim 클립 수업 영상 mp4 mov webm mkv" },
     { id: "video-compress", name: "동영상 압축", desc: "용량 줄이고 공유하기",   category: "video",    tint: "pink",   icon: "video",   ready: false, keywords: "영상 동영상 압축 mp4" },
     { id: "groups",  name: "모둠 편성",       desc: "조건에 맞게 모둠 나누기",   category: "class",    tint: "teal",   icon: "users",   ready: false, keywords: "모둠 조 편성 학생" },
     { id: "seat",    name: "자리 배치",       desc: "학급 자리 간편하게",        category: "class",    tint: "lilac",  icon: "layout",  ready: false, keywords: "자리 좌석 배치 학생" }
@@ -5012,6 +5405,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     video: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4Z"/>',
     capture: '<path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><circle cx="12" cy="12" r="3.5"/>',
     extract: '<rect x="2" y="5" width="13" height="14" rx="2"/><path d="m7 9.5 4 2.5-4 2.5Z"/><path d="M18.5 9v6M21.5 7v10"/>',
+    scissors: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
     users: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M18 11a3 3 0 0 0 0-6m1 10a5 5 0 0 1 3 5"/>',
     layout: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
     grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -5138,6 +5532,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (current !== "pitch") stopPitch();
     if (current !== "extract") stopExtract();
     if (current !== "capture") stopCapture();
+    if (current !== "vcut") stopVcut();
     if (current === "ladder") ldLayout();
     if (current === "roulette") rlLayout();
     if (ldFull() && !$("panel-" + current).contains(ldFull())) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
@@ -5232,6 +5627,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "pitch") openPitch(files);
     else if (current === "extract") openExtract(files);
     else if (current === "capture") openCapture(files);
+    else if (current === "vcut") openVcut(files);
     else if (current === "home" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette") return;
     else addMosaic(files);
   });
