@@ -599,6 +599,72 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .ld-list b { font-weight: 700; overflow-wrap: anywhere; }
 .ld-list span { margin-left: auto; padding-left: 8px; font-weight: 700; color: var(--c); text-align: right; overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) { .ld-res.is-on { animation: none; } }
+/* Roulette */
+.rl-edit { display: flex; flex-direction: column; gap: 10px; }
+.rl-edit-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 14px; }
+.rl-edit-head label { font-weight: 700; }
+.rl-edit-head label span { color: var(--muted); font-weight: 500; }
+.rl-edit-head #rlInfo { color: var(--muted); font-size: 13px; }
+.rl-text {
+  display: block; width: 100%; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--surface);
+  font: inherit; font-size: 15px; line-height: 1.55; resize: vertical;
+}
+.rl-text:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.rl-stage { display: flex; flex-direction: column; gap: 14px; }
+.rl-title-field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.rl-title-field label { font-weight: 700; }
+.rl-title-in {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); font-size: 16px; font-weight: 700;
+}
+.rl-title-in:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.rl-title { margin: -6px 0 22px; text-align: center; font-size: 26px; font-weight: 900; letter-spacing: -0.6px; line-height: 1.3; overflow-wrap: anywhere; }
+.rl-stage.is-full .rl-title { font-size: 44px; margin: -14px 0 26px; }
+.ld-hint { color: var(--muted); font-size: 13px; }
+.panel.is-drop { outline: 2px dashed var(--accent); outline-offset: 10px; border-radius: 12px; }
+.rl-box { padding: 26px 12px 18px; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--radius-card); }
+.rl-wheel { position: relative; margin-inline: auto; }
+.rl-wheel canvas { display: block; width: 100%; height: 100%; border-radius: 50%; cursor: pointer; }
+.rl-pointer {
+  position: absolute; top: -14px; left: 50%; z-index: 1;
+  width: 34px; height: 42px; margin-left: -17px;
+  background: var(--fg); clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 12%; transform: rotate(var(--k, 0deg));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .25));
+  pointer-events: none;
+}
+.rl-hub {
+  position: absolute; left: 50%; top: 50%; z-index: 1;
+  width: 23%; aspect-ratio: 1; min-width: 64px; transform: translate(-50%, -50%);
+  padding: 0; border: 4px solid #fff; border-radius: 50%;
+  background: var(--accent); color: var(--accent-fg);
+  box-shadow: 0 4px 14px rgba(33, 34, 86, .28);
+  font-size: 16px; font-weight: 800; cursor: pointer;
+}
+.rl-hub:hover { background: var(--accent-dark); }
+.rl-hub[disabled] { cursor: default; background: #8f84f0; }
+.rl-result {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 14px 16px; border: 2px solid var(--accent); border-radius: var(--radius-card);
+  background: var(--accent-soft); text-align: center;
+}
+.rl-result small { color: var(--accent-dark); font-size: 13px; font-weight: 700; }
+.rl-result strong { font-size: 32px; font-weight: 900; line-height: 1.25; letter-spacing: -0.5px; color: var(--fg); overflow-wrap: anywhere; }
+.rl-result.is-empty { border: 1px dashed var(--line); background: var(--surface); }
+.rl-result.is-empty small { color: var(--subtle); }
+.rl-result.is-empty strong { color: var(--subtle); font-size: 20px; font-weight: 700; }
+.rl-result.is-pop strong { animation: ld-pop .45s ease-out; }
+.rl-stage .bar { border-top: 0; padding-top: 0; }
+.rl-stage.is-full { background: #fff; padding: 24px 28px; overflow: auto; justify-content: center; }
+.rl-stage.is-full .rl-box { background: #fff; border: 0; padding-top: 30px; }
+.rl-stage.is-full .rl-hub { font-size: 24px; border-width: 6px; }
+.rl-stage.is-full .rl-result strong { font-size: 56px; }
+.rl-stage.is-full .rl-result.is-empty strong { font-size: 28px; }
+.rl-stage.is-full .rl-result small { font-size: 18px; }
+.rl-stage.is-full .bar .count { font-size: 20px; }
+.rl-sum-btns { display: flex; gap: 6px; }
+@media (prefers-reduced-motion: reduce) { .rl-result.is-pop strong { animation: none; } }
 /* Audio key change */
 .key-box { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 8px 0 4px; }
 .key-step { width: 56px; height: 56px; padding: 0; border-radius: 50%; font-size: 26px; line-height: 1; justify-content: center; }
@@ -1093,6 +1159,12 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <div class="field"><label class="check"><input type="checkbox" id="ldHideLad"> 사다리 가리기</label></div>
     </div>
     <div class="ld-fill">
+      <div class="field">
+        <span class="label">이름 불러오기</span>
+        <button type="button" class="btn small primary" id="ldRoster">명렬표 엑셀 불러오기</button>
+        <input type="file" id="ldRosterIn" accept=".xlsx,.xls,.csv" hidden>
+        <span class="ld-hint">나이스 학생 명렬표에서 이름만 읽어 위 칸에 넣습니다. 파일을 끌어다 놓아도 됩니다.</span>
+      </div>
       <details class="ld-paste">
         <summary>이름 한꺼번에 넣기</summary>
         <textarea id="ldPaste" rows="4" placeholder="명렬표나 엑셀에서 이름을 복사해 붙여 넣으세요.&#10;줄바꿈, 쉼표, 띄어쓰기 어느 것으로 나뉘어 있어도 됩니다."></textarea>
@@ -1131,6 +1203,68 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <li>사다리는 시작할 때마다 새로 만들어집니다. 가로줄은 이웃한 두 줄 사이마다 최소 두 개씩 놓여서 한쪽으로 몰리지 않습니다.</li>
       <li>"결과 가리기"를 켜 두면 길이 도착할 때까지 결과가 ?로 보이고, "사다리 가리기"를 켜면 가로줄도 지나간 길만 보입니다.</li>
       <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 사다리만 꽉 차게 띄울 수 있습니다. 2명부터 30명까지 할 수 있고, 적은 이름은 이 기기에만 저장됩니다.</li>
+    </ul>
+  </section>
+  <!-- Roulette -->
+  <section class="panel" id="panel-roulette" hidden>
+    <div>
+      <p class="eyebrow">학급 도구</p>
+      <h2>룰렛 돌리기</h2>
+      <p class="sub">항목을 한 줄에 하나씩 적고 룰렛을 돌리세요. 발표자 뽑기, 모둠 순서, 칭찬 보상 고르기에 쓰기 좋습니다.</p>
+    </div>
+    <div class="settings">
+      <div class="field">
+        <span class="label" id="rlDurLabel">돌리는 시간</span>
+        <div class="seg" role="radiogroup" aria-labelledby="rlDurLabel">
+          <label><input type="radio" name="rldur" value="3"><span>짧게</span></label>
+          <label><input type="radio" name="rldur" value="5" checked><span>보통</span></label>
+          <label><input type="radio" name="rldur" value="8"><span>길게</span></label>
+        </div>
+      </div>
+      <div class="field"><label class="check"><input type="checkbox" id="rlRemove"> 뽑힌 항목 빼기</label></div>
+      <div class="field"><label class="check"><input type="checkbox" id="rlSound" checked> 소리</label></div>
+      <div class="field"><label class="check"><input type="checkbox" id="rlAutoFull"> 돌릴 때 크게 보기</label></div>
+    </div>
+    <div class="rl-edit">
+      <div class="rl-title-field"><label for="rlTitleIn">룰렛 제목</label><input type="text" id="rlTitleIn" class="rl-title-in" maxlength="40" placeholder="예: 오늘의 발표자 (비워 두면 제목 없이 돌아갑니다)"></div>
+      <div class="rl-edit-head"><label for="rlText">항목 <span>(한 줄에 하나)</span></label><span id="rlInfo"></span></div>
+      <textarea id="rlText" class="rl-text" rows="6" spellcheck="false" placeholder="한 줄에 하나씩 적으세요.&#10;명렬표나 엑셀에서 이름을 복사해 붙여 넣어도 됩니다."></textarea>
+      <div class="field">
+        <span class="label">빠르게 채우기</span>
+        <span class="ld-win">1번부터 <input type="number" class="time-in" id="rlNum" min="2" max="100" value="25" aria-label="마지막 번호"> 번까지</span>
+        <button type="button" class="btn small" id="rlFillNum">번호로 채우기</button>
+        <button type="button" class="btn small" id="rlFillLd">사다리타기 이름 가져오기</button>
+        <button type="button" class="btn small primary" id="rlRoster">명렬표 엑셀 불러오기</button>
+        <input type="file" id="rlRosterIn" accept=".xlsx,.xls,.csv" hidden>
+        <button type="button" class="btn small ghost" id="rlClear">비우기</button>
+      </div>
+    </div>
+    <div class="rl-stage" id="rlStage">
+      <div class="rl-box" id="rlBox">
+        <p class="rl-title" id="rlTitle" hidden></p>
+        <div class="rl-wheel" id="rlWheel">
+          <canvas id="rlCanvas" aria-hidden="true"></canvas>
+          <span class="rl-pointer" id="rlPointer" aria-hidden="true"></span>
+          <button type="button" class="rl-hub" id="rlHub">돌리기</button>
+        </div>
+      </div>
+      <div class="rl-result is-empty" id="rlResult" aria-live="polite"><small id="rlResultLabel">뽑힌 항목</small><strong id="rlWinner">룰렛을 돌려 보세요</strong></div>
+      <div class="bar">
+        <div class="count" id="rlStatus" aria-live="polite"></div>
+        <button type="button" class="btn ghost" id="rlRefill" hidden>뺀 항목 되돌리기</button>
+        <button type="button" class="btn ghost" id="rlFull">크게 보기</button>
+        <button type="button" class="btn primary" id="rlSpin">룰렛 돌리기</button>
+      </div>
+    </div>
+    <div class="ld-summary" id="rlSummary" hidden>
+      <div class="ld-summary-head"><strong>뽑힌 순서</strong><span class="rl-sum-btns"><button type="button" class="btn small ghost" id="rlHistClear">기록 지우기</button><button type="button" class="btn small" id="rlCopy">결과 복사</button></span></div>
+      <ol class="ld-list" id="rlList"></ol>
+    </div>
+    <ul class="foot">
+      <li>어느 칸에 멈출지는 돌리기 전에 모든 항목이 똑같은 확률로 정해지고, 룰렛은 그 칸에 멈추도록 돌아갑니다. 같은 이름을 두 줄 적으면 그 이름이 뽑힐 확률이 두 배가 됩니다.</li>
+      <li>"뽑힌 항목 빼기"를 켜면 뽑힌 항목이 다음 판부터 룰렛에서 빠져서 겹치지 않게 차례로 뽑을 수 있습니다. "뺀 항목 되돌리기"를 누르면 다시 모두 들어갑니다.</li>
+      <li>"명렬표 엑셀 불러오기"는 나이스에서 내려받은 학생 명렬표 같은 엑셀 파일에서 "성명" 또는 "이름" 칸을 찾아 이름만 넣습니다. 파일을 이 화면에 끌어다 놓아도 됩니다. 파일은 기기 안에서만 읽고 어디에도 보내지 않습니다.</li>
+      <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 룰렛만 꽉 차게 띄울 수 있고, "돌릴 때 크게 보기"를 켜 두면 돌리는 순간 저절로 커집니다. 스페이스바나 Enter 키로도 돌릴 수 있습니다. 2개부터 100개까지 넣을 수 있고, 적은 항목은 이 기기에만 저장됩니다.</li>
     </ul>
   </section>
   </main>
@@ -3413,6 +3547,454 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   });
   ldRender();
 
+  /* ================= class roster (NEIS 학생 명렬표 등) ================= */
+  // Reads an .xlsx/.xls/.csv on this device and returns the names under a "성명"/"이름" header.
+  // NEIS exports repeat the header on every page, so every header row is followed.
+  var XLSX_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+  var NAME_HEAD = /^(성명|이름|학생명|학생성명|학생이름|성명\(한글\)|한글성명)$/;
+  var NUM_HEAD = /^(번호|번|학생번호|출석번호|출석부번호)$/;
+  function rosterClean(v) { return String(v == null ? "" : v).replace(/\s+/g, " ").trim(); }
+  function rosterNames(rows) {
+    var out = [], found = false;
+    for (var r = 0; r < rows.length; r++) {
+      var row = rows[r], col = -1, num = -1;
+      for (var c = 0; c < row.length; c++) {
+        var h = rosterClean(row[c]).replace(/\s/g, "");
+        if (col < 0 && NAME_HEAD.test(h)) col = c;
+        else if (num < 0 && NUM_HEAD.test(h)) num = c;
+      }
+      if (col < 0) continue;
+      found = true;
+      for (r = r + 1; r < rows.length; r++) {
+        var cells = rows[r];
+        var name = rosterClean(cells[col]);
+        if (NAME_HEAD.test(name.replace(/\s/g, ""))) { r--; break; } // the next page's header
+        if (!name) continue;
+        if (num >= 0 && !/^\d{1,3}$/.test(rosterClean(cells[num]))) continue; // notes, totals, signatures
+        if (/^[\d\s.\-\/:]+$/.test(name) || name.length > 20) continue;
+        out.push(name);
+      }
+    }
+    if (found) return out;
+    // no header: take the column with the most Korean-name-looking cells
+    var best = [], counts = {};
+    rows.forEach(function (row) {
+      row.forEach(function (v, c) {
+        var t = rosterClean(v);
+        if (/^[가-힣]{2,5}$/.test(t)) (counts[c] = counts[c] || []).push(t);
+      });
+    });
+    for (var k in counts) if (counts[k].length > best.length) best = counts[k];
+    return best.length >= 2 ? best : [];
+  }
+  async function readRoster(file) {
+    if (!file) return null;
+    if (!/\.(xlsx|xls|csv)$/i.test(file.name)) { toast("엑셀 파일(.xlsx .xls)이나 .csv 파일을 올려 주세요."); return null; }
+    try { await loadScript(XLSX_URL); } catch (err) { toast("엑셀을 읽는 도구를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요."); return null; }
+    var wb;
+    try {
+      var buf = await file.arrayBuffer();
+      wb = XLSX.read(new Uint8Array(buf), { type: "array", cellText: true, cellDates: false });
+    } catch (err) {
+      if (/password|encrypt/i.test(String(err && err.message))) toast("암호가 걸린 파일은 읽을 수 없습니다. 엑셀에서 열어 암호를 풀고 다시 저장한 뒤 올려 주세요.");
+      else toast("이 파일을 읽지 못했습니다. 엑셀에서 열어 .xlsx로 다시 저장한 뒤 올려 주세요.");
+      return null;
+    }
+    var names = [];
+    wb.SheetNames.forEach(function (n) {
+      if (names.length) return; // the first sheet with names wins
+      var rows = XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: false, defval: "", blankrows: false });
+      names = rosterNames(rows);
+    });
+    if (!names.length) { toast("이름 칸을 찾지 못했습니다. \"성명\" 또는 \"이름\" 칸이 있는 파일인지 확인해 주세요."); return null; }
+    return names;
+  }
+  // a file input plus drag-and-drop onto the tool's panel
+  function rosterHook(btn, input, panel, apply) {
+    $(btn).addEventListener("click", function () { $(input).click(); });
+    $(input).addEventListener("change", async function () {
+      var f = this.files && this.files[0];
+      this.value = "";
+      var names = await readRoster(f);
+      if (names) apply(names);
+    });
+    var el = $(panel), depth = 0;
+    function hasFile(e) { return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], "Files") !== -1; }
+    el.addEventListener("dragenter", function (e) { if (!hasFile(e)) return; e.preventDefault(); depth++; el.classList.add("is-drop"); });
+    el.addEventListener("dragover", function (e) { if (hasFile(e)) e.preventDefault(); });
+    el.addEventListener("dragleave", function () { if (--depth <= 0) { depth = 0; el.classList.remove("is-drop"); } });
+    el.addEventListener("drop", async function (e) {
+      if (!hasFile(e)) return;
+      e.preventDefault(); depth = 0; el.classList.remove("is-drop");
+      var names = await readRoster(e.dataTransfer.files[0]);
+      if (names) apply(names);
+    });
+  }
+  rosterHook("ldRoster", "ldRosterIn", "panel-ladder", function (list) {
+    var total = list.length;
+    if (total < LD_MIN) { toast("이름이 한 명뿐이라 사다리를 만들 수 없습니다."); return; }
+    list = list.slice(0, LD_MAX);
+    for (var i = 0; i < LD_MAX; i++) ld.names[i] = (list[i] || "").slice(0, 20);
+    ld.n = 0;
+    ldSetCount(list.length);
+    toast(total > LD_MAX ? total + "명 중 " + LD_MAX + "명까지만 넣었습니다. 사다리는 30명까지 할 수 있습니다." : "명렬표에서 " + total + "명을 불러왔습니다.");
+  });
+
+  /* ================= roulette ================= */
+  // The winning slice is picked first (every remaining item equally likely), then the wheel is
+  // turned so that slice stops under the pointer at the top.
+  var RL_MIN = 2, RL_MAX = 100, RL_LEN = 30;
+  var rl = { items: [], out: [], rot: 0, win: -1, spinning: false, raf: 0, hist: [], size: 420, kick: 0, ac: null, lastTick: 0 };
+  var rlCtx = $("rlCanvas").getContext("2d");
+  (function () {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem("toolbox-roulette") || "null"); } catch (err) { s = null; }
+    var text = "1모둠\n2모둠\n3모둠\n4모둠\n5모둠\n6모둠";
+    if (s && typeof s === "object") {
+      if (typeof s.text === "string") text = s.text.slice(0, 6000);
+      if (typeof s.remove === "boolean") $("rlRemove").checked = s.remove;
+      if (typeof s.sound === "boolean") $("rlSound").checked = s.sound;
+      if (typeof s.autoFull === "boolean") $("rlAutoFull").checked = s.autoFull;
+      if (typeof s.title === "string") $("rlTitleIn").value = s.title.slice(0, 40);
+      if (s.dur) document.querySelectorAll('input[name="rldur"]').forEach(function (r) { r.checked = r.value === String(s.dur); });
+    }
+    $("rlText").value = text;
+  })();
+  function rlDur() { var r = document.querySelector('input[name="rldur"]:checked'); return r ? +r.value : 5; }
+  function rlSave() {
+    try {
+      localStorage.setItem("toolbox-roulette", JSON.stringify({ text: $("rlText").value, remove: $("rlRemove").checked,
+        sound: $("rlSound").checked, dur: rlDur(), autoFull: $("rlAutoFull").checked, title: $("rlTitleIn").value }));
+    } catch (err) { /* private window: settings simply aren't remembered */ }
+  }
+  function rlSplit(text) {
+    // one item per line; a single pasted line of names separated by commas or tabs is split too
+    var parts = /[\n\r]/.test(text.trim()) ? text.split(/[\n\r]+/) : text.split(/[,\t;]+/);
+    return parts.map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+  function rlParse() {
+    var list = rlSplit($("rlText").value);
+    rl.items = list.slice(0, RL_MAX).map(function (s) { return s.slice(0, RL_LEN); });
+    rl.out = rl.items.map(function () { return false; });
+    rl.win = -1;
+    $("rlInfo").textContent = list.length ? list.length + "개" + (list.length > RL_MAX ? " (" + RL_MAX + "개까지만 룰렛에 넣습니다)" : "") : "";
+  }
+  function rlActive() {
+    var a = [];
+    for (var i = 0; i < rl.items.length; i++) if (!rl.out[i]) a.push(i);
+    return a;
+  }
+  function rlColor(j, m) {
+    var c = j % LD_COLORS.length;
+    if (j === m - 1 && m > 1 && c === 0) c = 2; // last slice never matches the first one beside it
+    return LD_COLORS[c];
+  }
+
+  /* ---- drawing ---- */
+  function rlLayout() {
+    if (current !== "roulette") return;
+    var full = ldFull() === $("rlStage");
+    var w = $("rlBox").clientWidth - 24, size;
+    if (full) {
+      var other = $("rlResult").offsetHeight + $("rlStage").querySelector(".bar").offsetHeight + ($("rlTitle").hidden ? 0 : $("rlTitle").offsetHeight + 12);
+      size = Math.min(w, window.innerHeight - other - 130);
+    } else {
+      size = Math.min(w, 520);
+    }
+    size = Math.max(200, Math.floor(size));
+    rl.size = size;
+    var dpr = Math.min(3, window.devicePixelRatio || 1);
+    var cv = $("rlCanvas");
+    cv.width = Math.round(size * dpr); cv.height = Math.round(size * dpr);
+    $("rlWheel").style.width = size + "px"; $("rlWheel").style.height = size + "px";
+    rlCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    rlDraw();
+  }
+  function rlFit(text, maxW, fs) {
+    var font = function (f) { return "800 " + f + "px " + getComputedStyle(document.body).fontFamily; };
+    rlCtx.font = font(fs);
+    var w = rlCtx.measureText(text).width;
+    if (w > maxW) {
+      var f2 = Math.max(fs * 0.72, fs * maxW / w);
+      rlCtx.font = font(f2);
+      if (rlCtx.measureText(text).width <= maxW) return text;
+      var t = text;
+      while (t.length > 1 && rlCtx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
+      return t + "…";
+    }
+    return text;
+  }
+  function rlDraw() {
+    var ctx = rlCtx, S = rl.size, c = S / 2, R = c - 4, act = rlActive(), m = act.length;
+    ctx.clearRect(0, 0, S, S);
+    if (!m) {
+      ctx.beginPath(); ctx.arc(c, c, R, 0, Math.PI * 2);
+      ctx.fillStyle = "#e9ebf2"; ctx.fill();
+      return;
+    }
+    var slice = Math.PI * 2 / m, showWin = rl.win >= 0 && !rl.spinning;
+    for (var j = 0; j < m; j++) {
+      var a0 = rl.rot + j * slice - Math.PI / 2;
+      ctx.beginPath(); ctx.moveTo(c, c); ctx.arc(c, c, R, a0, a0 + slice); ctx.closePath();
+      ctx.fillStyle = rlColor(j, m); ctx.fill();
+      if (showWin && act[j] !== rl.win) { ctx.fillStyle = "rgba(255,255,255,.62)"; ctx.fill(); }
+      if (m > 1 && m <= 80) { ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = m > 40 ? 1 : 2; ctx.stroke(); }
+    }
+    // labels run along the radius, ending near the rim
+    var hub = Math.max(32, S * 0.115), outer = R - Math.max(10, S * 0.03), maxW = outer - hub - 10;
+    var fs = Math.max(10, Math.min(S * 0.06, (2 * Math.PI * R * 0.72 / m) * 0.62));
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (var k = 0; k < m; k++) {
+      var text = rlFit(rl.items[act[k]], maxW, fs);
+      ctx.save();
+      ctx.translate(c, c);
+      var ang = rl.rot + (k + 0.5) * slice - Math.PI / 2;
+      // labels on the left half are turned the other way so nothing reads upside down
+      var flip = Math.cos(ang) < -0.0001;
+      ctx.rotate(flip ? ang + Math.PI : ang);
+      ctx.textAlign = flip ? "left" : "right";
+      var dim = showWin && act[k] !== rl.win;
+      ctx.fillStyle = dim ? "rgba(21,24,38,.45)" : "#fff";
+      if (!dim) { ctx.shadowColor = "rgba(0,0,0,.25)"; ctx.shadowBlur = 2; }
+      ctx.fillText(text, flip ? -outer : outer, 0);
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(c, c, R, 0, Math.PI * 2);
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.stroke();
+  }
+  function rlRender() {
+    var n = rl.items.length, left = rlActive().length;
+    // with "뽑힌 항목 빼기" on, the item just drawn leaves the wheel at the next spin
+    var next = left - ($("rlRemove").checked && rl.win >= 0 ? 1 : 0);
+    var canSpin = !rl.spinning && n >= RL_MIN && next > 0;
+    $("rlSpin").disabled = !canSpin; $("rlHub").disabled = !canSpin;
+    var st;
+    if (rl.spinning) st = "돌아가는 중…";
+    else if (n < RL_MIN) st = "항목을 두 개 이상 적어 주세요.";
+    else if (next <= 0) st = "모두 뽑았습니다. \"뺀 항목 되돌리기\"를 누르면 다시 시작합니다.";
+    else if (next < n) st = "남은 항목 " + next + "개 / 전체 " + n + "개";
+    else st = "항목 " + n + "개. 룰렛을 돌려 보세요.";
+    $("rlStatus").textContent = st;
+    $("rlRefill").hidden = next === n;
+    rlDraw();
+  }
+  function rlShowResult(name, nth) {
+    var box = $("rlResult");
+    box.classList.remove("is-empty", "is-pop");
+    if (name == null) {
+      box.classList.add("is-empty");
+      $("rlResultLabel").textContent = "뽑힌 항목";
+      $("rlWinner").textContent = "룰렛을 돌려 보세요";
+      return;
+    }
+    void box.offsetWidth;
+    box.classList.add("is-pop");
+    $("rlResultLabel").textContent = nth + "번째로 뽑힌 항목";
+    $("rlWinner").textContent = name;
+  }
+  function rlSummary() {
+    $("rlSummary").hidden = !rl.hist.length;
+    $("rlList").innerHTML = rl.hist.map(function (h, i) {
+      return '<li style="--c:' + h.c + '"><i></i><b>' + esc(h.name) + "</b><span>" + (i + 1) + "번째</span></li>";
+    }).join("");
+  }
+
+  /* ---- sound: short clicks while turning, a little chime at the end ---- */
+  function rlAudio() {
+    if (!$("rlSound").checked) return null;
+    try {
+      if (!rl.ac) { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; rl.ac = new C(); }
+      if (rl.ac.state === "suspended") rl.ac.resume();
+    } catch (err) { return null; }
+    return rl.ac;
+  }
+  function rlTone(freq, at, len, vol, type) {
+    var ac = rl.ac, o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, at);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+    o.connect(g); g.connect(ac.destination);
+    o.start(at); o.stop(at + len + 0.02);
+  }
+  function rlTick() {
+    if (!rl.ac || !$("rlSound").checked || current !== "roulette") return;
+    rlTone(1250, rl.ac.currentTime, 0.035, 0.07, "triangle");
+  }
+  function rlChime() {
+    if (!rl.ac || !$("rlSound").checked || current !== "roulette") return;
+    var t = rl.ac.currentTime + 0.02;
+    [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { rlTone(f, t + i * 0.09, i === 3 ? 0.5 : 0.16, 0.12, "triangle"); });
+  }
+
+  /* ---- spinning ---- */
+  function rlRand(n) {
+    if (window.crypto && crypto.getRandomValues) {
+      var buf = new Uint32Array(1), lim = Math.floor(4294967296 / n) * n;
+      do { crypto.getRandomValues(buf); } while (buf[0] >= lim);
+      return buf[0] % n;
+    }
+    return Math.floor(Math.random() * n);
+  }
+  function rlSpin() {
+    if (rl.spinning) return;
+    if (rl.items.length < RL_MIN) { toast("항목을 두 개 이상 적어 주세요."); $("rlText").focus(); return; }
+    if (rl.win >= 0 && $("rlRemove").checked) rl.out[rl.win] = true;
+    rl.win = -1;
+    var act = rlActive(), m = act.length;
+    if (!m) { toast("모두 뽑았습니다. \"뺀 항목 되돌리기\"를 눌러 주세요."); rlRender(); return; }
+    rlAudio();
+    var pick = rlRand(m), slice = Math.PI * 2 / m, TAU = Math.PI * 2;
+    // land somewhere inside the picked slice, never right on its edge
+    var target = -(pick + 0.12 + 0.76 * Math.random()) * slice;
+    var sec = rlDur(), turns = sec + 1;
+    var from = rl.rot, to = target + TAU * Math.ceil((from + turns * TAU - target) / TAU);
+    var dur = ldReduce ? 700 : sec * 1000, t0 = null, lastIdx = Math.floor(from / slice);
+    rl.spinning = true;
+    rlShowResult(null);
+    $("rlResultLabel").textContent = "돌아가는 중";
+    $("rlWinner").textContent = "…";
+    rlRender();
+    function frame(now) {
+      if (t0 == null) t0 = now;
+      var p = Math.min(1, (now - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 4);
+      rl.rot = from + (to - from) * e;
+      var idx = Math.floor(rl.rot / slice);
+      if (idx !== lastIdx) {
+        lastIdx = idx;
+        rl.kick = now;
+        if (now - rl.lastTick > 28) { rl.lastTick = now; rlTick(); }
+      }
+      var k = Math.max(0, 1 - (now - rl.kick) / 110);
+      $("rlPointer").style.setProperty("--k", (-22 * k).toFixed(1) + "deg");
+      rlDraw();
+      if (p < 1) { rl.raf = requestAnimationFrame(frame); return; }
+      rl.raf = 0;
+      rl.rot = to % TAU;
+      rl.spinning = false;
+      rl.win = act[pick];
+      $("rlPointer").style.setProperty("--k", "0deg");
+      rl.hist.push({ name: rl.items[rl.win], c: rlColor(pick, m) });
+      rlShowResult(rl.items[rl.win], rl.hist.length);
+      rlSummary();
+      rlChime();
+      rlRender();
+    }
+    rl.raf = requestAnimationFrame(frame);
+  }
+  function rlSetText(text) {
+    if (rl.spinning) return;
+    $("rlText").value = text;
+    rlParse(); rlShowResult(null); rlRender(); rlSave();
+  }
+
+  var rlEnterFull = null;
+  function rlGo() {
+    // "돌릴 때 크게 보기": the click that spins is also allowed to open full screen
+    if ($("rlAutoFull").checked && rlEnterFull && !ldFull() && !rl.spinning && !$("rlSpin").disabled) rlEnterFull();
+    rlSpin();
+  }
+  $("rlSpin").addEventListener("click", rlGo);
+  $("rlHub").addEventListener("click", rlGo);
+  $("rlCanvas").addEventListener("click", rlGo);
+  $("rlText").addEventListener("input", function () {
+    if (rl.spinning) return;
+    rlParse(); rlShowResult(null); rlRender(); rlSave();
+  });
+  $("rlRemove").addEventListener("change", function () { rlRender(); rlSave(); });
+  $("rlSound").addEventListener("change", function () { if (this.checked) rlAudio(); rlSave(); });
+  document.querySelectorAll('input[name="rldur"]').forEach(function (r) { r.addEventListener("change", rlSave); });
+  $("rlRefill").addEventListener("click", function () {
+    if (rl.spinning) return;
+    rl.out = rl.items.map(function () { return false; });
+    rl.win = -1;
+    rlShowResult(null); rlRender();
+    toast("뺀 항목을 모두 다시 넣었습니다.");
+  });
+  $("rlFillNum").addEventListener("click", function () {
+    var n = Math.max(RL_MIN, Math.min(RL_MAX, parseInt($("rlNum").value, 10) || 25));
+    $("rlNum").value = n;
+    var v = [];
+    for (var i = 1; i <= n; i++) v.push(i + "번");
+    rlSetText(v.join("\n"));
+  });
+  rosterHook("rlRoster", "rlRosterIn", "panel-roulette", function (list) {
+    if (rl.spinning) return;
+    rlSetText(list.slice(0, RL_MAX).join("\n"));
+    toast(list.length > RL_MAX ? list.length + "명 중 " + RL_MAX + "명까지만 넣었습니다." : "명렬표에서 " + list.length + "명을 불러왔습니다.");
+  });
+  function rlTitle() {
+    var t = $("rlTitleIn").value.trim();
+    $("rlTitle").textContent = t;
+    $("rlTitle").hidden = !t;
+  }
+  $("rlTitleIn").addEventListener("input", function () { rlTitle(); rlSave(); if (ldFull()) rlLayout(); });
+  $("rlAutoFull").addEventListener("change", rlSave);
+  $("rlFillLd").addEventListener("click", function () {
+    var names = ld.names.slice(0, ld.n).map(function (s) { return s.trim(); }).filter(Boolean);
+    if (names.length < RL_MIN) { toast("사다리타기에 적힌 이름이 없습니다. 사다리타기에서 이름을 먼저 넣어 주세요."); return; }
+    rlSetText(names.join("\n"));
+    toast("사다리타기 이름 " + names.length + "개를 가져왔습니다.");
+  });
+  $("rlClear").addEventListener("click", function () { rlSetText(""); $("rlText").focus(); });
+  $("rlHistClear").addEventListener("click", function () { rl.hist = []; rlSummary(); });
+  $("rlCopy").addEventListener("click", function () {
+    var text = rl.hist.map(function (h, i) { return (i + 1) + "\t" + h.name; }).join("\n");
+    function done() { toast("결과를 복사했습니다. 엑셀이나 한글에 붙여 넣으세요."); }
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      document.body.removeChild(ta);
+      if (ok) done(); else toast("복사하지 못했습니다. 목록을 직접 선택해 복사해 주세요.");
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+  });
+  document.addEventListener("keydown", function (e) {
+    // space or Enter spins, unless the teacher is typing somewhere
+    if (current !== "roulette" || (e.key !== " " && e.key !== "Enter") || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target, tag = t && t.tagName;
+    if (tag === "TEXTAREA" || tag === "INPUT" || tag === "BUTTON" || tag === "SELECT" || tag === "A" || (t && t.isContentEditable)) return;
+    e.preventDefault();
+    rlGo();
+  });
+  (function () {
+    var stage = $("rlStage");
+    var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (!req) { $("rlFull").hidden = true; $("rlAutoFull").closest(".field").hidden = true; return; }
+    rlEnterFull = function () {
+      try {
+        var p = req.call(stage);
+        if (p && p.catch) p.catch(function () { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); });
+      } catch (err) { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); }
+    };
+    $("rlFull").addEventListener("click", function () {
+      if (ldFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+      rlEnterFull();
+    });
+    function changed() {
+      var on = ldFull() === stage;
+      stage.classList.toggle("is-full", on);
+      $("rlFull").textContent = on ? "크게 보기 닫기" : "크게 보기";
+      rlLayout();
+    }
+    document.addEventListener("fullscreenchange", changed);
+    document.addEventListener("webkitfullscreenchange", changed);
+  })();
+  var rlResizeQueued = false;
+  window.addEventListener("resize", function () {
+    if (rlResizeQueued) return;
+    rlResizeQueued = true;
+    requestAnimationFrame(function () { rlResizeQueued = false; rlLayout(); });
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { rlDraw(); });
+  rlTitle();
+  rlParse();
+  rlRender();
+
   /* ================= site: tool data, header, home, routing ================= */
   /*
    * To add a tool:
@@ -3449,6 +4031,8 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       keywords: "서명 사인 싸인 전자서명 도장 손글씨 그리기 투명 배경 png" },
     { id: "ladder",  name: "사다리타기",      desc: "순서와 당번 공정하게",      category: "class",    tint: "teal",   icon: "ladder",  short: "사다리", ready: true,
       keywords: "사다리 사다리타기 사다리게임 제비뽑기 추첨 뽑기 순서 당번 역할 발표 학생 학급 랜덤" },
+    { id: "roulette", name: "룰렛 돌리기",    desc: "발표자와 순서 뽑기",        category: "class",    tint: "orange", icon: "wheel",   short: "룰렛", ready: true,
+      keywords: "룰렛 돌림판 돌리기 원판 추첨 뽑기 제비뽑기 랜덤 발표 발표자 순서 당첨 보상 학생 학급" },
     { id: "qr",      name: "QR코드 생성",     desc: "링크를 간편하게",           category: "other",    tint: "sky",    icon: "qr",      ready: false,
       keywords: "qr 큐알 링크 주소" },
     { id: "video-compress", name: "동영상 압축", desc: "용량 줄이고 공유하기",   category: "video",    tint: "pink",   icon: "video",   ready: false, keywords: "영상 동영상 압축 mp4" },
@@ -3472,6 +4056,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     pitch: '<path d="M9 18V5l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/>',
     pen: '<path d="M15 4.5a2.1 2.1 0 0 1 3 3L8.5 17 5 18l1-3.5Z"/><path d="M3 21.5c2.5-1.2 4.5-1.2 6 0s3.5 1.2 6 0 4-1 6 0"/>',
     ladder: '<path d="M6 3v18M12 3v18M18 3v18M6 7h6M12 11h6M6 15h6M12 19h6"/>',
+    wheel: '<circle cx="12" cy="13" r="8.5"/><path d="M12 13V4.5M12 13l7.4 4.2M12 13l-7.4 4.2"/><path d="m10 1.5h4l-2 3Z"/>',
     chev: '<path d="m6 9 6 6 6-6"/>',
     arrow: '<path d="m9 6 6 6-6 6"/>'
   };
@@ -3588,7 +4173,8 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (current !== "merge") stopMerge();
     if (current !== "pitch") stopPitch();
     if (current === "ladder") ldLayout();
-    else if (ldFull()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    if (current === "roulette") rlLayout();
+    if (ldFull() && !$("panel-" + current).contains(ldFull())) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     markActive(name);
     closeMenus();
     if (scrollToTools && current === "home" && name !== "home") $("tools").scrollIntoView({ block: "start" });
@@ -3677,7 +4263,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "audio") loadAudio(files[0]);
     else if (current === "merge") addMerge(files);
     else if (current === "pitch") openPitch(files);
-    else if (current === "home" || current === "convert" || current === "sign" || current === "ladder") return;
+    else if (current === "home" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette") return;
     else addMosaic(files);
   });
 })();
