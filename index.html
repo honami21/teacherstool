@@ -583,7 +583,14 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .ld-board.is-narrow .ld-name, .ld-board.is-narrow .ld-res, .ld-board.is-narrow .ld-in { font-size: 13px; padding-inline: 1px; letter-spacing: -0.3px; }
 .ld-svg { display: block; overflow: visible; }
 .ld-rail, .ld-rung { stroke: #c3c9d8; stroke-width: 4; stroke-linecap: round; }
-.ld-path { fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.ld-path { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; transition: opacity .2s; }
+.ld-svg.has-focus .ld-path { opacity: .12; }
+.ld-svg.has-focus .ld-path.is-focus { opacity: 1; stroke-width: 7; }
+.ld-board.has-focus .ld-name:not(.is-focus), .ld-board.has-focus .ld-res:not(.is-focus) { opacity: .35; }
+.ld-res.is-on { cursor: pointer; }
+.ld-list li { cursor: pointer; border-radius: 6px; }
+.ld-list li:hover, .ld-list li.is-focus { background: var(--sunken); }
+.ld-list li.is-focus b { color: var(--c); }
 .ld-head { stroke: #fff; stroke-width: 3; }
 .ld-stage .bar { border-top: 0; padding-top: 0; }
 .ld-stage.is-full { background: #fff; padding: 28px; overflow: auto; justify-content: center; }
@@ -3238,13 +3245,15 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   function ldTrace(start) {
     var c = start, pts = [[c, 0]];
     ld.rungs.forEach(function (r) {
-      if (r.g === c) { pts.push([c, r.y], [c + 1, r.y]); c++; }
-      else if (r.g === c - 1) { pts.push([c, r.y], [c - 1, r.y]); c--; }
+      // every rung is crossed by exactly two people going opposite ways, so the one going right
+      // is drawn just above the rung and the one going left just below: both colours stay visible
+      if (r.g === c) { pts.push([c, r.y, -1], [c + 1, r.y, -1]); c++; }
+      else if (r.g === c - 1) { pts.push([c, r.y, 1], [c - 1, r.y, 1]); c--; }
     });
     pts.push([c, 1]);
     return { pts: pts, end: c };
   }
-  function ldPx(p) { return [(p[0] + 0.5) * ld.colW, p[1] * ld.H]; }
+  function ldPx(p) { return [(p[0] + 0.5) * ld.colW, p[1] * ld.H + (p[2] || 0) * (ldFull() ? 5 : 3.5)]; }
   function ldLength(pts) {
     var len = 0;
     for (var i = 1; i < pts.length; i++) len += Math.abs(pts[i][0] - pts[i - 1][0]) + Math.abs(pts[i][1] - pts[i - 1][1]);
@@ -3323,6 +3332,27 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     }
     $("ldSvg").innerHTML = svg;
     for (var j in ld.paths) ldPaint(ld.paths[j]);
+    ldApplyFocus();
+  }
+  function ldApplyFocus() {
+    var f = ld.focus, svg = $("ldSvg");
+    if (f != null && !(ld.paths[f] && ld.paths[f].done)) f = ld.focus = null;
+    svg.classList.toggle("has-focus", f != null);
+    $("ldBoard").classList.toggle("has-focus", f != null);
+    svg.querySelectorAll(".ld-path").forEach(function (el) { el.classList.toggle("is-focus", +el.dataset.p === f); });
+    var line = f != null && svg.querySelector('[data-p="' + f + '"]');
+    if (line) svg.appendChild(line);
+    var end = f != null ? ld.paths[f].end : -1;
+    document.querySelectorAll("#ldNames [data-i]").forEach(function (el) { el.classList.toggle("is-focus", +el.dataset.i === f); });
+    document.querySelectorAll("#ldResults [data-r]").forEach(function (el) { el.classList.toggle("is-focus", +el.dataset.r === end); });
+    document.querySelectorAll("#ldList [data-c]").forEach(function (el) { el.classList.toggle("is-focus", +el.dataset.c === f); });
+  }
+  function ldToggleFocus(c) {
+    if (!(ld.paths[c] && ld.paths[c].done)) return;
+    ld.focus = ld.focus === c ? null : c;
+    ldApplyFocus();
+    $("ldStatus").textContent = ld.focus == null ? "이름이나 결과를 누르면 그 사람의 길만 보여요."
+      : ldName(c) + " → " + ldResult(ld.paths[c].end) + "  (다시 누르면 전체 보기)";
   }
   function ldPaint(P) {
     var pts = P.trace.pts.map(ldPx), total = 0, i;
@@ -3363,6 +3393,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     var px = ldLength(trace.pts.map(ldPx));
     ld.paths[c] = { c: c, trace: trace, end: trace.end, p: 0, t0: null, delay: delay || 0, done: false,
       dur: ldReduce ? 200 : Math.max(1600, Math.min(4200, px / 0.32)) };
+    ld.focus = null;
     var btn = document.querySelector('#ldNames [data-i="' + c + '"]');
     if (btn) btn.classList.add("is-on");
     ldDraw();
@@ -3376,19 +3407,20 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (ld.order.length === ld.n) {
       ldDraw();
       $("ldAll").hidden = true;
-      $("ldStatus").textContent = ldFull() ? "모두 결과가 나왔습니다." : "모두 결과가 나왔습니다. 아래에서 결과를 복사할 수 있어요.";
+      $("ldStatus").textContent = "모두 결과가 나왔습니다. 이름이나 결과를 누르면 그 사람의 길만 보여요.";
     }
     ldSummary();
   }
   function ldSummary() {
     $("ldSummary").hidden = !ld.order.length;
     $("ldList").innerHTML = ld.order.map(function (c) {
-      return '<li style="--c:' + ldColor(c) + '"><i></i><b>' + esc(ldName(c)) + "</b><span>" + esc(ldResult(ld.paths[c].end)) + "</span></li>";
+      return '<li data-c="' + c + '" style="--c:' + ldColor(c) + '"><i></i><b>' + esc(ldName(c)) + "</b><span>" + esc(ldResult(ld.paths[c].end)) + "</span></li>";
     }).join("");
+    ldApplyFocus();
   }
   function ldReset() {
     if (ld.raf) cancelAnimationFrame(ld.raf);
-    ld.raf = 0; ld.paths = {}; ld.order = [];
+    ld.raf = 0; ld.paths = {}; ld.order = []; ld.focus = null;
     ldSummary();
   }
   function ldRender() {
@@ -3447,8 +3479,20 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   $("ldHideLad").addEventListener("change", function () { if (ld.mode === "play") ldDraw(); ldSave(); });
   $("ldNames").addEventListener("click", function (e) {
     var b = e.target.closest('[data-ld="play"]');
-    if (b) ldPlay(+b.dataset.i, 0);
+    if (!b) return;
+    var c = +b.dataset.i;
+    if (ld.paths[c] && ld.paths[c].done) ldToggleFocus(c); else ldPlay(c, 0);
   });
+  $("ldResults").addEventListener("click", function (e) {
+    var el = e.target.closest("[data-r]");
+    if (!el) return;
+    for (var k in ld.paths) if (ld.paths[k].done && ld.paths[k].end === +el.dataset.r) ldToggleFocus(+k);
+  });
+  $("ldList").addEventListener("click", function (e) {
+    var li = e.target.closest("[data-c]");
+    if (li) ldToggleFocus(+li.dataset.c);
+  });
+  $("ldSvg").addEventListener("click", function () { if (ld.focus != null) ldToggleFocus(ld.focus); });
   $("panel-ladder").addEventListener("input", function (e) {
     var t = e.target;
     if (t.dataset.ld === "name") ld.names[+t.dataset.i] = t.value;
