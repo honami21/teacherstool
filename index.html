@@ -1143,6 +1143,49 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     </ul>
   </section>
 
+  <!-- ===== Video to audio ===== -->
+  <section class="panel" id="panel-extract" hidden>
+    <div>
+      <p class="eyebrow">영상</p>
+      <h2>영상에서 음원 추출</h2>
+      <p class="sub">영상 파일을 넣으면 화면은 빼고 소리만 MP3나 WAV로 저장합니다.</p>
+    </div>
+    <div class="drop" id="xDrop" role="group" aria-label="소리를 뽑을 영상 파일 올리기">
+      <strong>영상 파일을 여기에 끌어다 놓으세요</strong>
+      <span>MP4, MOV, WEBM 등 한 번에 한 개씩 작업합니다</span>
+      <button type="button" class="pick" id="xPick">파일 선택</button>
+      <input type="file" id="xInput" accept="video/*,.mp4,.m4v,.mov,.webm,.mkv,.3gp" hidden>
+    </div>
+    <div id="xWork" class="panel" hidden>
+      <div class="settings">
+        <div class="field">
+          <span class="label" id="xFmtLabel">저장 형식</span>
+          <div class="seg mono" role="radiogroup" aria-labelledby="xFmtLabel">
+            <label><input type="radio" name="xfmt" id="xfmtMp3" value="mp3" checked><span>MP3</span></label>
+            <label><input type="radio" name="xfmt" id="xfmtWav" value="wav"><span>WAV</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="xCount" aria-live="polite"></div>
+        <button type="button" class="btn" id="xPlay">▶ 들어 보기</button>
+        <button type="button" class="btn primary" id="xExport">저장하기</button>
+      </div>
+      <div class="bar">
+        <div class="count">이어서 다듬기</div>
+        <button type="button" class="btn" id="xToTrim">음원 자르기로</button>
+        <button type="button" class="btn" id="xToPitch">음원 키 변경으로</button>
+      </div>
+      <div class="note" id="xZipNote" hidden>Claude 화면에서는 음원 파일을 바로 저장할 수 없어서, 결과를 ZIP 파일에 담아 저장합니다. ZIP을 풀면 음원 파일이 들어 있습니다.</div>
+    </div>
+    <ul class="foot">
+      <li>휴대폰과 아이폰으로 찍은 영상(MP4, MOV)은 대부분 됩니다. AVI, WMV, FLV처럼 오래된 형식은 브라우저가 읽지 못하니, 먼저 MP4로 바꿔 주세요.</li>
+      <li>영상 전체를 이 기기 메모리에 올려서 소리를 풉니다. 컴퓨터는 1GB 안팎, 휴대폰은 300MB 안팎까지가 무난하고, 그보다 크면 멈추거나 실패할 수 있습니다. 2GB가 넘는 파일은 열지 않습니다.</li>
+      <li>앞뒤를 자르거나 일부만 쓰려면, 뽑은 뒤 "음원 자르기로"를 눌러 바로 이어서 작업하세요.</li>
+      <li>MP3는 192kbps로 저장되고, WAV는 음질 손실이 없지만 용량이 큽니다. 5.1채널 소리는 스테레오로 합쳐 저장합니다.</li>
+    </ul>
+  </section>
+
   <!-- ===== Mosaic ===== -->
   <section class="panel" id="panel-mosaic" hidden>
     <div>
@@ -3233,6 +3276,135 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   });
   pRefresh();
 
+  /* ================= Video to audio ================= */
+  // Reuses decodeFile(), encodeMp3(), encodeWav() and audioCtx() from the audio tools above.
+  // The browser's own audio decoder reads the sound track out of the video file; nothing is uploaded.
+  var X = { file: null, buf: null, srcCh: 0, busy: false, saving: false, src: null, playing: false };
+  var X_MAX = 2147483648;                                     // 2GB: larger files cannot be read in one piece
+  var X_WARN = (isIOS || /Android|Mobi/i.test(navigator.userAgent)) ? 314572800 : 1073741824;
+  if (settings.afmt === "wav") $("xfmtWav").checked = true;
+  if (inViewer) $("xZipNote").hidden = false;
+
+  function xBase() { return baseName(X.file.name); }
+  function xRefresh(msg) {
+    if (!X.buf) return;
+    var lock = X.busy || X.saving;
+    var ch = X.srcCh === 1 ? "모노" : X.srcCh === 2 ? "스테레오" : X.srcCh + "채널 → 스테레오";
+    $("xCount").textContent = msg || (X.file.name + " · 소리 " + fmtTime(X.buf.duration) + " · " + ch);
+    $("xPlay").textContent = X.playing ? "■ 멈춤" : "▶ 들어 보기";
+    ["xPlay", "xExport", "xToTrim", "xToPitch"].forEach(function (id) { $(id).disabled = lock; });
+  }
+  function stopExtract() {
+    if (X.src) { X.src.onended = null; try { X.src.stop(); } catch (e) {} X.src = null; }
+    if (X.playing) { X.playing = false; xRefresh(); }
+  }
+  // Mono and stereo stay as they are; 5.1 and other layouts are mixed down to stereo by the browser.
+  async function xStereo(buf) {
+    if (buf.numberOfChannels <= 2) return buf;
+    var O = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    var off = new O(2, buf.length, buf.sampleRate);
+    var src = off.createBufferSource();
+    src.buffer = buf;
+    src.connect(off.destination);
+    src.start();
+    return await off.startRendering();
+  }
+  function xPeak(buf) {
+    var peak = 0;
+    for (var c = 0; c < buf.numberOfChannels; c++) {
+      var d = buf.getChannelData(c);
+      for (var i = 0; i < d.length; i += 64) { var v = Math.abs(d[i]); if (v > peak) peak = v; }
+    }
+    return peak;
+  }
+  async function openExtract(fileList) {
+    var file = fileList && fileList[0];
+    if (!file || X.busy || X.saving) return;
+    stopExtract();
+    if (file.size >= X_MAX) { toast("2GB가 넘는 영상은 브라우저가 한 번에 읽을 수 없습니다. 영상을 나누거나 줄인 뒤 올려 주세요."); return; }
+    var big = file.size > X_WARN;
+    X.busy = true;
+    if (X.buf) xRefresh("영상에서 소리를 꺼내는 중…");
+    toast(big ? "파일이 커서 오래 걸리거나 멈출 수 있습니다. 소리를 꺼내는 중…" : "영상에서 소리를 꺼내는 중…");
+    try {
+      var raw = await decodeFile(file);
+      if (!raw.length) throw new Error("empty");
+      var buf = await xStereo(raw);
+      X.file = file; X.buf = buf; X.srcCh = raw.numberOfChannels;
+      $("xWork").hidden = false;
+      X.busy = false;
+      xRefresh();
+      if (xPeak(buf) < 0.0005) toast("소리를 꺼냈지만 거의 무음입니다. 소리가 없는 영상일 수 있습니다.");
+      else toast("소리를 꺼냈습니다. 들어 보고 저장하세요.");
+    } catch (e) {
+      X.busy = false;
+      xRefresh();
+      if (e && (e.name === "RangeError" || /memory|allocation/i.test(e.message || ""))) toast("메모리가 부족해 열지 못했습니다. 더 짧거나 작은 영상으로 해 보세요.");
+      else if (big) toast("열지 못했습니다. 파일이 커서 메모리가 부족했거나, 소리가 없는 영상일 수 있습니다.");
+      else toast("소리를 찾지 못했습니다. 소리가 없는 영상이거나 이 브라우저가 읽지 못하는 형식입니다.");
+    }
+  }
+  wireDrop($("xDrop"), $("xInput"), $("xPick"), openExtract);
+  document.querySelectorAll('input[name="xfmt"]').forEach(function (r) {
+    r.addEventListener("change", function () { settings.afmt = r.value; saveSettings(); });
+  });
+
+  $("xPlay").addEventListener("click", function () {
+    if (!X.buf) return;
+    if (X.playing) { stopExtract(); return; }
+    var ctx = audioCtx();
+    if (ctx.state === "suspended") ctx.resume();
+    var src = ctx.createBufferSource();
+    src.buffer = X.buf;
+    src.connect(ctx.destination);
+    src.onended = function () { if (X.src === src) { X.src = null; X.playing = false; xRefresh(); } };
+    src.start();
+    X.src = src; X.playing = true;
+    xRefresh();
+  });
+  $("xExport").addEventListener("click", async function () {
+    if (!X.buf || X.busy || X.saving) return;
+    stopExtract();
+    var fmt = $("xfmtWav").checked ? "wav" : "mp3";
+    X.saving = true; xRefresh("저장할 파일을 만드는 중…");
+    try {
+      var chans = [];
+      for (var c = 0; c < X.buf.numberOfChannels; c++) chans.push(X.buf.getChannelData(c));
+      var res = { chans: chans, sr: X.buf.sampleRate, len: X.buf.length }, blob;
+      if (fmt === "mp3") blob = await encodeMp3(res, function (pct) { xRefresh("MP3로 만드는 중… " + pct + "%"); });
+      else blob = encodeWav(res);
+      var name = xBase() + "_음원." + fmt;
+      if (inViewer) await saveZip([{ name: name, blob: blob }], xBase() + "_음원.zip");
+      else await saveFile(name, blob);
+    } catch (e) {
+      toast(fmt === "mp3" ? "MP3로 만들지 못했습니다. 저장 형식을 WAV로 바꿔 다시 해 보세요." : "음원을 만들지 못했습니다. 파일이 커서 메모리가 부족했을 수 있습니다.");
+    }
+    X.saving = false;
+    xRefresh();
+  });
+  // Hands the extracted sound to the trimmer or the key changer without decoding the video again.
+  $("xToTrim").addEventListener("click", function () {
+    if (!X.buf) return;
+    stopExtract();
+    stopAudio();
+    var buf = X.buf;
+    A.buf = buf; A.file = { name: xBase() + ".wav" };
+    A.peaks = computePeaks(buf);
+    A.start = buf.duration * 0.25; A.end = buf.duration * 0.75; A.cursor = A.start;
+    $("aWork").hidden = false;
+    go("audio");
+    aRefresh();
+  });
+  $("xToPitch").addEventListener("click", function () {
+    if (!X.buf) return;
+    stopExtract();
+    P.token++; P.busy = false; P.cache = null;
+    P.file = { name: xBase() + ".wav" }; P.buf = X.buf;
+    $("kWork").hidden = false;
+    go("pitch");
+    pRefresh();
+  });
+
   /* ================= Standard document converter (download only) ================= */
   $("cDownload").addEventListener("click", async function () {
     try {
@@ -4332,6 +4504,8 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       keywords: "룰렛 돌림판 돌리기 원판 추첨 뽑기 제비뽑기 랜덤 발표 발표자 순서 당첨 보상 학생 학급" },
     { id: "qr",      name: "QR코드 생성",     desc: "링크를 간편하게",           category: "other",    tint: "sky",    icon: "qr",      ready: false,
       keywords: "qr 큐알 링크 주소" },
+    { id: "extract", name: "영상에서 음원 추출", desc: "영상 속 소리만 MP3로", category: "video",  tint: "purple", icon: "extract", short: "음원 추출", ready: true,
+      keywords: "영상 동영상 비디오 음원 소리 오디오 추출 뽑기 꺼내기 분리 배경음악 bgm 녹화 mp4 mov m4v webm mp3 wav" },
     { id: "video-compress", name: "동영상 압축", desc: "용량 줄이고 공유하기",   category: "video",    tint: "pink",   icon: "video",   ready: false, keywords: "영상 동영상 압축 mp4" },
     { id: "groups",  name: "모둠 편성",       desc: "조건에 맞게 모둠 나누기",   category: "class",    tint: "teal",   icon: "users",   ready: false, keywords: "모둠 조 편성 학생" },
     { id: "seat",    name: "자리 배치",       desc: "학급 자리 간편하게",        category: "class",    tint: "lilac",  icon: "layout",  ready: false, keywords: "자리 좌석 배치 학생" }
@@ -4346,6 +4520,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     overlap: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
     qr: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zm7 0v3m-7 4h3m4-2v2h-2"/>',
     video: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4Z"/>',
+    extract: '<rect x="2" y="5" width="13" height="14" rx="2"/><path d="m7 9.5 4 2.5-4 2.5Z"/><path d="M18.5 9v6M21.5 7v10"/>',
     users: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M18 11a3 3 0 0 0 0-6m1 10a5 5 0 0 1 3 5"/>',
     layout: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
     grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -4470,6 +4645,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (current === "sign") sResize();
     if (current !== "merge") stopMerge();
     if (current !== "pitch") stopPitch();
+    if (current !== "extract") stopExtract();
     if (current === "ladder") ldLayout();
     if (current === "roulette") rlLayout();
     if (ldFull() && !$("panel-" + current).contains(ldFull())) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
@@ -4562,6 +4738,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "audio") loadAudio(files[0]);
     else if (current === "merge") addMerge(files);
     else if (current === "pitch") openPitch(files);
+    else if (current === "extract") openExtract(files);
     else if (current === "home" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette") return;
     else addMosaic(files);
   });
