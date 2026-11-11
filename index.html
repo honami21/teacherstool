@@ -52,6 +52,9 @@ body {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  /* Korean text wraps between words, never inside one; a word longer than the line still breaks so nothing overflows */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 button, input { font: inherit; color: inherit; }
 a { color: inherit; }
