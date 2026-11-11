@@ -794,13 +794,14 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 }
 .ex-pill { padding: .2em .85em .25em; border-radius: 999px; background: var(--b-acc); color: var(--b-acc-fg); font-size: 1.2em; font-weight: 800; }
 .ex-cur-no { margin-top: .25em; font-size: 1.7em; font-weight: 800; color: var(--b-acc); }
-.ex-cur-subj { font-size: 5.6em; font-weight: 900; letter-spacing: -.04em; line-height: 1.08; overflow-wrap: anywhere; word-break: keep-all; }
-.ex-cur-subj.is-msg { font-size: 3em; }
+.ex-cur-subj { width: 100%; font-size: 5.6em; font-weight: 900; letter-spacing: -.04em; line-height: 1.12; white-space: nowrap; overflow: hidden; }
+.ex-cur-subj.is-msg { font-size: 4.6em; }
 .ex-cur-time { font-size: 1.6em; font-weight: 700; color: var(--b-muted); font-variant-numeric: tabular-nums; }
 .ex-tiles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .8em; width: 100%; margin-top: auto; padding-top: .5em; }
-.ex-tile { min-width: 0; padding: .65em .9em .75em; border-radius: .8em; background: var(--b-bg); }
+.ex-tiles.is-solo { grid-template-columns: minmax(0, 1fr); }
+.ex-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: .65em .9em .75em; border-radius: .8em; background: var(--b-bg); text-align: center; overflow: hidden; }
 .ex-tile small { display: block; font-size: 1.1em; font-weight: 700; color: var(--b-muted); }
-.ex-tile b { display: block; font-size: 3em; font-weight: 900; line-height: 1.15; letter-spacing: -.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ex-tile b { display: block; font-size: 3em; font-weight: 900; line-height: 1.1; letter-spacing: -.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ex-prog { width: 100%; height: .75em; border-radius: 999px; background: var(--b-bg); overflow: hidden; }
 .ex-prog i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--b-acc); transition: width .9s linear; }
 .ex-now.is-warn .ex-pill, .ex-now.is-warn .ex-prog i { background: var(--b-warn); }
@@ -815,7 +816,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   padding: .5em .8em; border-radius: .7em; background: var(--b-card); font-size: 1.3em; font-weight: 700;
 }
 .ex-tt .no, .ex-tt .t { color: var(--b-muted); }
-.ex-tt .s { overflow-wrap: anywhere; }
+.ex-tt .s { overflow-wrap: anywhere; word-break: keep-all; }
 .ex-tt .t { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ex-tt li.is-next { box-shadow: inset 0 0 0 2px var(--b-acc); }
 .ex-tt li.is-now { background: var(--b-acc); color: var(--b-acc-fg); }
@@ -6062,6 +6063,39 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       li.classList.toggle("is-past", !!(x && x.e <= t));
     });
     if (status !== exLastStatus) { exLastStatus = status; $("exStatus").textContent = status; }
+    exFit(false);
+  }
+  // Keeps the big subject or message on one line (shrinking it when needed), and makes the clock
+  // and the countdown as large as their boxes allow. Both boxes share one size so they line up.
+  var exFitKey = "";
+  function exFit(force) {
+    var board = $("exBoard"), subj = $("exCurSubj"), tiles = $("exNow").querySelector(".ex-tiles");
+    var solo = $("exLeftTile").hidden;
+    var key = subj.textContent + "|" + subj.className + "|" + solo + "|" + board.style.fontSize + "|" + board.clientWidth;
+    if (!force && key === exFitKey) return;
+    exFitKey = key;
+    tiles.classList.toggle("is-solo", solo);
+    subj.style.fontSize = "";
+    var avail = subj.clientWidth;
+    if (avail && subj.scrollWidth > avail) {
+      var fs = parseFloat(getComputedStyle(subj).fontSize);
+      subj.style.fontSize = (fs * avail / subj.scrollWidth * 0.98).toFixed(2) + "px";
+    }
+    var u = parseFloat(getComputedStyle(board).fontSize) || 13;
+    // widest text each box can show, so the size does not jump from second to second
+    var boxes = [[$("exClock"), "00:00:00"]];
+    if (!solo) boxes.push([$("exLeft"), "00분 00초"]);
+    var size = u * (solo ? 7 : 4.4);
+    boxes.forEach(function (bx) {
+      var b = bx[0], text = b.textContent, tile = b.parentNode, cs = getComputedStyle(tile);
+      var room = tile.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      b.style.fontSize = "100px";
+      b.innerHTML = '<span style="display:inline-block">' + bx[1] + "</span>";
+      var w = b.firstChild.getBoundingClientRect().width;
+      b.textContent = text;
+      if (w > 0 && room > 0) size = Math.min(size, 100 * room / w * 0.96);
+    });
+    boxes.forEach(function (bx) { bx[0].style.fontSize = size.toFixed(2) + "px"; });
   }
   // Font size drives every size on the board (all in em), so the board scales to the TV.
   function exLayout() {
@@ -6076,14 +6110,17 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       var h = board.clientHeight;
       u = Math.min(w / 60, h / 32);
       board.style.fontSize = u.toFixed(2) + "px";
+      exFit(true);
       // shrink a little at a time until nothing spills out (many periods, long notes)
       for (var k = 0; k < 14 && board.scrollHeight > board.clientHeight + 1; k++) {
         u *= 0.94;
         board.style.fontSize = u.toFixed(2) + "px";
+        exFit(true);
       }
     } else {
       u = narrow ? Math.max(10.5, w / 32) : w / 60;
       board.style.fontSize = u.toFixed(2) + "px";
+      exFit(true);
     }
   }
   function exLoop() {
