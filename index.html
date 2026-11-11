@@ -70,7 +70,7 @@ a { color: inherit; }
 .lab { display: inline-block; padding: 3px 8px 5px; border-radius: 9px; background: linear-gradient(120deg, #5544e9, #7940ed); color: #fff; letter-spacing: -1px; }
 
 .top-nav { display: flex; align-items: center; gap: 4px; margin-inline: auto; white-space: nowrap; }
-.nav-group { position: relative; }
+.nav-group { position: relative; flex: none; width: 140px; }
 .nav-item {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 10px 15px; border: 0; border-radius: 999px;
@@ -98,6 +98,26 @@ a.sub-link[aria-current="page"] { background: var(--accent-soft); color: var(--a
   display: inline-block; padding: 2px 7px; border-radius: 999px;
   background: #eef0f5; color: #6b7386; font-size: 11px; font-weight: 700; line-height: 1.5; white-space: nowrap;
 }
+
+.nav-item.is-hot { background: var(--sunken); }
+.site-header.is-mega .nav-item .chev { transform: rotate(180deg); }
+
+/* Mega menu: hovering any category with a mouse drops every category's menu at once */
+.mega {
+  position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--surface); border-bottom: 1px solid var(--line);
+  box-shadow: 0 18px 30px rgba(33, 34, 86, .08);
+  animation: megaDrop .2s ease-out;
+}
+.mega[hidden] { display: none; }
+.mega-in { display: grid; padding-block: 14px 22px; }
+.mega-col { min-width: 0; padding: 6px 6px 6px 0; border-radius: 14px; transition: background .15s; }
+.mega-col.is-hot { background: var(--sunken); }
+.mega-col.is-hot a.sub-link:hover { background: var(--surface); }
+.mega-links { display: flex; flex-direction: column; gap: 2px; }
+.mega .sub-link { padding: 9px 8px 9px var(--nav-pad, 15px); white-space: normal; word-break: keep-all; line-height: 1.4; }
+@keyframes megaDrop { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .mega { animation: none; } }
 
 .header-actions { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 .icon-btn { display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--fg); cursor: pointer; }
@@ -237,7 +257,9 @@ a.tool-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-soft);
 @media (max-width: 1260px) {
   :root { --gutter: 28px; }
   .header-in { gap: 16px; }
-  .top-nav { gap: 0; }
+  :root { --nav-pad: 10px; }
+  .nav-group { flex: 0 1 118px; width: auto; min-width: 0; }
+  .top-nav { gap: 0; flex: 1 1 auto; min-width: 0; justify-content: center; }
   .nav-item { padding-inline: 10px; font-size: 14px; }
   .brand-word { font-size: 24px; }
   .brand-mark { width: 46px; height: 46px; }
@@ -252,6 +274,7 @@ a.tool-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-soft);
   :root { --gutter: 18px; }
   .header-in { min-height: 68px; }
   .top-nav { display: none; }
+  .mega { display: none !important; }
   .header-actions { gap: 8px; margin-left: auto; }
   .mobile-toggle { display: grid; }
   .main { padding-block: 24px 40px; }
@@ -758,6 +781,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
         </button>
       </div>
     </div>
+    <div class="mega" id="mega" hidden><div class="wrap mega-in" id="megaIn"></div></div>
     <nav class="mobile-nav" id="mobileNav" aria-label="모바일 메뉴" hidden>
       <div class="wrap" id="mobileNavIn"></div>
     </nav>
@@ -5453,6 +5477,10 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     html += '<a class="nav-item" href="#all" data-nav="all">전체 도구</a>';
     $("topNav").innerHTML = html;
 
+    $("megaIn").innerHTML = NAV_ORDER.map(function (cid) {
+      return '<div class="mega-col" data-col="' + cid + '"><div class="mega-links">' + SubLinks(cid) + "</div></div>";
+    }).join("");
+
     var m = '<div class="m-home"><a href="#all" data-nav="all">전체 도구</a></div>';
     CATEGORIES.forEach(function (c) {
       m += '<div class="m-group"><p class="m-group-title">' + esc(c.label) + '</p><div class="m-links">' + SubLinks(c.id) + "</div></div>";
@@ -5573,7 +5601,53 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     $("mobileToggle").setAttribute("aria-expanded", open ? "true" : "false");
     $("mobileToggle").setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
   }
-  function closeMenus() { openGroup(null); setMobile(false); }
+  function closeMenus() { openGroup(null); setMobile(false); setMega(false); }
+
+  // Mega menu (mouse only): pointing at any category opens every category's menu together.
+  // Touch screens and keyboards keep the click-to-open single menus above.
+  var hoverQuery = window.matchMedia ? window.matchMedia("(hover: hover) and (pointer: fine)") : null;
+  var megaTimer = 0;
+  function megaOpen() { return !$("mega").hidden; }
+  function markHot(group) {
+    document.querySelectorAll(".top-nav [data-group]").forEach(function (b) { b.classList.toggle("is-hot", b.dataset.group === group); });
+    document.querySelectorAll(".mega-col").forEach(function (c) { c.classList.toggle("is-hot", c.dataset.col === group); });
+  }
+  function setMega(open, group) {
+    clearTimeout(megaTimer);
+    if (open) openGroup(null);
+    if (open && $("mega").hidden) alignMega();
+    $("mega").hidden = !open;
+    document.querySelector(".site-header").classList.toggle("is-mega", open);
+    markHot(open ? group : null);
+  }
+  // Line each column up under its own menu button: column i runs from button i's left edge to button i+1's.
+  function alignMega() {
+    var groups = document.querySelectorAll(".top-nav .nav-group");
+    var x = [];
+    groups.forEach(function (g) { var r = g.getBoundingClientRect(); x.push([r.left, r.right]); });
+    if (!x.length) return;
+    var cols = x.map(function (r, i) { return Math.max(0, (i < x.length - 1 ? x[i + 1][0] : r[1]) - r[0]) + "px"; });
+    var inner = $("megaIn");
+    inner.style.gridTemplateColumns = cols.join(" ");
+    inner.style.paddingLeft = (x[0][0] - $("mega").getBoundingClientRect().left) + "px";
+    inner.style.paddingRight = "0";
+    inner.style.maxWidth = "none";
+  }
+  window.addEventListener("resize", function () { if (megaOpen()) setMega(false); });
+  function megaStay() { clearTimeout(megaTimer); }
+  function megaLeave() { if (megaOpen()) { clearTimeout(megaTimer); megaTimer = setTimeout(function () { setMega(false); }, 220); } }
+  $("topNav").addEventListener("mouseover", function (e) {
+    var g = e.target.closest && e.target.closest(".nav-group");
+    if (!g || !hoverQuery || !hoverQuery.matches || window.innerWidth <= 860) { if (megaOpen()) megaStay(); return; }
+    setMega(true, g.querySelector("[data-group]").dataset.group);
+  });
+  $("topNav").addEventListener("mouseleave", megaLeave);
+  $("mega").addEventListener("mouseleave", megaLeave);
+  $("mega").addEventListener("mouseover", function (e) {
+    megaStay();
+    var col = e.target.closest && e.target.closest(".mega-col");
+    if (col) markHot(col.dataset.col);
+  });
 
   Header();
   $("popular").innerHTML = '<span class="popular-label">인기 도구</span>' + TOOL_LIST.filter(function (t) { return t.popular; })
@@ -5588,6 +5662,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     var brand = el.closest(".brand");
     if (brand) { e.preventDefault(); go("home"); return; }
     var groupBtn = el.closest("[data-group]");
+    if (groupBtn && megaOpen()) return;
     if (groupBtn) { openGroup(groupBtn.getAttribute("aria-expanded") === "true" ? null : groupBtn.dataset.group); return; }
     if (el.closest(".tool-card.is-soon, .sub-link.is-soon")) { toast("아직 준비 중인 도구입니다."); return; }
     if (!el.closest(".nav-group")) openGroup(null);
