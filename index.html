@@ -838,6 +838,68 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .ex-stage.is-full .ex-board { flex: 1; border: 0; border-radius: 0; box-shadow: none; padding: .4em .6em; }
 .ex-stage.is-full .bar .count { color: var(--b-muted); }
 .ex-stage.is-full.is-dark .btn.ghost { color: var(--b-muted); }
+/* Timer */
+.tm-form { display: flex; flex-direction: column; gap: 16px; }
+.tm-time-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.tm-time-row .label { font-size: 14px; font-weight: 700; color: var(--fg); }
+.tm-in { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; }
+.tm-in input { width: 4.6em; padding: 8px 8px; font-size: 16px; font-weight: 700; }
+.tm-quick { display: flex; flex-wrap: wrap; gap: 6px; }
+.tm-quick .btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-dark); font-weight: 700; }
+.tm-stage {
+  --b-bg: #ffffff; --b-card: #eef0f6; --b-line: #e4e7ef; --b-fg: #151826; --b-muted: #5b6277;
+  --b-acc: #5b45f2; --b-warn: #e8740c; --b-end: #d6402f; --b-end-soft: #fdecea;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.tm-stage.is-dark {
+  --b-bg: #10131c; --b-card: #232839; --b-line: #2b3247; --b-fg: #f4f6fb; --b-muted: #a3abbf;
+  --b-acc: #a99cff; --b-warn: #ffad4d; --b-end: #ff8072; --b-end-soft: #3b2125;
+}
+.tm-board {
+  display: flex; flex-direction: column; align-items: center; gap: 18px;
+  padding: 30px 20px 26px; border: 1px solid var(--b-line); border-radius: var(--radius-card);
+  background: var(--b-bg); color: var(--b-fg); box-shadow: var(--shadow-soft); transition: background .3s;
+}
+.tm-board .rl-title { margin: 0; }
+.tm-time {
+  font-size: clamp(72px, 17vw, 164px); font-weight: 900; line-height: 1; letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums; white-space: nowrap; transition: color .3s;
+}
+.tm-time.is-long { font-size: clamp(54px, 12vw, 124px); }
+.tm-done-msg { margin-top: -6px; font-size: clamp(24px, 4vw, 36px); font-weight: 900; color: var(--b-end); letter-spacing: -.5px; }
+.tm-prog { width: 100%; max-width: 640px; height: 12px; border-radius: 999px; background: var(--b-card); overflow: hidden; }
+.tm-prog i { display: block; width: 100%; height: 100%; border-radius: inherit; background: var(--b-acc); transition: width .3s linear, background .3s; }
+.tm-ctrl { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.tm-ctrl .btn { min-width: 76px; padding: 10px 16px; font-size: 15px; font-weight: 600; }
+.tm-ctrl .tm-main { min-width: 128px; }
+.tm-stage.is-dark .tm-ctrl .btn:not(.primary) { background: var(--b-card); border-color: var(--b-line); color: var(--b-fg); }
+.tm-stage.is-dark .tm-ctrl .btn.primary { background: var(--b-acc); border-color: var(--b-acc); color: #10131c; }
+.tm-board.is-warn .tm-time { color: var(--b-warn); }
+.tm-board.is-warn .tm-prog i { background: var(--b-warn); }
+.tm-board.is-end .tm-time { color: var(--b-end); }
+.tm-board.is-end .tm-prog i { background: var(--b-end); }
+.tm-board.is-done { background: var(--b-end-soft); }
+.tm-board.is-done .tm-time { color: var(--b-end); animation: tm-blink 1s steps(2, start) infinite; }
+@keyframes tm-blink { 50% { opacity: .2; } }
+.tm-stage .bar { border-top: 0; padding-top: 0; }
+.tm-stage.is-full { background: var(--b-bg); padding: 22px 28px 16px; overflow: hidden; justify-content: center; }
+.tm-stage.is-full .tm-board { flex: 1; justify-content: center; gap: 3.2vh; border: 0; border-radius: 0; box-shadow: none; }
+.tm-stage.is-full .tm-board.is-done { border-radius: 24px; }
+.tm-stage.is-full .rl-title { font-size: clamp(36px, 5.4vw, 76px); padding: 12px 40px 16px; border-radius: 22px; }
+.tm-stage.is-full .tm-time { font-size: min(29vw, 48vh); }
+.tm-stage.is-full .tm-time.is-long { font-size: min(19vw, 40vh); }
+.tm-stage.is-full .tm-done-msg { font-size: clamp(34px, 5vw, 72px); }
+.tm-stage.is-full .tm-prog { max-width: 78vw; height: max(14px, 2vh); }
+.tm-stage.is-full .tm-ctrl .btn { min-width: 110px; padding: 12px 22px; font-size: 20px; }
+.tm-stage.is-full .tm-ctrl .tm-main { min-width: 170px; }
+.tm-stage.is-full .bar .count { color: var(--b-muted); font-size: 18px; }
+.tm-stage.is-full.is-dark .bar .btn.ghost { color: var(--b-muted); }
+@media (max-width: 470px) {
+  .tm-board { padding: 22px 12px 20px; gap: 14px; }
+  .tm-ctrl .btn { min-width: 0; padding: 9px 12px; }
+  .tm-ctrl .tm-main { min-width: 104px; }
+}
+@media (prefers-reduced-motion: reduce) { .tm-board.is-done .tm-time { animation: none; } }
 /* Audio key change */
 .key-box { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 8px 0 4px; }
 .key-step { width: 56px; height: 56px; padding: 0; border-radius: 50%; font-size: 26px; line-height: 1; justify-content: center; }
@@ -1563,7 +1625,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   <!-- Ladder game -->
   <section class="panel" id="panel-ladder" hidden>
     <div>
-      <p class="eyebrow">학급 도구</p>
+      <p class="eyebrow">학급 운영</p>
       <h2>사다리타기</h2>
       <p class="sub">위 칸에 참가자, 아래 칸에 결과를 적고 사다리를 시작하세요. 이름을 누르면 사다리를 따라 내려가 결과가 나옵니다. 발표 순서, 청소 당번, 역할 정하기에 쓰기 좋습니다.</p>
     </div>
@@ -1578,12 +1640,14 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       </div>
       <div class="field"><label class="check"><input type="checkbox" id="ldHideRes" checked> 결과 가리기</label></div>
       <div class="field"><label class="check"><input type="checkbox" id="ldHideLad"> 사다리 가리기</label></div>
+      <div class="field"><button type="button" class="btn small" id="ldResetAll">모두 처음으로</button></div>
     </div>
     <div class="ld-fill">
       <div class="field">
         <span class="label">이름 불러오기</span>
         <button type="button" class="btn small primary" id="ldRoster">명렬표 엑셀 불러오기</button>
         <input type="file" id="ldRosterIn" accept=".xlsx,.xls,.csv" hidden>
+        <button type="button" class="btn small ghost" id="ldClearNames">이름 비우기</button>
         <span class="ld-hint">나이스 학생 명렬표에서 이름만 읽어 위 칸에 넣습니다. 파일을 끌어다 놓아도 됩니다.</span>
       </div>
       <details class="ld-paste">
@@ -1630,7 +1694,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   <!-- Roulette -->
   <section class="panel" id="panel-roulette" hidden>
     <div>
-      <p class="eyebrow">학급 도구</p>
+      <p class="eyebrow">학급 운영</p>
       <h2>룰렛 돌리기</h2>
       <p class="sub">항목을 한 줄에 하나씩 적고 룰렛을 돌리세요. 발표자 뽑기, 모둠 순서, 칭찬 보상 고르기에 쓰기 좋습니다.</p>
     </div>
@@ -1692,7 +1756,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   <!-- Exam board -->
   <section class="panel" id="panel-exam" hidden>
     <div>
-      <p class="eyebrow">학급 도구</p>
+      <p class="eyebrow">학급 운영</p>
       <h2>시험 안내 화면</h2>
       <p class="sub">교시별 과목과 시간, 재적과 응시, 결시 인원을 적고 "크게 보기"를 누르세요. 교실 TV나 전자칠판에 시험 안내가 꽉 차게 뜨고, 지금 몇 교시인지와 남은 시간이 시계에 맞춰 저절로 바뀝니다.</p>
     </div>
@@ -1777,6 +1841,57 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <li>화면은 이 기기의 시계를 따라갑니다. 시험 중에는 남은 시간과 진행 막대가 보이고, 끝나기 5분 전부터 빨갛게 바뀝니다. 쉬는 시간에는 다음 교시가 시작할 때까지 남은 시간을 보여 줍니다.</li>
       <li>한 교시짜리 시험은 교시 수를 1로 두면 됩니다. 교시 수를 늘리면 앞 교시가 끝난 뒤 쉬는 시간만큼 지나서 다음 교시 시각이 채워집니다.</li>
       <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 시험 안내만 꽉 차게 띄울 수 있고, 띄워 두는 동안에는 화면이 저절로 꺼지지 않게 합니다. Esc 키를 누르면 닫힙니다. 적은 내용은 이 기기에만 저장됩니다.</li>
+    </ul>
+  </section>
+  <!-- Timer -->
+  <section class="panel" id="panel-timer" hidden>
+    <div>
+      <p class="eyebrow">학급 운영</p>
+      <h2>타이머</h2>
+      <p class="sub">제목과 시간을 정하고 "시작"을 누르세요. "크게 보기"를 누르면 교실 TV나 전자칠판에 타이머만 꽉 차게 띄울 수 있습니다.</p>
+    </div>
+    <div class="tm-form">
+      <div class="rl-title-field"><label for="tmTitle">타이머 제목</label><input type="text" id="tmTitle" class="rl-title-in" maxlength="40" placeholder="예: 수학 문제 풀이"></div>
+      <div class="tm-time-row">
+        <span class="label">시간</span>
+        <span class="tm-in"><input type="number" class="time-in" id="tmMin" min="0" max="180" inputmode="numeric" aria-label="분"> 분</span>
+        <span class="tm-in"><input type="number" class="time-in" id="tmSec" min="0" max="59" inputmode="numeric" aria-label="초"> 초</span>
+        <div class="tm-quick" id="tmQuick" role="group" aria-label="빠른 시간 설정">
+          <button type="button" class="btn small" data-sec="60">1분</button>
+          <button type="button" class="btn small" data-sec="180">3분</button>
+          <button type="button" class="btn small" data-sec="300">5분</button>
+          <button type="button" class="btn small" data-sec="600">10분</button>
+          <button type="button" class="btn small" data-sec="900">15분</button>
+        </div>
+      </div>
+      <div class="settings">
+        <div class="field"><label class="check"><input type="checkbox" id="tmSound" checked> 끝나면 알림음</label></div>
+        <div class="field"><label class="check"><input type="checkbox" id="tmDark"> 어두운 화면</label></div>
+      </div>
+    </div>
+    <div class="tm-stage" id="tmStage">
+      <div class="tm-board" id="tmBoard">
+        <div class="rl-title" id="tmBTitle" hidden></div>
+        <div class="tm-time" id="tmTime" role="timer" aria-live="off">05:00</div>
+        <div class="tm-done-msg" id="tmDoneMsg" hidden>시간 종료!</div>
+        <div class="tm-prog" aria-hidden="true"><i id="tmBar"></i></div>
+        <div class="tm-ctrl">
+          <button type="button" class="btn" id="tmMinus1" aria-label="1분 빼기">−1분</button>
+          <button type="button" class="btn primary tm-main" id="tmGo">시작</button>
+          <button type="button" class="btn" id="tmReset">처음으로</button>
+          <button type="button" class="btn" id="tmPlus1" aria-label="1분 더하기">+1분</button>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="tmStatus" aria-live="polite"></div>
+        <button type="button" class="btn primary" id="tmFull">크게 보기</button>
+      </div>
+    </div>
+    <ul class="foot">
+      <li>1분 남으면 주황색, 10초 남으면 빨간색으로 바뀌고, 끝나면 알림음과 함께 "시간 종료!"가 깜빡입니다. 알림음은 기기 소리가 켜져 있어야 들립니다.</li>
+      <li>타이머가 도는 동안에도 −1분, +1분으로 시간을 줄이거나 늘릴 수 있습니다. 시간을 새로 정하려면 일시정지하거나 "처음으로"를 누르세요.</li>
+      <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 타이머만 꽉 차게 띄울 수 있습니다. 타이머가 돌거나 크게 띄워 둔 동안에는 화면이 저절로 꺼지지 않게 합니다. 스페이스바로 시작과 일시정지, Esc 키로 크게 보기를 닫을 수 있습니다.</li>
+      <li>다른 메뉴로 옮겨 가도 타이머는 계속 돌아갑니다. 마지막에 쓴 제목과 시간은 이 기기에만 저장됩니다.</li>
     </ul>
   </section>
   <!-- ===== Guide: 사이트 소개 · 자주 묻는 질문 · 건의하기 ===== -->
@@ -5192,6 +5307,41 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     for (var i = 0; i < ld.n; i++) v.push("");
     ldFill(v);
   });
+  $("ldClearNames").addEventListener("click", function () {
+    for (var i = 0; i < LD_MAX; i++) ld.names[i] = "";
+    if (ld.mode !== "setup") { ld.mode = "setup"; ldReset(); }
+    ldRender();
+    ldSave();
+    toast("이름을 모두 지웠습니다.");
+  });
+  // Everything back to how the page first opens. It erases typed names, so the first press only asks.
+  var ldResetTimer = 0;
+  $("ldResetAll").addEventListener("click", function () {
+    var btn = this;
+    if (!ldResetTimer) {
+      btn.textContent = "한 번 더 누르면 초기화";
+      btn.classList.add("primary");
+      ldResetTimer = setTimeout(function () { ldResetTimer = 0; btn.textContent = "모두 처음으로"; btn.classList.remove("primary"); }, 3000);
+      return;
+    }
+    clearTimeout(ldResetTimer); ldResetTimer = 0;
+    btn.textContent = "모두 처음으로"; btn.classList.remove("primary");
+    for (var i = 0; i < LD_MAX; i++) { ld.names[i] = ""; ld.results[i] = ""; }
+    ld.n = 6;
+    ld.results[2] = "당첨";
+    for (var k = 0; k < ld.n; k++) if (!ld.results[k]) ld.results[k] = "꽝";
+    $("ldHideRes").checked = true;
+    $("ldHideLad").checked = false;
+    $("ldWin").value = 1;
+    $("ldPaste").value = "";
+    $("ldPasteInfo").textContent = "";
+    $("ldPaste").closest("details").open = false;
+    ld.mode = "setup";
+    ldReset();
+    ldRender();
+    ldSave();
+    toast("사다리타기를 처음 상태로 되돌렸습니다.");
+  });
   $("ldCopy").addEventListener("click", function () {
     var text = ld.order.map(function (c) { return ldName(c) + "\t" + ldResult(ld.paths[c].end); }).join("\n");
     function done() { toast("결과를 복사했습니다. 엑셀이나 한글에 붙여 넣으세요."); }
@@ -6042,6 +6192,249 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   exPaint();
   exLoop();
 
+  /* ================= Timer ================= */
+  var TM_MAX = 180 * 60;
+  var tm = { title: "", total: 300, sound: true, dark: false };
+  (function () {
+    var s;
+    try { s = JSON.parse(localStorage.getItem("toolbox-timer") || "null"); } catch (err) { s = null; }
+    if (!s || typeof s !== "object") return;
+    if (typeof s.title === "string") tm.title = s.title.slice(0, 40);
+    if (typeof s.total === "number" && s.total >= 1 && s.total <= TM_MAX) tm.total = Math.round(s.total);
+    tm.sound = s.sound !== false;
+    tm.dark = !!s.dark;
+  })();
+  var tmLeft = tm.total * 1000, tmBase = tmLeft, tmEnd = 0;
+  var tmRun = false, tmStarted = false, tmDone = false;
+  var tmTicker = null, tmWake = null, tmAudio = null;
+  function tmSave() { try { localStorage.setItem("toolbox-timer", JSON.stringify(tm)); } catch (err) {} }
+  function tmPad(n) { return (n < 10 ? "0" : "") + n; }
+  function tmFmt(sec) {
+    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+    return h ? h + ":" + tmPad(m) + ":" + tmPad(s) : tmPad(m) + ":" + tmPad(s);
+  }
+  function tmSay(sec) {
+    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60, out = [];
+    if (h) out.push(h + "시간");
+    if (m) out.push(m + "분");
+    if (s || !out.length) out.push(s + "초");
+    return out.join(" ");
+  }
+  function tmNow() { return tmRun ? Math.max(0, tmEnd - Date.now()) : tmLeft; }
+  function tmFields() {
+    $("tmMin").value = Math.floor(tm.total / 60);
+    $("tmSec").value = tm.total % 60;
+  }
+  function tmPaint() {
+    var left = tmNow(), sec = Math.ceil(left / 1000);
+    var t = $("tmTime"), txt = tmFmt(sec);
+    if (t.textContent !== txt) t.textContent = txt;
+    t.classList.toggle("is-long", sec >= 3600);
+    var b = $("tmBoard");
+    b.classList.toggle("is-warn", tmStarted && !tmDone && sec <= 60 && sec > 10);
+    b.classList.toggle("is-end", tmStarted && !tmDone && sec <= 10);
+    b.classList.toggle("is-done", tmDone);
+    $("tmDoneMsg").hidden = !tmDone;
+    $("tmBar").style.width = (tmBase > 0 ? Math.min(100, left / tmBase * 100) : 0).toFixed(2) + "%";
+    var ti = $("tmBTitle");
+    ti.textContent = tm.title;
+    ti.hidden = !tm.title.trim();
+    var go = $("tmGo");
+    go.textContent = tmRun ? "일시정지" : tmDone ? "다시 시작" : tmStarted ? "계속" : "시작";
+    go.className = tmRun ? "btn tm-main" : "btn primary tm-main";
+    $("tmMinus1").disabled = sec <= 0 || tmDone;
+    $("tmPlus1").disabled = sec >= TM_MAX;
+    $("tmReset").disabled = !tmStarted && !tmDone;
+    var lock = tmRun;
+    $("tmMin").disabled = lock; $("tmSec").disabled = lock;
+    $("tmQuick").querySelectorAll("button").forEach(function (q) {
+      q.disabled = lock;
+      q.setAttribute("aria-pressed", String(+q.dataset.sec === tm.total));
+    });
+    $("tmStage").classList.toggle("is-dark", tm.dark);
+    var st;
+    if (tmDone) st = "시간 종료";
+    else if (tmRun) {
+      var end = new Date(tmEnd + 999), hh = end.getHours();
+      st = "진행 중 · " + (hh < 12 ? "오전 " : "오후 ") + ((hh % 12) || 12) + ":" + tmPad(end.getMinutes()) + "에 끝나요";
+    } else if (tmStarted) st = "일시정지 · " + tmSay(sec) + " 남음";
+    else st = "준비됨 · " + tmSay(tm.total);
+    var stEl = $("tmStatus");
+    if (stEl.textContent !== st) stEl.textContent = st;
+  }
+  function tmTick() {
+    if (tmRun && tmNow() <= 0) { tmFinish(); return; }
+    tmPaint();
+  }
+  function tmStopTicker() { if (tmTicker) { clearInterval(tmTicker); tmTicker = null; } }
+  function tmCtx() {
+    if (!tmAudio) {
+      var C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      try { tmAudio = new C(); } catch (err) { return null; }
+    }
+    if (tmAudio.state === "suspended" && tmAudio.resume) tmAudio.resume().catch(function () {});
+    return tmAudio;
+  }
+  function tmBeep() {
+    var c = tmCtx();
+    if (!c) return;
+    var t0 = c.currentTime + 0.05;
+    for (var r = 0; r < 3; r++) {
+      for (var k = 0; k < 2; k++) {
+        var st = t0 + r * 0.9 + k * 0.22, o = c.createOscillator(), g = c.createGain();
+        o.type = "sine";
+        o.frequency.value = k ? 1175 : 880;
+        g.gain.setValueAtTime(0.0001, st);
+        g.gain.exponentialRampToValueAtTime(0.4, st + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, st + 0.19);
+        o.connect(g); g.connect(c.destination);
+        o.start(st); o.stop(st + 0.21);
+      }
+    }
+  }
+  // keep the screen awake while the timer runs or is shown big
+  function tmWakeSync() {
+    var on = tmRun || ldFull() === $("tmStage");
+    if (on && !tmWake && navigator.wakeLock && navigator.wakeLock.request) {
+      tmWake = "pending";
+      navigator.wakeLock.request("screen").then(function (l) {
+        if (tmWake !== "pending") { l.release().catch(function () {}); return; }
+        tmWake = l;
+        l.addEventListener("release", function () { if (tmWake === l) tmWake = null; });
+      }).catch(function () { if (tmWake === "pending") tmWake = null; });
+    } else if (!on && tmWake) {
+      if (tmWake !== "pending") tmWake.release().catch(function () {});
+      tmWake = null;
+    }
+  }
+  function tmStart() {
+    if (tm.sound) tmCtx();   // unlock sound on this tap so the end beep can play
+    if (tmDone || tmLeft <= 0) { tmLeft = tm.total * 1000; tmBase = tmLeft; }
+    tmDone = false;
+    tmStarted = true;
+    tmRun = true;
+    tmEnd = Date.now() + tmLeft;
+    tmStopTicker();
+    tmTicker = setInterval(tmTick, 200);
+    tmWakeSync();
+    tmPaint();
+  }
+  function tmPause() {
+    tmLeft = tmNow();
+    tmRun = false;
+    tmStopTicker();
+    tmWakeSync();
+    tmPaint();
+  }
+  function tmReset() {
+    tmRun = false; tmStarted = false; tmDone = false;
+    tmLeft = tm.total * 1000; tmBase = tmLeft;
+    tmStopTicker();
+    tmWakeSync();
+    tmPaint();
+  }
+  function tmFinish() {
+    tmRun = false; tmDone = true; tmLeft = 0;
+    tmStopTicker();
+    tmWakeSync();
+    if (tm.sound) tmBeep();
+    tmPaint();
+  }
+  function tmAdd(ms) {
+    var left = Math.max(0, Math.min(TM_MAX * 1000, tmNow() + ms));
+    if (!tmStarted && !tmDone) {
+      // not started yet: +1/-1 just changes the set time
+      var sec = Math.ceil(left / 1000);
+      if (sec < 1) return;
+      tm.total = sec; tmSave(); tmFields();
+      tmLeft = sec * 1000; tmBase = tmLeft;
+      tmPaint();
+      return;
+    }
+    if (tmDone) { if (ms <= 0) return; tmDone = false; }
+    tmBase = Math.max(tmBase, left);
+    if (tmRun) { tmEnd = Date.now() + left; if (left <= 0) { tmFinish(); return; } }
+    else tmLeft = left;
+    tmPaint();
+  }
+  function tmSetTotal(sec) {
+    sec = Math.max(1, Math.min(TM_MAX, Math.round(sec)));
+    tm.total = sec;
+    tmSave();
+    tmReset();
+  }
+  $("tmTitle").value = tm.title;
+  $("tmSound").checked = tm.sound;
+  $("tmDark").checked = tm.dark;
+  tmFields();
+  $("tmTitle").addEventListener("input", function () { tm.title = this.value; tmSave(); tmPaint(); });
+  function tmFieldTotal() {
+    var m = parseInt($("tmMin").value, 10), s = parseInt($("tmSec").value, 10);
+    if (isNaN(m)) m = 0;
+    if (isNaN(s)) s = 0;
+    m = Math.max(0, Math.min(180, m)); s = Math.max(0, Math.min(59, s));
+    return Math.min(TM_MAX, m * 60 + s);
+  }
+  function tmFromFields() {
+    var total = tmFieldTotal();
+    if (total >= 1 && total !== tm.total) tmSetTotal(total);
+  }
+  $("tmMin").addEventListener("input", tmFromFields);
+  $("tmSec").addEventListener("input", tmFromFields);
+  ["tmMin", "tmSec"].forEach(function (id) {
+    $(id).addEventListener("change", function () { if (tmFieldTotal() >= 1) tmFields(); });
+    $(id).addEventListener("keydown", function (e) { if (e.key === "Enter") { tmFields(); tmStart(); } });
+  });
+  $("tmQuick").addEventListener("click", function (e) {
+    var q = e.target.closest("button[data-sec]");
+    if (!q || q.disabled) return;
+    tmSetTotal(+q.dataset.sec);
+    tmFields();
+  });
+  $("tmGo").addEventListener("click", function () { if (tmRun) tmPause(); else tmStart(); });
+  $("tmReset").addEventListener("click", tmReset);
+  $("tmPlus1").addEventListener("click", function () { tmAdd(60000); });
+  $("tmMinus1").addEventListener("click", function () { tmAdd(-60000); });
+  $("tmSound").addEventListener("change", function () { tm.sound = this.checked; tmSave(); if (tm.sound) tmCtx(); });
+  $("tmDark").addEventListener("change", function () { tm.dark = this.checked; tmSave(); tmPaint(); });
+  document.addEventListener("keydown", function (e) {
+    // space starts and pauses, unless the teacher is typing somewhere
+    if (current !== "timer" || e.key !== " " || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target, tag = t && t.tagName;
+    if (tag === "TEXTAREA" || tag === "INPUT" || tag === "BUTTON" || tag === "SELECT" || tag === "A" || (t && t.isContentEditable)) return;
+    e.preventDefault();
+    if (tmRun) tmPause(); else tmStart();
+  });
+  (function () {
+    var stage = $("tmStage");
+    var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (!req) { $("tmFull").hidden = true; return; }
+    $("tmFull").addEventListener("click", function () {
+      if (ldFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+      try {
+        var p = req.call(stage);
+        if (p && p.catch) p.catch(function () { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); });
+      } catch (err) { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); }
+    });
+    function changed() {
+      var on = ldFull() === stage;
+      stage.classList.toggle("is-full", on);
+      $("tmFull").textContent = on ? "크게 보기 닫기" : "크게 보기";
+      $("tmFull").className = on ? "btn ghost" : "btn primary";
+      tmWakeSync();
+    }
+    document.addEventListener("fullscreenchange", changed);
+    document.addEventListener("webkitfullscreenchange", changed);
+  })();
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState !== "visible") return;
+    if (tmWake && tmWake !== "pending" && tmWake.released) tmWake = null;
+    tmWakeSync();
+    tmTick();
+  });
+  tmPaint();
+
   /* ================= site: tool data, header, home, routing ================= */
   /*
    * To add a tool:
@@ -6055,7 +6448,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     { id: "document", name: "문서",      label: "문서 도구", icon: "file",  tone: "#544bf2" },
     { id: "audio",    name: "음원",      label: "음원 도구", icon: "audio", tone: "#9b41ed" },
     { id: "video",    name: "영상",      label: "영상 도구", icon: "video", tone: "#9d47f2" },
-    { id: "class",    name: "학급 도구", label: "학급 도구", icon: "users", tone: "#12af71" },
+    { id: "class",    name: "학급 운영", label: "학급 운영", icon: "users", tone: "#12af71" },
     { id: "other",    name: "기타",      label: "기타 도구", icon: "grid",  tone: "#6355ef" }
   ];
   var NAV_ORDER = ["photo", "audio", "document", "video", "class"];
@@ -6079,6 +6472,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     { id: "ladder",  name: "사다리타기",      desc: "순서와 당번 공정하게",      category: "class",    tint: "teal",   icon: "ladder",  short: "사다리", ready: true },
     { id: "roulette", name: "룰렛 돌리기",    desc: "발표자와 순서 뽑기",        category: "class",    tint: "orange", icon: "wheel",   short: "룰렛", ready: true },
     { id: "exam",    name: "시험 안내 화면",  desc: "TV에 띄우는 시험 시간과 인원", category: "class", tint: "sky",    icon: "clock",   short: "시험 안내", ready: true },
+    { id: "timer",   name: "타이머",          desc: "제목 붙여 크게 띄우는 타이머", category: "class", tint: "pink",  icon: "timer",   short: "타이머", ready: true },
     { id: "qr",      name: "QR코드 생성",     desc: "링크를 간편하게",           category: "other",    tint: "sky",    icon: "qr",      ready: false },
     { id: "extract", name: "영상에서 음원 추출", desc: "영상 속 소리만 MP3로", category: "video",  tint: "purple", icon: "extract", short: "음원 추출", ready: true },
     { id: "capture", name: "영상 장면 캡처", desc: "원하는 순간을 사진으로", category: "video", tint: "blue", icon: "capture", short: "장면 캡처", ready: true },
@@ -6109,6 +6503,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     pen: '<path d="M15 4.5a2.1 2.1 0 0 1 3 3L8.5 17 5 18l1-3.5Z"/><path d="M3 21.5c2.5-1.2 4.5-1.2 6 0s3.5 1.2 6 0 4-1 6 0"/>',
     ladder: '<path d="M6 3v18M12 3v18M18 3v18M6 7h6M12 11h6M6 15h6M12 19h6"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    timer: '<circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M9.5 2.5h5M12 2.5V6M18 6.5l1.6-1.6"/>',
     wheel: '<circle cx="12" cy="13" r="8.5"/><path d="M12 13V4.5M12 13l7.4 4.2M12 13l-7.4 4.2"/><path d="m10 1.5h4l-2 3Z"/>',
     chev: '<path d="m6 9 6 6 6-6"/>',
     arrow: '<path d="m9 6 6 6-6 6"/>'
@@ -6244,6 +6639,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (current === "ladder") ldLayout();
     if (current === "roulette") rlLayout();
     if (current === "exam") exPaint();
+    if (current === "timer") tmPaint();
     if (ldFull() && !$("panel-" + current).contains(ldFull())) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     markActive(name);
     closeMenus();
@@ -6367,7 +6763,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "extract") openExtract(files);
     else if (current === "capture") openCapture(files);
     else if (current === "vcut") openVcut(files);
-    else if (current === "home" || current === "guide" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette" || current === "exam") return;
+    else if (current === "home" || current === "guide" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette" || current === "exam" || current === "timer") return;
     else addMosaic(files);
   });
 })();
