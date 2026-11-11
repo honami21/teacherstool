@@ -6377,21 +6377,21 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 (function () {
   var GC = "https://teacherstool.goatcounter.com";
   var live = location.hostname === "honami21.github.io";
-  function pad(n) { return (n < 10 ? "0" : "") + n; }
   function getJSON(url) {
     // 아직 방문이 없으면 GoatCounter가 404와 함께 0을 돌려줍니다. 설정이 꺼져 있으면 403입니다.
-    return fetch(url).then(function (r) { if (!r.ok && r.status !== 404) throw r.status; return r.json(); });
+    return fetch(url, { cache: "no-cache" }).then(function (r) { if (!r.ok && r.status !== 404) throw r.status; return r.json(); });
   }
   // 하단 방문자 수: 불러오지 못하면(설정 꺼짐, 차단, 오프라인) 조용히 숨긴 채로 둡니다.
   function showVisits() {
     var el = document.getElementById("visitCount");
     if (!el || !window.fetch) return;
-    var d = new Date(), today = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+    // GoatCounter는 날짜를 UTC 자정으로 받으므로, "오늘"은 한국 시간 오전 9시부터 센 값입니다.
+    var today = new Date().toISOString().slice(0, 10);
     getJSON(GC + "/counter/TOTAL.json").then(function (total) {
       if (!total || total.count == null) return;
       el.innerHTML = "누적 방문 <b>" + total.count + "</b>";
       el.hidden = false;
-      return getJSON(GC + "/counter/TOTAL.json?start=" + today + "&end=" + today).then(function (t) {
+      return getJSON(GC + "/counter/TOTAL.json?start=" + today).then(function (t) {
         if (t && t.count != null) el.innerHTML = "오늘 <b>" + t.count + "</b> · 누적 방문 <b>" + total.count + "</b>";
       }).catch(function () {});
     }).catch(function () {});
