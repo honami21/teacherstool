@@ -950,6 +950,39 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 }
 .footer-links { display: inline-flex; gap: 14px; }
 .footer-right .footer-links a { color: #838b9d; font-weight: 500; }
+/* ---------- Category page (#cat-<id>) ---------- */
+.main > #panel-cat { max-width: 1100px; }
+.cat-head { display: flex; align-items: flex-start; gap: 18px; padding: 28px 30px; border-radius: var(--radius-card); background: var(--tint, var(--sunken)); }
+.cat-badge { display: grid; place-items: center; flex: none; width: 64px; height: 64px; border-radius: 18px; background: #fff; color: var(--tone); box-shadow: var(--shadow-soft); }
+.cat-badge .ico { width: 34px; height: 34px; }
+.cat-head h2 { font-size: 30px; }
+.cat-desc { margin: 10px 0 0; color: #3b3f55; font-size: 16px; line-height: 1.75; max-width: 46em; word-break: keep-all; }
+.cat-tools h3 { margin: 0 0 14px; font-size: 19px; font-weight: 800; letter-spacing: -0.5px; }
+.cat-tools h3 small { margin-left: 6px; color: var(--subtle); font-size: 14px; font-weight: 700; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
+.cat-others { padding-top: 18px; border-top: 1px solid var(--line); }
+.cat-others p { margin: 0 0 10px; color: var(--muted); font-size: 14px; font-weight: 700; }
+.cat-others div { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat-others a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--fg); font-size: 14px; font-weight: 700; text-decoration: none; }
+.cat-others a .ico { width: 18px; height: 18px; color: var(--tone); }
+.cat-others a:hover { border-color: #b5a9fb; background: #fbfaff; }
+.sub-link.is-all { color: var(--accent-dark); font-weight: 800; border-bottom: 1px solid var(--line); border-radius: 9px 9px 0 0; margin-bottom: 2px; }
+.sub-link.is-all .ico { width: 16px; height: 16px; stroke-width: 2.2; }
+.m-group-title-wrap { margin: 0 0 6px; }
+a.m-group-title { margin: 0; display: inline-flex; align-items: center; gap: 2px; color: var(--muted); text-decoration: none; }
+a.m-group-title:hover { color: var(--accent-dark); }
+a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
+@media (max-width: 860px) {
+  .cat-head { padding: 22px 20px; gap: 14px; }
+  .cat-badge { width: 52px; height: 52px; border-radius: 15px; }
+  .cat-badge .ico { width: 28px; height: 28px; }
+  .cat-head h2 { font-size: 25px; }
+  .cat-desc { font-size: 15px; }
+  .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+}
+@media (max-width: 470px) {
+  .cat-head { flex-direction: column; }
+}
 @media (max-width: 560px) {
   .g-card { padding: 20px 18px; }
     }
@@ -1897,12 +1930,34 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <li>다른 메뉴로 옮겨 가도 타이머는 계속 돌아갑니다. 마지막에 쓴 제목과 시간은 이 기기에만 저장됩니다.</li>
     </ul>
   </section>
+  <!-- ===== Category page: opened from a top menu (#cat-<id>) ===== -->
+  <section class="panel" id="panel-cat" hidden>
+    <div class="cat-head" id="catHead">
+      <span class="cat-badge" id="catIcon"></span>
+      <div>
+        <p class="eyebrow">분류</p>
+        <h2 id="catName"></h2>
+        <p class="cat-desc" id="catDesc"></p>
+      </div>
+    </div>
+    <section class="cat-tools" aria-labelledby="catToolsTitle">
+      <h3 id="catToolsTitle"></h3>
+      <div class="cat-grid" id="catGrid"></div>
+      <p class="empty-state" id="catEmpty" hidden>이 분류의 도구는 준비 중입니다.</p>
+      <p class="tools-note">모든 파일은 이 기기 안에서만 처리되고 서버로 보내지 않습니다.</p>
+    </section>
+    <nav class="cat-others" aria-label="다른 분류">
+      <p>다른 분류 보기</p>
+      <div id="catOthers"></div>
+    </nav>
+  </section>
+
   <!-- ===== Guide: 사이트 소개 · 자주 묻는 질문 · 건의하기 ===== -->
   <section class="panel" id="panel-guide" hidden>
     <div>
       <p class="eyebrow">안내</p>
       <h2>TeachersTool 안내</h2>
-      <p class="sub">사이트를 처음 쓰신다면 아래 내용을 먼저 읽어 보세요.</p>
+      <p class="sub">TeachersTool을 처음 쓰신다면 여기부터 읽어 보세요. 사이트를 쓰는 방법과 파일이 안전하게 처리되는 방식, 궁금한 점과 건의할 곳을 한곳에 모았어요.</p>
       <nav class="g-jump" aria-label="안내 바로가기" id="gJump"></nav>
     </div>
 
@@ -6522,6 +6577,15 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     { id: "class",    name: "학급 운영", label: "학급 운영", icon: "users", tone: "#12af71" },
     { id: "other",    name: "기타",      label: "기타 도구", icon: "grid",  tone: "#6355ef" }
   ];
+  // Category page text: keep it general (no tool names) so new tools need no rewrite.
+  var CAT_INFO = {
+    photo:    { tint: "blue",   desc: "수업 자료나 학교 홈페이지 등에 올릴 사진을 손볼 때 쓰는 도구예요. 형식을 바꾸고, 가려야 할 부분을 가리는 등 사진을 쓰기 좋게 다듬는 일을 간편하게 할 수 있어요. 사진이 기기 밖으로 나가지 않으니 학생 사진도 안심하고 쓰셔도 돼요." },
+    audio:    { tint: "purple", desc: "수업 활동이나 학교 행사에 쓸 음악과 소리를 준비하는 도구예요. 필요한 만큼 다듬고 원하는 모양으로 고치는 일을 프로그램 설치 없이 브라우저에서 들으면서 할 수 있어요." },
+    document: { tint: "lilac",  desc: "공문, 제출 서류, 결재 파일처럼 업무 문서를 다루다 자주 막히는 일을 덜어 주는 도구예요. 용량, 형식, 파일 정리처럼 번거로운 손질을 몇 번의 클릭으로 끝낼 수 있어요." },
+    video:    { tint: "purple", desc: "수업이나 행사 영상을 필요한 만큼, 필요한 모양으로 쓰고 싶을 때 쓰는 도구예요. 큰 영상도 서버에 올리지 않고 기기 안에서 처리해요." },
+    "class":  { tint: "green",  desc: "학급을 꾸려 가며 매일 생기는 크고 작은 일을 돕는 도구예요. 순서 정하기, 시간 안내처럼 반복되는 일을 학생들과 함께 공정하고 빠르게 처리할 수 있어요. 큰 글씨와 단순한 화면으로 만들어 스마트칠판이나 교실 TV에 띄우면 모두가 함께 보며 쓰기 좋아요." },
+    other:    { tint: "lilac",  desc: "다른 분류에 딱 맞지 않지만 학교 일에 자주 필요한 도구를 모아 두는 곳이에요. 필요한 도구를 차근차근 채워 갈게요." }
+  };
   var NAV_ORDER = ["photo", "audio", "document", "video", "class"];
   // 안내 menu: one page (panel-guide) with three sections; each hash scrolls to its section.
   var GUIDE = [
@@ -6607,7 +6671,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       html += '<div class="nav-group">' +
         '<button type="button" class="nav-item" data-group="' + cid + '" aria-expanded="false" aria-controls="sub-' + cid + '">' +
         esc(c.name) + icon("chev", "chev") + "</button>" +
-        '<div class="nav-sub" id="sub-' + cid + '" hidden>' + SubLinks(cid) + "</div></div>";
+        '<div class="nav-sub" id="sub-' + cid + '" hidden>' +
+        '<a class="sub-link is-all" href="#cat-' + cid + '" data-nav="cat-' + cid + '">' + esc(c.name) + " 한눈에 보기" + icon("arrow") + "</a>" +
+        SubLinks(cid) + "</div></div>";
     });
     html += '<a class="nav-item" href="#all" data-nav="all">전체 도구</a>';
     // 안내 comes first, before the tool categories
@@ -6624,9 +6690,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 
     var m = '<div class="m-home"><a href="#all" data-nav="all">전체 도구</a></div>';
     CATEGORIES.forEach(function (c) {
-      m += '<div class="m-group"><p class="m-group-title">' + esc(c.label) + '</p><div class="m-links">' + SubLinks(c.id) + "</div></div>";
+      m += '<div class="m-group"><p class="m-group-title-wrap"><a class="m-group-title" href="#cat-' + c.id + '" data-nav="cat-' + c.id + '">' + esc(c.label) + icon("arrow") + '</a></p><div class="m-links">' + SubLinks(c.id) + "</div></div>";
     });
-    var guideGroup = '<div class="m-group"><p class="m-group-title">안내</p><div class="m-links">' + GuideLinks() + "</div></div>";
+    var guideGroup = '<div class="m-group"><p class="m-group-title-wrap"><a class="m-group-title" href="#about" data-nav="about">안내' + icon("arrow") + '</a></p><div class="m-links">' + GuideLinks() + "</div></div>";
     m = m.replace("</div>", "</div>" + guideGroup);   // right after the "전체 도구" button, before the tool groups
     $("mobileNavIn").innerHTML = m;
   }
@@ -6651,6 +6717,24 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       '<span class="category-icon">' + icon(c.icon) + "</span>" +
       '<span class="category-text"><strong>' + esc(c.label) + "</strong><small>" + esc(summary) + "</small></span>" +
       icon("arrow", "category-arrow") + "</a>";
+  }
+
+  /* ---- category page ---- */
+  function renderCat(cid) {
+    var c = catOf(cid), info = CAT_INFO[cid] || {};
+    var list = readyIn(cid);
+    $("catHead").className = "cat-head tint-" + (info.tint || "lilac");
+    $("catHead").style.setProperty("--tone", c.tone);
+    $("catIcon").innerHTML = icon(c.icon);
+    $("catName").textContent = c.label;
+    $("catDesc").textContent = info.desc || "";
+    $("catToolsTitle").innerHTML = esc(c.name) + " 도구" + (list.length ? "<small>" + list.length + "개</small>" : "");
+    $("catGrid").innerHTML = list.map(ToolCard).join("");
+    $("catGrid").hidden = !list.length;
+    $("catEmpty").hidden = list.length > 0;
+    $("catOthers").innerHTML = CATEGORIES.filter(function (o) { return o.id !== cid; }).map(function (o) {
+      return '<a href="#cat-' + o.id + '" data-nav="cat-' + o.id + '" style="--tone:' + o.tone + '">' + icon(o.icon) + esc(o.label) + "</a>";
+    }).join("") + '<a href="#all" data-nav="all">' + icon("grid") + "전체 도구</a>";
   }
 
   /* ---- home state: featured, all, or one category ---- */
@@ -6688,6 +6772,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     var guide = guideOf(name);
     if (guide) {
       current = "guide";
+    } else if (name.indexOf("cat-") === 0 && catOf(name.slice(4))) {
+      current = "cat";
+      renderCat(name.slice(4));
     } else if (tool && tool.ready) {
       current = name;
     } else {
@@ -6700,6 +6787,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     $("panel-home").hidden = current !== "home";
     PANELS.forEach(function (t) { $("panel-" + t).hidden = t !== current; });
     $("panel-guide").hidden = current !== "guide";
+    $("panel-cat").hidden = current !== "cat";
     if (current === "audio") drawWave(); else stopAudio();
     if (current === "sign") sResize();
     if (current !== "merge") stopMerge();
@@ -6808,7 +6896,10 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     var brand = el.closest(".brand");
     if (brand) { e.preventDefault(); go("home"); return; }
     var groupBtn = el.closest("[data-group]");
-    if (groupBtn && megaOpen()) return;
+    if (groupBtn && (megaOpen() || e.pointerType === "mouse")) {
+      go(groupBtn.dataset.group === "guide" ? "about" : "cat-" + groupBtn.dataset.group);
+      return;
+    }
     if (groupBtn) { openGroup(groupBtn.getAttribute("aria-expanded") === "true" ? null : groupBtn.dataset.group); return; }
     if (el.closest(".tool-card.is-soon, .sub-link.is-soon")) { toast("아직 준비 중인 도구입니다."); return; }
     if (!el.closest(".nav-group")) openGroup(null);
