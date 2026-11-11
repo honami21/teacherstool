@@ -724,6 +724,117 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .rl-stage.is-full .bar .count { font-size: 20px; }
 .rl-sum-btns { display: flex; gap: 6px; }
 @media (prefers-reduced-motion: reduce) { .rl-result.is-pop strong { animation: none; } }
+/* Exam board */
+.ex-form { display: flex; flex-direction: column; gap: 20px; }
+.ex-row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.ex-block { display: flex; flex-direction: column; gap: 10px; }
+.ex-block-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; font-size: 14px; }
+.ex-block-head strong, .ex-block-head label { font-weight: 700; }
+.ex-block-head span { color: var(--muted); font-size: 13px; font-weight: 500; }
+.ex-periods { display: flex; flex-direction: column; gap: 8px; }
+.ex-p {
+  display: grid; grid-template-columns: 4.4em minmax(0, 1fr) auto; align-items: center; gap: 8px 12px;
+  padding: 8px 12px; background: var(--sunken); border: 1px solid var(--line); border-radius: 12px;
+}
+.ex-p-no { font-weight: 800; color: var(--accent-dark); white-space: nowrap; }
+.ex-subj {
+  min-width: 0; width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface); font-size: 15px; font-weight: 700;
+}
+.ex-p-times { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ex-p-times .time-in { width: 9.6em; }
+#exQStart { width: 9.6em; }
+.ex-p-len { min-width: 4.2em; color: var(--muted); font-size: 13px; text-align: right; }
+.ex-p-len.is-bad { color: var(--err); font-weight: 700; }
+.ex-subj:focus, .ex-num input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.ex-people { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.ex-num { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 13px; font-weight: 600; }
+.ex-num input {
+  width: 6.4em; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+  color: var(--fg); font-size: 18px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums;
+}
+.ex-num.is-wide { flex: 1 1 200px; }
+.ex-num.is-wide input { width: 100%; font-size: 15px; font-weight: 600; text-align: left; }
+.ex-warn { color: var(--err); font-size: 13px; font-weight: 600; margin: 0; }
+@media (max-width: 600px) {
+  .ex-row2 { grid-template-columns: minmax(0, 1fr); }
+  .ex-p { grid-template-columns: auto minmax(0, 1fr); }
+  .ex-p-times { grid-column: 1 / -1; flex-wrap: wrap; }
+  .ex-p-times .time-in { flex: 1 1 6.4em; width: auto; }
+}
+
+.ex-stage {
+  --b-bg: #ffffff; --b-card: #f5f6fa; --b-line: #e4e7ef; --b-fg: #151826; --b-muted: #5b6277;
+  --b-acc: #5b45f2; --b-acc-fg: #ffffff; --b-acc-soft: #f2efff; --b-warn: #d6402f; --b-warn-soft: #fdecea;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.ex-stage.is-dark {
+  --b-bg: #10131c; --b-card: #1b2030; --b-line: #2b3247; --b-fg: #f4f6fb; --b-muted: #a3abbf;
+  --b-acc: #a99cff; --b-acc-fg: #10131c; --b-acc-soft: #232241; --b-warn: #ff8072; --b-warn-soft: #3b2125;
+}
+.ex-stage .bar { border-top: 0; padding-top: 0; }
+.ex-board {
+  display: flex; flex-direction: column; gap: .9em; min-height: 0;
+  padding: 1.1em 1.3em 1.3em; background: var(--b-bg); color: var(--b-fg);
+  border: 1px solid var(--line); border-radius: var(--radius-card); box-shadow: var(--shadow-soft);
+  font-size: 13px; line-height: 1.25; overflow: hidden;
+}
+.ex-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .3em 1em; padding-bottom: .7em; border-bottom: 2px solid var(--b-line); }
+.ex-head-l { display: flex; flex-wrap: wrap; align-items: baseline; gap: .2em .7em; min-width: 0; }
+.ex-head-l strong { font-size: 2em; font-weight: 900; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.ex-head-l span, .ex-date { font-size: 1.35em; font-weight: 700; color: var(--b-muted); }
+.ex-date { white-space: nowrap; }
+.ex-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 1.1em; }
+.ex-now {
+  display: flex; flex-direction: column; align-items: flex-start; gap: .45em; min-width: 0;
+  padding: 1.2em 1.4em 1.3em; border-radius: 1em; background: var(--b-acc-soft);
+}
+.ex-pill { padding: .2em .85em .25em; border-radius: 999px; background: var(--b-acc); color: var(--b-acc-fg); font-size: 1.2em; font-weight: 800; }
+.ex-cur-no { margin-top: .25em; font-size: 1.7em; font-weight: 800; color: var(--b-acc); }
+.ex-cur-subj { font-size: 5.6em; font-weight: 900; letter-spacing: -.04em; line-height: 1.08; overflow-wrap: anywhere; word-break: keep-all; }
+.ex-cur-subj.is-msg { font-size: 3em; }
+.ex-cur-time { font-size: 1.6em; font-weight: 700; color: var(--b-muted); font-variant-numeric: tabular-nums; }
+.ex-tiles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .8em; width: 100%; margin-top: auto; padding-top: .5em; }
+.ex-tile { min-width: 0; padding: .65em .9em .75em; border-radius: .8em; background: var(--b-bg); }
+.ex-tile small { display: block; font-size: 1.1em; font-weight: 700; color: var(--b-muted); }
+.ex-tile b { display: block; font-size: 3em; font-weight: 900; line-height: 1.15; letter-spacing: -.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ex-prog { width: 100%; height: .75em; border-radius: 999px; background: var(--b-bg); overflow: hidden; }
+.ex-prog i { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--b-acc); transition: width .9s linear; }
+.ex-now.is-warn .ex-pill, .ex-now.is-warn .ex-prog i { background: var(--b-warn); }
+.ex-now.is-warn .ex-pill { color: #fff; }
+.ex-now.is-warn #exLeft { color: var(--b-warn); }
+.ex-now.is-warn { background: var(--b-warn-soft); }
+.ex-now.is-done .ex-pill { background: var(--b-muted); color: var(--b-bg); }
+.ex-side { display: flex; flex-direction: column; gap: .9em; min-width: 0; }
+.ex-tt { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .35em; }
+.ex-tt li {
+  display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; align-items: center; gap: .6em;
+  padding: .5em .8em; border-radius: .7em; background: var(--b-card); font-size: 1.3em; font-weight: 700;
+}
+.ex-tt .no, .ex-tt .t { color: var(--b-muted); }
+.ex-tt .s { overflow-wrap: anywhere; }
+.ex-tt .t { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ex-tt li.is-next { box-shadow: inset 0 0 0 2px var(--b-acc); }
+.ex-tt li.is-now { background: var(--b-acc); color: var(--b-acc-fg); }
+.ex-tt li.is-now .no, .ex-tt li.is-now .t { color: inherit; opacity: .85; }
+.ex-tt li.is-past { opacity: .45; }
+.ex-board.is-many .ex-tt li { padding: .35em .75em; font-size: 1.1em; }
+.ex-ppl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6em; }
+.ex-ppl div { padding: .55em .4em .6em; border-radius: .8em; background: var(--b-card); text-align: center; }
+.ex-ppl small { display: block; font-size: 1.2em; font-weight: 700; color: var(--b-muted); }
+.ex-ppl b { display: block; font-size: 3em; font-weight: 900; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ex-ppl .is-on b { color: var(--b-warn); }
+.ex-board.is-solo .ex-ppl b { font-size: 3.8em; }
+.ex-abswho { margin: -.2em 0 0; font-size: 1.25em; font-weight: 700; color: var(--b-muted); overflow-wrap: anywhere; }
+.ex-notes {
+  margin: 0; padding: .7em .9em .75em 1.9em; border-radius: .8em; background: var(--b-card);
+  display: flex; flex-direction: column; gap: .3em; font-size: 1.25em; font-weight: 600; overflow-wrap: anywhere; word-break: keep-all;
+}
+.ex-board.is-narrow .ex-main { grid-template-columns: minmax(0, 1fr); }
+.ex-stage.is-full { background: var(--b-bg); padding: 18px 22px 16px; overflow: hidden; }
+.ex-stage.is-full .ex-board { flex: 1; border: 0; border-radius: 0; box-shadow: none; padding: .4em .6em; }
+.ex-stage.is-full .bar .count { color: var(--b-muted); }
+.ex-stage.is-full.is-dark .btn.ghost { color: var(--b-muted); }
 /* Audio key change */
 .key-box { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 8px 0 4px; }
 .key-step { width: 56px; height: 56px; padding: 0; border-radius: 50%; font-size: 26px; line-height: 1; justify-content: center; }
@@ -1530,6 +1641,96 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <li>"뽑힌 항목 빼기"를 켜면 뽑힌 항목이 다음 판부터 룰렛에서 빠져서 겹치지 않게 차례로 뽑을 수 있습니다. "뺀 항목 되돌리기"를 누르면 다시 모두 들어갑니다.</li>
       <li>"명렬표 엑셀 불러오기"는 나이스에서 내려받은 학생 명렬표 같은 엑셀 파일에서 "성명" 또는 "이름" 칸을 찾아 이름만 넣습니다. 파일을 이 화면에 끌어다 놓아도 됩니다. 파일은 기기 안에서만 읽고 어디에도 보내지 않습니다.</li>
       <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 룰렛만 꽉 차게 띄울 수 있고, "돌릴 때 크게 보기"를 켜 두면 돌리는 순간 저절로 커집니다. 스페이스바나 Enter 키로도 돌릴 수 있습니다. 2개부터 100개까지 넣을 수 있고, 적은 항목은 이 기기에만 저장됩니다.</li>
+    </ul>
+  </section>
+  <!-- Exam board -->
+  <section class="panel" id="panel-exam" hidden>
+    <div>
+      <p class="eyebrow">학급 도구</p>
+      <h2>시험 안내 화면</h2>
+      <p class="sub">교시별 과목과 시간, 재적과 응시, 결시 인원을 적고 "크게 보기"를 누르세요. 교실 TV나 전자칠판에 시험 안내가 꽉 차게 뜨고, 지금 몇 교시인지와 남은 시간이 시계에 맞춰 저절로 바뀝니다.</p>
+    </div>
+    <div class="settings">
+      <div class="field">
+        <span class="label" id="exCountLabel">교시 수</span>
+        <div class="stepper" role="group" aria-labelledby="exCountLabel">
+          <button type="button" class="btn" id="exMinus" aria-label="한 교시 줄이기">−</button>
+          <span class="val" id="exCount" aria-live="polite">2교시</span>
+          <button type="button" class="btn" id="exPlus" aria-label="한 교시 늘리기">+</button>
+        </div>
+      </div>
+      <div class="field"><label class="check"><input type="checkbox" id="exDark"> 어두운 화면</label></div>
+    </div>
+    <div class="ex-form">
+      <div class="ex-row2">
+        <div class="rl-title-field"><label for="exTitle">시험 이름</label><input type="text" id="exTitle" class="rl-title-in" maxlength="40" placeholder="예: 1학기 총괄평가"></div>
+        <div class="rl-title-field"><label for="exRoom">학년 반 또는 시험실</label><input type="text" id="exRoom" class="rl-title-in" maxlength="30" placeholder="예: 3학년 1반"></div>
+      </div>
+      <div class="ex-block">
+        <div class="ex-block-head"><strong>교시별 과목과 시간</strong><span id="exInfo"></span></div>
+        <div class="ex-periods" id="exPeriods"></div>
+        <div class="field">
+          <span class="label">시각 빠르게 채우기</span>
+          <span class="ld-win">1교시 시작 <input type="time" class="time-in" id="exQStart" value="09:00" aria-label="1교시 시작 시각"></span>
+          <span class="ld-win">시험 <input type="number" class="time-in sec-in" id="exQLen" min="5" max="300" value="40" aria-label="한 교시 시험 시간"> 분</span>
+          <span class="ld-win">쉬는 시간 <input type="number" class="time-in sec-in" id="exQGap" min="0" max="180" value="10" aria-label="쉬는 시간"> 분</span>
+          <button type="button" class="btn small" id="exQFill">시각 채우기</button>
+        </div>
+      </div>
+      <div class="ex-block">
+        <div class="ex-block-head"><strong>인원</strong><span>재적과 결시를 적으면 응시 인원은 저절로 계산됩니다.</span></div>
+        <div class="ex-people">
+          <label class="ex-num"><span>재적</span><input type="number" id="exTotal" min="0" max="999" inputmode="numeric"></label>
+          <label class="ex-num"><span>응시</span><input type="number" id="exTake" min="0" max="999" inputmode="numeric"></label>
+          <label class="ex-num"><span>결시</span><input type="number" id="exAbs" min="0" max="999" inputmode="numeric"></label>
+          <label class="ex-num is-wide"><span>결시자 번호 (선택)</span><input type="text" id="exAbsWho" maxlength="40" placeholder="예: 7번, 15번"></label>
+        </div>
+        <p class="ex-warn" id="exPplWarn" hidden></p>
+      </div>
+      <div class="ex-block">
+        <div class="ex-block-head"><label for="exNotes">안내 문구 <span>(한 줄에 하나, 적지 않아도 됩니다)</span></label></div>
+        <textarea id="exNotes" class="rl-text" rows="3" placeholder="예: 휴대폰은 전원을 끄고 앞에 제출합니다.&#10;답안지 수정은 수정테이프만 사용합니다."></textarea>
+      </div>
+    </div>
+    <div class="ex-stage" id="exStage">
+      <div class="ex-board" id="exBoard">
+        <div class="ex-head">
+          <div class="ex-head-l"><strong id="exBTitle"></strong><span id="exBRoom"></span></div>
+          <span class="ex-date" id="exBDate"></span>
+        </div>
+        <div class="ex-main">
+          <div class="ex-now" id="exNow">
+            <span class="ex-pill" id="exPill"></span>
+            <div class="ex-cur-no" id="exCurNo"></div>
+            <div class="ex-cur-subj" id="exCurSubj"></div>
+            <div class="ex-cur-time" id="exCurTime"></div>
+            <div class="ex-tiles">
+              <div class="ex-tile"><small>현재 시각</small><b id="exClock">--:--:--</b></div>
+              <div class="ex-tile" id="exLeftTile"><small id="exLeftLabel">남은 시간</small><b id="exLeft"></b></div>
+            </div>
+            <div class="ex-prog" id="exProg"><i id="exProgBar"></i></div>
+          </div>
+          <div class="ex-side">
+            <ol class="ex-tt" id="exTT"></ol>
+            <div class="ex-ppl">
+              <div><small>재적</small><b id="exBTotal">-</b></div>
+              <div><small>응시</small><b id="exBTake">-</b></div>
+              <div id="exBAbsBox"><small>결시</small><b id="exBAbs">-</b></div>
+            </div>
+            <p class="ex-abswho" id="exBAbsWho" hidden></p>
+            <ul class="ex-notes" id="exBNotes" hidden></ul>
+          </div>
+        </div>
+      </div>
+      <div class="bar" id="exBar">
+        <div class="count" id="exStatus"></div>
+        <button type="button" class="btn primary" id="exFull">크게 보기</button>
+      </div>
+    </div>
+    <ul class="foot">
+      <li>화면은 이 기기의 시계를 따라갑니다. 시험 중에는 남은 시간과 진행 막대가 보이고, 끝나기 5분 전부터 빨갛게 바뀝니다. 쉬는 시간에는 다음 교시가 시작할 때까지 남은 시간을 보여 줍니다.</li>
+      <li>한 교시짜리 시험은 교시 수를 1로 두면 됩니다. 교시 수를 늘리면 앞 교시가 끝난 뒤 쉬는 시간만큼 지나서 다음 교시 시각이 채워집니다.</li>
+      <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 시험 안내만 꽉 차게 띄울 수 있고, 띄워 두는 동안에는 화면이 저절로 꺼지지 않게 합니다. Esc 키를 누르면 닫힙니다. 적은 내용은 이 기기에만 저장됩니다.</li>
     </ul>
   </section>
   </main>
@@ -5335,6 +5536,365 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   rlParse();
   rlRender();
 
+  /* ================= exam board ================= */
+  // Periods are {subj, s, e} with s/e as "HH:MM". The board follows this device's clock and
+  // works out each second whether we are before, during, between or after the periods.
+  var EX_MIN = 1, EX_MAX = 8;
+  var ex = { title: "", room: "", periods: [], total: "", take: "", abs: "", absWho: "", notes: "", dark: false, qStart: "09:00", qLen: 40, qGap: 10 };
+  var exWake = null, exLastStatus = "";
+  (function exLoad() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem("toolbox-exam") || "null"); } catch (err) { s = null; }
+    if (s && typeof s === "object") {
+      ["title", "room", "total", "take", "abs", "absWho", "notes", "qStart"].forEach(function (k) { if (typeof s[k] === "string") ex[k] = s[k]; });
+      if (typeof s.dark === "boolean") ex.dark = s.dark;
+      // the first version defaulted to 50-minute periods; a screen nobody edited moves to the 40-minute default
+      var old = JSON.stringify(s.periods) === '[{"subj":"","s":"09:00","e":"09:50"},{"subj":"","s":"10:00","e":"10:50"}]';
+      if (old) s.periods = [];
+      if (old && +s.qLen === 50) s.qLen = 40;
+      if (isFinite(s.qLen)) ex.qLen = +s.qLen;
+      if (isFinite(s.qGap)) ex.qGap = +s.qGap;
+      if (Array.isArray(s.periods)) ex.periods = s.periods.slice(0, EX_MAX).map(function (p) {
+        return { subj: String(p && p.subj || ""), s: String(p && p.s || ""), e: String(p && p.e || "") };
+      });
+    }
+    if (!ex.periods.length) ex.periods = [{ subj: "", s: "09:00", e: "09:40" }, { subj: "", s: "09:50", e: "10:30" }];
+  })();
+  function exSave() {
+    try { localStorage.setItem("toolbox-exam", JSON.stringify(ex)); } catch (err) {}
+  }
+  function exMin(hm) {
+    var m = /^(\d{1,2}):(\d{2})/.exec(hm || "");
+    if (!m) return null;
+    var h = +m[1], mi = +m[2];
+    return h < 24 && mi < 60 ? h * 60 + mi : null;
+  }
+  function exHM(min) {
+    min = ((Math.round(min) % 1440) + 1440) % 1440;
+    var h = Math.floor(min / 60), m = min % 60;
+    return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
+  }
+  function exPad(n) { return (n < 10 ? "0" : "") + n; }
+  function exLen(p) {
+    var s = exMin(p.s), e = exMin(p.e);
+    return s === null || e === null ? null : e - s;
+  }
+  function exSubj(p, i) { return p.subj.trim() || (i + 1) + "교시"; }
+  // "23분 10초", or "1시간 5분" once it is an hour or more
+  function exDur(sec) {
+    sec = Math.max(0, Math.ceil(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+    if (h) return h + "시간" + (m ? " " + m + "분" : "");
+    if (m) return m + "분 " + exPad(s) + "초";
+    return s + "초";
+  }
+  function exDurMin(sec) {
+    var m = Math.ceil(sec / 60);
+    if (m >= 60) return Math.floor(m / 60) + "시간" + (m % 60 ? " " + m % 60 + "분" : "");
+    return m + "분";
+  }
+
+  /* ---- editor ---- */
+  function exRows() {
+    $("exCount").textContent = ex.periods.length + "교시";
+    $("exMinus").disabled = ex.periods.length <= EX_MIN;
+    $("exPlus").disabled = ex.periods.length >= EX_MAX;
+    $("exPeriods").innerHTML = ex.periods.map(function (p, i) {
+      return '<div class="ex-p" data-i="' + i + '">' +
+        '<span class="ex-p-no">' + (i + 1) + '교시</span>' +
+        '<input type="text" class="ex-subj" data-k="subj" maxlength="20" placeholder="과목 (예: 국어)" aria-label="' + (i + 1) + '교시 과목" value="' + esc(p.subj) + '">' +
+        '<span class="ex-p-times">' +
+        '<input type="time" class="time-in" data-k="s" aria-label="' + (i + 1) + '교시 시작 시각" value="' + esc(p.s) + '">' +
+        '<span aria-hidden="true">~</span>' +
+        '<input type="time" class="time-in" data-k="e" aria-label="' + (i + 1) + '교시 끝 시각" value="' + esc(p.e) + '">' +
+        '<span class="ex-p-len" data-len></span></span></div>';
+    }).join("");
+    exLens();
+  }
+  // the small "50분" next to each row, and a warning when times are missing, reversed or overlapping
+  function exLens() {
+    var problems = 0;
+    document.querySelectorAll("#exPeriods .ex-p").forEach(function (row) {
+      var i = +row.dataset.i, p = ex.periods[i], len = exLen(p), el = row.querySelector("[data-len]");
+      var prev = i > 0 ? exMin(ex.periods[i - 1].e) : null, s = exMin(p.s);
+      var msg = "", bad = false;
+      if (len === null) { msg = "시각 입력"; bad = true; }
+      else if (len <= 0) { msg = "시각 확인"; bad = true; }
+      else if (prev !== null && s !== null && s < prev) { msg = "앞 교시와 겹침"; bad = true; }
+      else msg = len + "분";
+      el.textContent = msg;
+      el.classList.toggle("is-bad", bad);
+      if (bad) problems++;
+    });
+    $("exInfo").textContent = problems ? "빨간 글씨 교시의 시각을 확인해 주세요." : "";
+  }
+  function exPeople(changed) {
+    var num = function (v) { v = String(v).trim(); if (v === "") return null; var n = Math.floor(+v); return isFinite(n) && n >= 0 ? n : null; };
+    var t = num($("exTotal").value), a = num($("exAbs").value), k = num($("exTake").value);
+    // keep 재적 = 응시 + 결시 whenever 재적 is known
+    if (t !== null) {
+      if (changed === "exTake" && k !== null) { a = Math.max(0, t - k); $("exAbs").value = a; }
+      else if (a !== null) { k = Math.max(0, t - a); $("exTake").value = k; }
+      else if (k !== null && changed === "exTotal") { a = Math.max(0, t - k); $("exAbs").value = a; }
+    }
+    ex.total = $("exTotal").value; ex.take = $("exTake").value; ex.abs = $("exAbs").value; ex.absWho = $("exAbsWho").value;
+    var warn = "";
+    if (t !== null && a !== null && a > t) warn = "결시 인원이 재적보다 많습니다.";
+    else if (t !== null && k !== null && k > t) warn = "응시 인원이 재적보다 많습니다.";
+    $("exPplWarn").textContent = warn;
+    $("exPplWarn").hidden = !warn;
+  }
+  function exFillTimes(fromIndex) {
+    var start = exMin($("exQStart").value), len = Math.floor(+$("exQLen").value), gap = Math.floor(+$("exQGap").value);
+    if (start === null) { toast("1교시 시작 시각을 먼저 적어 주세요."); return false; }
+    if (!(len >= 1)) { toast("시험 시간을 1분 이상으로 적어 주세요."); return false; }
+    if (!(gap >= 0)) gap = 0;
+    ex.qStart = $("exQStart").value; ex.qLen = len; ex.qGap = gap;
+    ex.periods.forEach(function (p, i) {
+      if (i < (fromIndex || 0)) return;
+      var s = start + i * (len + gap);
+      p.s = exHM(s); p.e = exHM(s + len);
+    });
+    return true;
+  }
+
+  /* ---- board ---- */
+  function exDateText(d) {
+    return (d.getMonth() + 1) + "월 " + d.getDate() + "일 " + "일월화수목금토".charAt(d.getDay()) + "요일";
+  }
+  function exPaint() {
+    var stage = $("exStage"), board = $("exBoard");
+    stage.classList.toggle("is-dark", ex.dark);
+    var title = ex.title.trim() || "시험 안내";
+    $("exBTitle").textContent = title;
+    $("exBRoom").textContent = ex.room.trim();
+    $("exBRoom").hidden = !ex.room.trim();
+    var n = ex.periods.length;
+    board.classList.toggle("is-solo", n === 1);
+    board.classList.toggle("is-many", n >= 6);
+    $("exTT").hidden = n === 1;
+    $("exTT").innerHTML = ex.periods.map(function (p, i) {
+      var s = exMin(p.s), e = exMin(p.e);
+      var t = s !== null && e !== null ? exHM(s) + " ~ " + exHM(e) : "시각 미정";
+      return '<li data-i="' + i + '"><span class="no">' + (i + 1) + '교시</span><span class="s">' + esc(p.subj.trim() || "과목 미정") + '</span><span class="t">' + t + "</span></li>";
+    }).join("");
+    var show = function (v) { v = String(v).trim(); return v === "" ? "-" : v; };
+    $("exBTotal").textContent = show(ex.total);
+    $("exBTake").textContent = show(ex.take);
+    $("exBAbs").textContent = show(ex.abs);
+    $("exBAbsBox").classList.toggle("is-on", +ex.abs > 0);
+    var who = ex.absWho.trim();
+    $("exBAbsWho").textContent = who ? "결시자: " + who : "";
+    $("exBAbsWho").hidden = !who;
+    var notes = ex.notes.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean).slice(0, 5);
+    $("exBNotes").innerHTML = notes.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("");
+    $("exBNotes").hidden = !notes.length;
+    exTick();
+    exLayout();
+  }
+  // Called every second while the exam screen is open.
+  function exTick() {
+    var now = new Date();
+    $("exClock").textContent = exPad(now.getHours()) + ":" + exPad(now.getMinutes()) + ":" + exPad(now.getSeconds());
+    var date = exDateText(now);
+    if ($("exBDate").textContent !== date) $("exBDate").textContent = date;
+    var t = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds() + now.getMilliseconds() / 1000;
+
+    var list = [];
+    ex.periods.forEach(function (p, i) {
+      var s = exMin(p.s), e = exMin(p.e);
+      if (s !== null && e !== null && e > s) list.push({ i: i, p: p, s: s * 60, e: e * 60 });
+    });
+    list.sort(function (a, b) { return a.s - b.s; });
+    var cur = null, next = null, anyPast = false;
+    list.forEach(function (x) {
+      if (x.s <= t && t < x.e && !cur) cur = x;
+      if (x.s > t && (!next || x.s < next.s)) next = x;
+      if (x.e <= t) anyPast = true;
+    });
+
+    var nowBox = $("exNow"), pill, no = "", subj, time = "", leftLabel = "", left = "", prog = null, warn = false, done = false, msg = false, status;
+    var multi = ex.periods.length > 1;
+    var range = function (x) { return exHM(x.s / 60) + " ~ " + exHM(x.e / 60) + "  (" + Math.round((x.e - x.s) / 60) + "분)"; };
+    if (cur) {
+      var rest = cur.e - t;
+      warn = rest <= 300;
+      pill = warn ? "종료 5분 전" : "시험 중";
+      no = multi ? (cur.i + 1) + "교시" : "";
+      subj = exSubj(cur.p, cur.i);
+      time = range(cur);
+      leftLabel = "남은 시간"; left = exDur(rest);
+      prog = (t - cur.s) / (cur.e - cur.s);
+      status = (multi ? (cur.i + 1) + "교시 " : "") + exSubj(cur.p, cur.i) + " 시험 중입니다. " + exDurMin(rest) + " 안에 끝납니다.";
+    } else if (next) {
+      var wait = next.s - t;
+      pill = anyPast ? "쉬는 시간" : "시험 전";
+      no = multi ? (anyPast ? "다음 시험  " : "") + (next.i + 1) + "교시" : "";
+      subj = exSubj(next.p, next.i);
+      time = range(next);
+      leftLabel = "시작까지"; left = exDur(wait);
+      status = (anyPast ? "쉬는 시간입니다. 다음 " : "") + (multi ? (next.i + 1) + "교시 " : "") + exSubj(next.p, next.i) + " 시험이 " + exDurMin(wait) + " 뒤에 시작합니다.";
+    } else if (list.length) {
+      pill = "시험 끝"; done = true; msg = true;
+      subj = multi ? "오늘 시험이 모두 끝났습니다" : "시험이 끝났습니다";
+      time = "수고 많았습니다";
+      status = "시험 시간이 모두 지났습니다.";
+    } else {
+      pill = "시각 미정"; msg = !ex.periods[0].subj.trim();
+      no = multi ? "1교시" : "";
+      subj = ex.periods[0].subj.trim() || "시험 시각을 적어 주세요";
+      status = "교시마다 시작과 끝 시각을 적으면 남은 시간이 나옵니다.";
+    }
+    if ($("exPill").textContent !== pill) $("exPill").textContent = pill;
+    $("exCurNo").textContent = no; $("exCurNo").hidden = !no;
+    if ($("exCurSubj").textContent !== subj) $("exCurSubj").textContent = subj;
+    $("exCurSubj").classList.toggle("is-msg", msg);
+    $("exCurTime").textContent = time; $("exCurTime").hidden = !time;
+    $("exLeftTile").hidden = !left;
+    $("exLeftLabel").textContent = leftLabel;
+    $("exLeft").textContent = left;
+    $("exProg").hidden = prog === null;
+    if (prog !== null) $("exProgBar").style.width = (Math.min(1, Math.max(0, prog)) * 100).toFixed(2) + "%";
+    nowBox.classList.toggle("is-warn", warn);
+    nowBox.classList.toggle("is-done", done);
+    document.querySelectorAll("#exTT li").forEach(function (li) {
+      var i = +li.dataset.i, x = null;
+      for (var k = 0; k < list.length; k++) if (list[k].i === i) x = list[k];
+      li.classList.toggle("is-now", !!(cur && cur.i === i));
+      li.classList.toggle("is-next", !cur && !!(next && next.i === i));
+      li.classList.toggle("is-past", !!(x && x.e <= t));
+    });
+    if (status !== exLastStatus) { exLastStatus = status; $("exStatus").textContent = status; }
+  }
+  // Font size drives every size on the board (all in em), so the board scales to the TV.
+  function exLayout() {
+    if (current !== "exam") return;
+    var stage = $("exStage"), board = $("exBoard"), full = ldFull() === stage;
+    var w = board.clientWidth;
+    if (!w) return;
+    var narrow = !full && w < 600;
+    board.classList.toggle("is-narrow", narrow);
+    var u;
+    if (full) {
+      var h = board.clientHeight;
+      u = Math.min(w / 60, h / 32);
+      board.style.fontSize = u.toFixed(2) + "px";
+      // shrink a little at a time until nothing spills out (many periods, long notes)
+      for (var k = 0; k < 14 && board.scrollHeight > board.clientHeight + 1; k++) {
+        u *= 0.94;
+        board.style.fontSize = u.toFixed(2) + "px";
+      }
+    } else {
+      u = narrow ? Math.max(10.5, w / 32) : w / 60;
+      board.style.fontSize = u.toFixed(2) + "px";
+    }
+  }
+  function exLoop() {
+    if (current === "exam") exTick();
+    setTimeout(exLoop, 1000 - Date.now() % 1000 + 15);
+  }
+
+  /* ---- events ---- */
+  $("exTitle").value = ex.title;
+  $("exRoom").value = ex.room;
+  $("exTotal").value = ex.total;
+  $("exTake").value = ex.take;
+  $("exAbs").value = ex.abs;
+  $("exAbsWho").value = ex.absWho;
+  $("exNotes").value = ex.notes;
+  $("exDark").checked = ex.dark;
+  $("exQStart").value = ex.qStart;
+  $("exQLen").value = ex.qLen;
+  $("exQGap").value = ex.qGap;
+
+  $("exPeriods").addEventListener("input", function (e) {
+    var row = e.target.closest(".ex-p"), k = e.target.dataset.k;
+    if (!row || !k) return;
+    ex.periods[+row.dataset.i][k] = e.target.value;
+    if (k !== "subj") exLens();
+    exSave(); exPaint();
+  });
+  $("exMinus").addEventListener("click", function () {
+    if (ex.periods.length <= EX_MIN) return;
+    ex.periods.pop();
+    exRows(); exSave(); exPaint();
+  });
+  $("exPlus").addEventListener("click", function () {
+    if (ex.periods.length >= EX_MAX) return;
+    // the new period starts one break after the last one ends, and lasts as long as it
+    var last = ex.periods[ex.periods.length - 1], e = exMin(last.e), len = exLen(last);
+    var gap = Math.floor(+$("exQGap").value); if (!(gap >= 0)) gap = 10;
+    if (!(len > 0)) len = Math.floor(+$("exQLen").value) || 40;
+    var p = { subj: "", s: "", e: "" };
+    if (e !== null && e + gap + len < 1440) { p.s = exHM(e + gap); p.e = exHM(e + gap + len); }
+    ex.periods.push(p);
+    exRows(); exSave(); exPaint();
+  });
+  $("exQFill").addEventListener("click", function () {
+    if (!exFillTimes(0)) return;
+    exRows(); exSave(); exPaint();
+    toast(ex.periods.length + "교시까지 시각을 채웠습니다.");
+  });
+  ["exQStart", "exQLen", "exQGap"].forEach(function (id) {
+    $(id).addEventListener("change", function () {
+      ex.qStart = $("exQStart").value; ex.qLen = +$("exQLen").value; ex.qGap = +$("exQGap").value; exSave();
+    });
+  });
+  ["exTitle", "exRoom", "exNotes"].forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      ex.title = $("exTitle").value; ex.room = $("exRoom").value; ex.notes = $("exNotes").value;
+      exSave(); exPaint();
+    });
+  });
+  ["exTotal", "exTake", "exAbs", "exAbsWho"].forEach(function (id) {
+    $(id).addEventListener("input", function () { exPeople(id); exSave(); exPaint(); });
+  });
+  $("exDark").addEventListener("change", function () { ex.dark = this.checked; exSave(); exPaint(); });
+  (function () {
+    var stage = $("exStage");
+    var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (!req) { $("exFull").hidden = true; return; }
+    $("exFull").addEventListener("click", function () {
+      if (ldFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+      try {
+        var p = req.call(stage);
+        if (p && p.catch) p.catch(function () { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); });
+      } catch (err) { toast("이 화면에서는 크게 보기를 쓸 수 없습니다."); }
+    });
+    // keep the TV from dimming while the board is up, where the browser allows it
+    function wake(on) {
+      if (on && !exWake && navigator.wakeLock && navigator.wakeLock.request) {
+        navigator.wakeLock.request("screen").then(function (l) {
+          exWake = l;
+          l.addEventListener("release", function () { if (exWake === l) exWake = null; });
+        }).catch(function () {});
+      } else if (!on && exWake) { exWake.release().catch(function () {}); exWake = null; }
+    }
+    function changed() {
+      var on = ldFull() === stage;
+      stage.classList.toggle("is-full", on);
+      $("exFull").textContent = on ? "크게 보기 닫기" : "크게 보기";
+      $("exFull").className = on ? "btn ghost" : "btn primary";
+      wake(on);
+      exLayout();
+    }
+    document.addEventListener("fullscreenchange", changed);
+    document.addEventListener("webkitfullscreenchange", changed);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible" && ldFull() === stage) wake(true);
+    });
+  })();
+  var exResizeQueued = false;
+  window.addEventListener("resize", function () {
+    if (exResizeQueued) return;
+    exResizeQueued = true;
+    requestAnimationFrame(function () { exResizeQueued = false; exLayout(); });
+  });
+  exRows();
+  exPeople("");
+  exPaint();
+  exLoop();
+
   /* ================= site: tool data, header, home, routing ================= */
   /*
    * To add a tool:
@@ -5364,6 +5924,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     { id: "sign",    name: "서명 만들기",     desc: "투명 배경 서명 PNG",        category: "document", tint: "sky",    icon: "pen",     short: "서명", ready: true },
     { id: "ladder",  name: "사다리타기",      desc: "순서와 당번 공정하게",      category: "class",    tint: "teal",   icon: "ladder",  short: "사다리", ready: true },
     { id: "roulette", name: "룰렛 돌리기",    desc: "발표자와 순서 뽑기",        category: "class",    tint: "orange", icon: "wheel",   short: "룰렛", ready: true },
+    { id: "exam",    name: "시험 안내 화면",  desc: "TV에 띄우는 시험 시간과 인원", category: "class", tint: "sky",    icon: "clock",   short: "시험 안내", ready: true },
     { id: "qr",      name: "QR코드 생성",     desc: "링크를 간편하게",           category: "other",    tint: "sky",    icon: "qr",      ready: false },
     { id: "extract", name: "영상에서 음원 추출", desc: "영상 속 소리만 MP3로", category: "video",  tint: "purple", icon: "extract", short: "음원 추출", ready: true },
     { id: "capture", name: "영상 장면 캡처", desc: "원하는 순간을 사진으로", category: "video", tint: "blue", icon: "capture", short: "장면 캡처", ready: true },
@@ -5393,6 +5954,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     pitch: '<path d="M9 18V5l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/>',
     pen: '<path d="M15 4.5a2.1 2.1 0 0 1 3 3L8.5 17 5 18l1-3.5Z"/><path d="M3 21.5c2.5-1.2 4.5-1.2 6 0s3.5 1.2 6 0 4-1 6 0"/>',
     ladder: '<path d="M6 3v18M12 3v18M18 3v18M6 7h6M12 11h6M6 15h6M12 19h6"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
     wheel: '<circle cx="12" cy="13" r="8.5"/><path d="M12 13V4.5M12 13l7.4 4.2M12 13l-7.4 4.2"/><path d="m10 1.5h4l-2 3Z"/>',
     chev: '<path d="m6 9 6 6 6-6"/>',
     arrow: '<path d="m9 6 6 6-6 6"/>'
@@ -5509,6 +6071,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (current !== "vcut") stopVcut();
     if (current === "ladder") ldLayout();
     if (current === "roulette") rlLayout();
+    if (current === "exam") exPaint();
     if (ldFull() && !$("panel-" + current).contains(ldFull())) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     markActive(name);
     closeMenus();
@@ -5630,7 +6193,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "extract") openExtract(files);
     else if (current === "capture") openCapture(files);
     else if (current === "vcut") openVcut(files);
-    else if (current === "home" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette") return;
+    else if (current === "home" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette" || current === "exam") return;
     else addMosaic(files);
   });
 })();
