@@ -844,6 +844,62 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .key-range { max-width: 460px; width: 100%; margin: 0 auto; }
 .key-range input[type="range"] { width: 100%; }
 .key-ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 0 2px; }
+
+/* ---------- Guide page (사이트 소개 · 자주 묻는 질문 · 업데이트 소식 · 건의하기) ---------- */
+/* with the 안내 menu there are seven top items: let them shrink instead of pushing the header wider than the screen */
+.top-nav { flex: 0 1 auto; min-width: 0; }
+.nav-group { flex: 0 1 auto; width: 140px; min-width: 0; }
+.g-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.g-jump a { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--fg); font-size: 14px; font-weight: 700; text-decoration: none; }
+.g-jump a:hover { border-color: #b5a9fb; background: #fbfaff; }
+.g-card { padding: 26px 28px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--shadow-soft); scroll-margin-top: 16px; }
+.g-card > h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; font-size: 21px; font-weight: 800; letter-spacing: -0.5px; }
+.g-card > h3 .ico { width: 24px; height: 24px; color: var(--accent); stroke-width: 2; }
+.g-card p { margin: 0; line-height: 1.7; }
+.g-card p + p { margin-top: 10px; }
+.g-safe { display: flex; gap: 14px; margin-bottom: 18px; padding: 16px 18px; border-radius: 14px; background: var(--accent-soft); }
+.g-safe .ico { flex: none; width: 28px; height: 28px; margin-top: 2px; color: var(--accent); stroke-width: 2; }
+.g-safe strong { display: block; margin-bottom: 4px; color: var(--accent-dark); font-size: 16px; }
+.g-safe span { color: #3b3f55; font-size: 14.5px; line-height: 1.65; }
+.g-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; margin-top: 18px; }
+.g-tools div { min-width: 0; }
+.g-tools b { display: block; margin-bottom: 4px; font-size: 13px; color: var(--muted); }
+.g-tools a { display: inline-block; margin: 0 6px 6px 0; padding: 5px 10px; border-radius: 8px; background: var(--sunken); color: var(--fg); font-size: 13.5px; font-weight: 600; text-decoration: none; }
+.g-tools a:hover { background: var(--accent-soft); color: var(--accent-dark); }
+.g-faq { border-top: 1px solid var(--line); }
+.g-faq details { border-bottom: 1px solid var(--line); }
+.g-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 2px; font-weight: 700; cursor: pointer; list-style: none; }
+.g-faq summary::-webkit-details-marker { display: none; }
+.g-faq summary::before { content: "Q"; flex: none; color: var(--accent); font-weight: 900; }
+.g-faq summary span { flex: 1; min-width: 0; }
+.g-faq summary .ico { flex: none; width: 16px; height: 16px; color: var(--muted); stroke-width: 2; transition: transform .15s; }
+.g-faq details[open] summary .ico { transform: rotate(180deg); }
+.g-faq summary:hover span { color: var(--accent-dark); }
+.g-faq .g-a { padding: 0 2px 16px 24px; color: #3b3f55; font-size: 14.5px; line-height: 1.7; }
+.g-faq .g-a ul { margin: 6px 0 0; padding-left: 1.2em; }
+.g-faq .g-a li + li { margin-top: 3px; }
+.g-news { margin: 0; padding: 0; list-style: none; }
+.g-news > li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 4px 18px; padding: 14px 0; border-top: 1px solid var(--line); }
+.g-news > li:first-child { border-top: 0; padding-top: 0; }
+.g-news time, .g-news .g-date { color: var(--accent-dark); font-family: var(--font-data); font-size: 13.5px; font-weight: 500; padding-top: 2px; }
+.g-news ul { margin: 0; padding-left: 1.1em; }
+.g-news ul li + li { margin-top: 3px; }
+.g-contact p { color: #3b3f55; }
+.g-contact .btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 11px 18px; border-radius: 10px; font-size: 15px; text-decoration: none; }
+.g-contact .btn .ig-icon { width: 20px; height: 20px; }
+.g-contact .foot { margin-top: 16px; }
+@media (min-width: 861px) and (max-width: 1020px) {
+  /* 7 menu items get tight here: the Instagram button keeps only its icon */
+  .social-link span { display: none; }
+  .social-link { padding: 10px; }
+}
+.footer-links { display: inline-flex; gap: 14px; }
+.footer-right .footer-links a { color: #838b9d; font-weight: 500; }
+@media (max-width: 560px) {
+  .g-card { padding: 20px 18px; }
+  .g-tools { grid-template-columns: minmax(0, 1fr); }
+  .g-news > li { grid-template-columns: minmax(0, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -1733,6 +1789,105 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 시험 안내만 꽉 차게 띄울 수 있고, 띄워 두는 동안에는 화면이 저절로 꺼지지 않게 합니다. Esc 키를 누르면 닫힙니다. 적은 내용은 이 기기에만 저장됩니다.</li>
     </ul>
   </section>
+  <!-- ===== Guide: 사이트 소개 · 자주 묻는 질문 · 업데이트 소식 · 건의하기 ===== -->
+  <section class="panel" id="panel-guide" hidden>
+    <div>
+      <p class="eyebrow">안내</p>
+      <h2>TeachersTool 안내</h2>
+      <p class="sub">사이트를 처음 쓰신다면 아래 내용을 먼저 읽어 보세요.</p>
+      <nav class="g-jump" aria-label="안내 바로가기" id="gJump"></nav>
+    </div>
+
+    <section class="g-card" id="g-about" aria-labelledby="gAboutTitle">
+      <h3 id="gAboutTitle"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>사이트 소개</h3>
+      <div class="g-safe">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <div>
+          <strong>파일은 내 기기 안에서만 처리돼요</strong>
+          <span>사진, 문서, 음원, 영상 파일을 어떤 서버로도 보내지 않습니다. 바꾸고 자르고 합치는 일은 모두 지금 쓰고 있는 브라우저 안에서 이루어지고, 창을 닫으면 넣었던 파일도 함께 사라집니다. 학생 사진이나 명렬표처럼 개인정보가 담긴 파일도 밖으로 나가지 않습니다.</span>
+        </div>
+      </div>
+      <p>TeachersTool은 학교에서 일하는 꼬비샘이 수업과 업무 중에 자주 부딪히던 작은 일들을 덜려고 만든 도구 모음입니다. 아이폰 사진 변환, PDF 용량 줄이기, 수업에 쓸 음원 자르기처럼 매번 프로그램을 찾아 설치하기 번거로웠던 일을 한곳에 모았습니다.</p>
+      <p>회원가입이나 결제 없이 무료로 쓸 수 있고, 표준문서 변환을 빼면 설치할 것도 없습니다. 지금 들어 있는 도구는 다음과 같습니다.</p>
+      <div class="g-tools" id="gTools"></div>
+    </section>
+
+    <section class="g-card" id="g-faq" aria-labelledby="gFaqTitle">
+      <h3 id="gFaqTitle"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01"/></svg>자주 묻는 질문</h3>
+      <div class="g-faq">
+        <details>
+          <summary><span>학생 사진이나 개인정보가 담긴 파일을 넣어도 되나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">네. 넣은 파일은 이 기기의 브라우저 안에서만 처리되고 서버로 보내지 않습니다. 사진 모자이크로 얼굴이나 이름을 가린 뒤 공유하는 용도로도 쓸 수 있습니다.</div>
+        </details>
+        <details>
+          <summary><span>넣은 파일이 어딘가에 저장되나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">파일은 저장되지 않습니다. 창을 닫거나 새로고침하면 넣었던 파일과 결과가 모두 사라지니, 결과는 저장 버튼으로 먼저 받아 두세요.
+            <ul>
+              <li>다음에 쓰기 편하도록 사다리타기와 룰렛 돌리기에 적은 이름, 시험 안내 화면에 적은 내용, 저장 형식 같은 설정은 이 기기의 브라우저에만 기억해 둡니다. 다른 기기나 다른 사람에게는 보이지 않습니다.</li>
+              <li>공용 컴퓨터에서 학생 이름을 지우고 싶다면 각 도구에서 목록을 비우거나 브라우저의 방문 기록과 사이트 데이터를 삭제하세요.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary><span>학교 컴퓨터에서도 되나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">크롬, 엣지, 웨일 같은 최신 브라우저라면 설치 없이 바로 쓸 수 있습니다. 인터넷 익스플로러에서는 동작하지 않습니다.
+            <ul>
+              <li>표준문서 변환만은 윈도우용 프로그램을 내려받아 실행하며, 한글과 MS 오피스가 설치된 윈도우 PC가 필요합니다.</li>
+              <li>학교 보안 설정 때문에 일부 사이트 접속이 막혀 있으면 도구를 불러오지 못할 수 있습니다. 그럴 때는 다른 네트워크나 기기에서 써 보세요.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary><span>휴대폰이나 태블릿에서도 되나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">표준문서 변환을 뺀 나머지 도구는 휴대폰과 태블릿에서도 쓸 수 있습니다. 다만 휴대폰은 컴퓨터보다 메모리가 작아서 큰 영상이나 쪽수가 많은 PDF는 처리가 느리거나 멈출 수 있습니다. 큰 파일은 컴퓨터에서 작업하는 편이 좋습니다.</div>
+        </details>
+        <details>
+          <summary><span>인터넷이 연결되어 있어야 하나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">네. 사이트를 열 때와 각 도구를 처음 쓸 때 파일을 처리하는 프로그램을 인터넷에서 받아 옵니다. 이때도 받아 오기만 할 뿐, 내 파일은 보내지 않습니다.</div>
+        </details>
+        <details>
+          <summary><span>파일이 커서 안 되거나 중간에 멈춰요.</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">모든 작업을 이 기기의 메모리로 처리하기 때문에, 기기 성능에 따라 다룰 수 있는 크기가 다릅니다.
+            <ul>
+              <li>영상은 컴퓨터에서 1GB 안팎, 휴대폰에서 300MB 안팎까지가 무난합니다. 2GB가 넘는 영상은 열리지 않습니다.</li>
+              <li>다른 탭과 프로그램을 닫고 다시 해 보거나, 파일을 나누어 여러 번에 걸쳐 작업해 보세요.</li>
+              <li>그래도 안 되면 어떤 파일이었는지 적어 건의하기로 알려 주세요.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary><span>저장한 파일은 어디에 있나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">브라우저의 다운로드 위치에 저장됩니다. 컴퓨터는 보통 "다운로드" 폴더, 아이폰은 파일 앱의 "다운로드" 폴더, 안드로이드 휴대폰은 내 파일 앱의 "Download" 폴더에서 찾을 수 있습니다.</div>
+        </details>
+        <details>
+          <summary><span>휴대폰 홈 화면에 추가하려면 어떻게 하나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">홈 화면에 추가해 두면 앱처럼 바로 열 수 있습니다.
+            <ul>
+              <li>아이폰(사파리): 아래쪽 공유 버튼을 누른 뒤 "홈 화면에 추가"를 누릅니다.</li>
+              <li>안드로이드(크롬): 오른쪽 위 ⋮ 메뉴에서 "홈 화면에 추가"를 누릅니다.</li>
+              <li>컴퓨터: 주소창 오른쪽의 별 모양을 누르거나 Ctrl+D를 눌러 즐겨찾기에 넣어 두세요.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="g-card" id="g-news" aria-labelledby="gNewsTitle">
+      <h3 id="gNewsTitle"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>업데이트 소식</h3>
+      <ul class="g-news" id="gNews"></ul>
+    </section>
+
+    <section class="g-card g-contact" id="g-contact" aria-labelledby="gContactTitle">
+      <h3 id="gContactTitle"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4A8 8 0 1 1 20 12Z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg>건의하기</h3>
+      <p>있었으면 하는 도구, 쓰다가 불편했던 점, 제대로 동작하지 않는 곳을 알려 주세요. 인스타그램 <b>ggobilog</b>로 DM을 보내 주시면 꼼꼼히 읽고 다음 업데이트에 반영하겠습니다.</p>
+      <a class="btn primary" href="https://www.instagram.com/ggobilog/" target="_blank" rel="noopener"><img class="ig-icon" alt="" src="data:image/webp;base64,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" alt="">인스타그램 DM 보내기</a>
+      <ul class="foot">
+        <li>프로필에서 "메시지 보내기"를 누르면 DM을 보낼 수 있습니다.</li>
+        <li>오류를 알려 주실 때는 어떤 도구에서, 어떤 기기와 브라우저로, 어떤 파일을 넣었을 때 생겼는지 적어 주시면 빨리 고칠 수 있습니다.</li>
+        <li>학생 개인정보가 담긴 파일은 DM으로 보내지 마세요.</li>
+      </ul>
+    </section>
+  </section>
   </main>
 
   <footer class="site-footer">
@@ -1740,6 +1895,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <span class="footer-brand">Teachers<b>Tool</b></span>
       <div class="footer-right">
         <span>수업과 업무에 필요한 작은 도구들</span>
+        <span class="footer-links"><a href="#about" data-nav="about">사이트 소개</a><a href="#contact" data-nav="contact">건의하기</a></span>
         <span class="footer-copy">© 꼬비샘</span>
         <a href="https://www.instagram.com/ggobilog/" target="_blank" rel="noopener" aria-label="인스타그램 ggobilog">
           <img class="ig-icon" src="data:image/webp;base64,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" alt="">
@@ -5912,6 +6068,20 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     { id: "other",    name: "기타",      label: "기타 도구", icon: "grid",  tone: "#6355ef" }
   ];
   var NAV_ORDER = ["photo", "audio", "document", "video", "class"];
+  // 안내 menu: one page (panel-guide) with four sections; each hash scrolls to its section.
+  var GUIDE = [
+    { id: "about",   name: "사이트 소개",    el: "g-about" },
+    { id: "faq",     name: "자주 묻는 질문", el: "g-faq" },
+    { id: "news",    name: "업데이트 소식",  el: "g-news" },
+    { id: "contact", name: "건의하기",       el: "g-contact" }
+  ];
+  // 업데이트 소식: newest first. Add one line here whenever a tool is added or changed.
+  var NEWS = [
+    { date: "2026.11.11", items: ["안내 메뉴 추가 (사이트 소개, 자주 묻는 질문, 업데이트 소식, 건의하기)", "학급 도구에 시험 안내 화면 추가", "사이트 이름을 TeachersTool로 변경"] },
+    { date: "2026.11.10", items: ["새 디자인으로 사이트 개편", "문서 도구에 서명 만들기, PDF 합치기 추가", "음원 도구에 음원 키 변경 추가", "학급 도구에 사다리타기, 룰렛 돌리기 추가", "영상 도구에 영상에서 음원 추출, 영상 장면 캡처, 영상 자르기 추가"] },
+    { date: "", label: "처음부터", items: ["HEIC 변환, 사진 모자이크, PDF 용량 줄이기, 표준문서 변환, 음원 자르기, 음원 합치기"] }
+  ];
+  function guideOf(id) { for (var i = 0; i < GUIDE.length; i++) if (GUIDE[i].id === id) return GUIDE[i]; return null; }
   var TOOL_LIST = [
     { id: "heic",    name: "HEIC 변환",       desc: "아이폰 사진을 JPG로",       category: "photo",    tint: "blue",   icon: "image",   short: "변환", ready: true,  featured: true },
     { id: "mosaic",  name: "사진 모자이크",   desc: "개인정보 안전하게",         category: "photo",    tint: "orange", icon: "mosaic",  short: "모자이크", ready: true,  featured: true },
@@ -5990,17 +6160,42 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
         '<div class="nav-sub" id="sub-' + cid + '" hidden>' + SubLinks(cid) + "</div></div>";
     });
     html += '<a class="nav-item" href="#all" data-nav="all">전체 도구</a>';
+    // 안내 comes first, before the tool categories
+    html = '<div class="nav-group">' +
+      '<button type="button" class="nav-item" data-group="guide" aria-expanded="false" aria-controls="sub-guide">안내' + icon("chev", "chev") + "</button>" +
+      '<div class="nav-sub" id="sub-guide" hidden>' + GuideLinks() + "</div></div>" + html;
     $("topNav").innerHTML = html;
 
-    $("megaIn").innerHTML = NAV_ORDER.map(function (cid) {
-      return '<div class="mega-col" data-col="' + cid + '"><div class="mega-links">' + SubLinks(cid) + "</div></div>";
-    }).join("");
+    // one mega column per menu button, in the same order (안내 first)
+    $("megaIn").innerHTML = '<div class="mega-col" data-col="guide"><div class="mega-links">' + GuideLinks() + "</div></div>" +
+      NAV_ORDER.map(function (cid) {
+        return '<div class="mega-col" data-col="' + cid + '"><div class="mega-links">' + SubLinks(cid) + "</div></div>";
+      }).join("");
 
     var m = '<div class="m-home"><a href="#all" data-nav="all">전체 도구</a></div>';
     CATEGORIES.forEach(function (c) {
       m += '<div class="m-group"><p class="m-group-title">' + esc(c.label) + '</p><div class="m-links">' + SubLinks(c.id) + "</div></div>";
     });
+    var guideGroup = '<div class="m-group"><p class="m-group-title">안내</p><div class="m-links">' + GuideLinks() + "</div></div>";
+    m = m.replace("</div>", "</div>" + guideGroup);   // right after the "전체 도구" button, before the tool groups
     $("mobileNavIn").innerHTML = m;
+  }
+  function GuideLinks() {
+    return GUIDE.map(function (g) { return '<a class="sub-link" href="#' + g.id + '" data-nav="' + g.id + '">' + esc(g.name) + "</a>"; }).join("");
+  }
+  function Guide() {
+    $("gJump").innerHTML = GUIDE.map(function (g) { return '<a href="#' + g.id + '" data-nav="' + g.id + '">' + esc(g.name) + "</a>"; }).join("");
+    $("gTools").innerHTML = CATEGORIES.map(function (c) {
+      var list = readyIn(c.id);
+      if (!list.length) return "";
+      return "<div><b>" + esc(c.label) + "</b>" + list.map(function (t) {
+        return '<a href="#' + t.id + '" data-nav="' + t.id + '">' + esc(t.name) + "</a>";
+      }).join("") + "</div>";
+    }).join("");
+    $("gNews").innerHTML = NEWS.map(function (n) {
+      var when = n.date ? '<time datetime="' + n.date.replace(/\./g, "-") + '">' + n.date + "</time>" : '<span class="g-date">' + esc(n.label || "") + "</span>";
+      return "<li>" + when + "<ul>" + n.items.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></li>";
+    }).join("");
   }
   function ToolCard(t) {
     if (!t.ready) {
@@ -6051,7 +6246,10 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   function route(hash, scrollToTools) {
     var name = hash || "home";
     var tool = toolOf(name);
-    if (tool && tool.ready) {
+    var guide = guideOf(name);
+    if (guide) {
+      current = "guide";
+    } else if (tool && tool.ready) {
       current = name;
     } else {
       current = "home";
@@ -6062,6 +6260,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     }
     $("panel-home").hidden = current !== "home";
     PANELS.forEach(function (t) { $("panel-" + t).hidden = t !== current; });
+    $("panel-guide").hidden = current !== "guide";
     if (current === "audio") drawWave(); else stopAudio();
     if (current === "sign") sResize();
     if (current !== "merge") stopMerge();
@@ -6075,12 +6274,13 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (ldFull() && !$("panel-" + current).contains(ldFull())) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     markActive(name);
     closeMenus();
-    if (scrollToTools && current === "home" && name !== "home") $("tools").scrollIntoView({ block: "start" });
+    if (guide) { if (guide.id === "about") window.scrollTo(0, 0); else $(guide.el).scrollIntoView({ block: "start" }); }
+    else if (scrollToTools && current === "home" && name !== "home") $("tools").scrollIntoView({ block: "start" });
     else window.scrollTo(0, 0);
   }
   function markActive(name) {
     var t = toolOf(name);
-    var group = t ? t.category : name.indexOf("cat-") === 0 ? name.slice(4) : null;
+    var group = t ? t.category : guideOf(name) ? "guide" : name.indexOf("cat-") === 0 ? name.slice(4) : null;
     document.querySelectorAll(".top-nav .nav-item").forEach(function (el) {
       var on = el.dataset.nav ? el.dataset.nav === name : el.dataset.group === group;
       el.classList.toggle("is-active", on);
@@ -6129,7 +6329,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   }
   // Line each column up under its own menu button: column i runs from button i's left edge to button i+1's.
   function alignMega() {
-    var groups = document.querySelectorAll(".top-nav .nav-group");
+    var groups = document.querySelectorAll("#topNav > *");
     var x = [];
     groups.forEach(function (g) { var r = g.getBoundingClientRect(); x.push([r.left, r.right]); });
     if (!x.length) return;
@@ -6157,6 +6357,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   });
 
   Header();
+  Guide();
   $("categoryGrid").innerHTML = CATEGORIES.map(ToolCategory).join("");
 
   document.addEventListener("click", function (e) {
@@ -6193,7 +6394,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "extract") openExtract(files);
     else if (current === "capture") openCapture(files);
     else if (current === "vcut") openVcut(files);
-    else if (current === "home" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette" || current === "exam") return;
+    else if (current === "home" || current === "guide" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette" || current === "exam") return;
     else addMosaic(files);
   });
 })();
