@@ -6387,12 +6387,19 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     if (!el || !window.fetch) return;
     // GoatCounter는 날짜를 UTC 자정으로 받으므로, "오늘"은 한국 시간 오전 9시부터 센 값입니다.
     var today = new Date().toISOString().slice(0, 10);
-    getJSON(GC + "/counter/TOTAL.json").then(function (total) {
+    // 누적도 오늘과 같은 방식(날짜를 지정한 요청)으로 물어야 두 숫자의 기준이 맞습니다.
+    // 날짜 없이 물으면 따로 저장된 값이 와서 오늘보다 작게 나온 적이 있습니다.
+    function num(v) { return parseInt(String(v).replace(/[^0-9]/g, ""), 10) || 0; }
+    function fmt(n) { return n.toLocaleString("ko-KR"); }
+    getJSON(GC + "/counter/TOTAL.json?start=2026-11-01").then(function (total) {
       if (!total || total.count == null) return;
-      el.innerHTML = "누적 방문 <b>" + total.count + "</b>";
+      var all = num(total.count);
+      el.innerHTML = "누적 방문 <b>" + fmt(all) + "</b>";
       el.hidden = false;
       return getJSON(GC + "/counter/TOTAL.json?start=" + today).then(function (t) {
-        if (t && t.count != null) el.innerHTML = "오늘 <b>" + t.count + "</b> · 누적 방문 <b>" + total.count + "</b>";
+        if (!t || t.count == null) return;
+        var day = num(t.count);
+        el.innerHTML = "오늘 <b>" + fmt(day) + "</b> · 누적 방문 <b>" + fmt(Math.max(all, day)) + "</b>";
       }).catch(function () {});
     }).catch(function () {});
   }
