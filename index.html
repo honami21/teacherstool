@@ -845,7 +845,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .key-range input[type="range"] { width: 100%; }
 .key-ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 0 2px; }
 
-/* ---------- Guide page (사이트 소개 · 자주 묻는 질문 · 업데이트 소식 · 건의하기) ---------- */
+/* ---------- Guide page (사이트 소개 · 자주 묻는 질문 · 건의하기) ---------- */
 /* with the 안내 menu there are seven top items: let them shrink instead of pushing the header wider than the screen */
 .top-nav { flex: 0 1 auto; min-width: 0; }
 .nav-group { flex: 0 1 auto; width: 140px; min-width: 0; }
@@ -861,11 +861,6 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .g-safe .ico { flex: none; width: 28px; height: 28px; margin-top: 2px; color: var(--accent); stroke-width: 2; }
 .g-safe strong { display: block; margin-bottom: 4px; color: var(--accent-dark); font-size: 16px; }
 .g-safe span { color: #3b3f55; font-size: 14.5px; line-height: 1.65; }
-.g-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; margin-top: 18px; }
-.g-tools div { min-width: 0; }
-.g-tools b { display: block; margin-bottom: 4px; font-size: 13px; color: var(--muted); }
-.g-tools a { display: inline-block; margin: 0 6px 6px 0; padding: 5px 10px; border-radius: 8px; background: var(--sunken); color: var(--fg); font-size: 13.5px; font-weight: 600; text-decoration: none; }
-.g-tools a:hover { background: var(--accent-soft); color: var(--accent-dark); }
 .g-faq { border-top: 1px solid var(--line); }
 .g-faq details { border-bottom: 1px solid var(--line); }
 .g-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 2px; font-weight: 700; cursor: pointer; list-style: none; }
@@ -878,12 +873,6 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .g-faq .g-a { padding: 0 2px 16px 24px; color: #3b3f55; font-size: 14.5px; line-height: 1.7; }
 .g-faq .g-a ul { margin: 6px 0 0; padding-left: 1.2em; }
 .g-faq .g-a li + li { margin-top: 3px; }
-.g-news { margin: 0; padding: 0; list-style: none; }
-.g-news > li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 4px 18px; padding: 14px 0; border-top: 1px solid var(--line); }
-.g-news > li:first-child { border-top: 0; padding-top: 0; }
-.g-news time, .g-news .g-date { color: var(--accent-dark); font-family: var(--font-data); font-size: 13.5px; font-weight: 500; padding-top: 2px; }
-.g-news ul { margin: 0; padding-left: 1.1em; }
-.g-news ul li + li { margin-top: 3px; }
 .g-contact p { color: #3b3f55; }
 .g-contact .btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 11px 18px; border-radius: 10px; font-size: 15px; text-decoration: none; }
 .g-contact .btn .ig-icon { width: 20px; height: 20px; }
@@ -897,9 +886,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .footer-right .footer-links a { color: #838b9d; font-weight: 500; }
 @media (max-width: 560px) {
   .g-card { padding: 20px 18px; }
-  .g-tools { grid-template-columns: minmax(0, 1fr); }
-  .g-news > li { grid-template-columns: minmax(0, 1fr); }
-}
+    }
 </style>
 </head>
 <body>
@@ -1789,7 +1776,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 시험 안내만 꽉 차게 띄울 수 있고, 띄워 두는 동안에는 화면이 저절로 꺼지지 않게 합니다. Esc 키를 누르면 닫힙니다. 적은 내용은 이 기기에만 저장됩니다.</li>
     </ul>
   </section>
-  <!-- ===== Guide: 사이트 소개 · 자주 묻는 질문 · 업데이트 소식 · 건의하기 ===== -->
+  <!-- ===== Guide: 사이트 소개 · 자주 묻는 질문 · 건의하기 ===== -->
   <section class="panel" id="panel-guide" hidden>
     <div>
       <p class="eyebrow">안내</p>
@@ -1808,8 +1795,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
         </div>
       </div>
       <p>TeachersTool은 학교에서 일하는 꼬비샘이 수업과 업무 중에 자주 부딪히던 작은 일들을 덜려고 만든 도구 모음입니다. 아이폰 사진 변환, PDF 용량 줄이기, 수업에 쓸 음원 자르기처럼 매번 프로그램을 찾아 설치하기 번거로웠던 일을 한곳에 모았습니다.</p>
-      <p>회원가입이나 결제 없이 무료로 쓸 수 있고, 표준문서 변환을 빼면 설치할 것도 없습니다. 지금 들어 있는 도구는 다음과 같습니다.</p>
-      <div class="g-tools" id="gTools"></div>
+      <p>회원가입이나 결제 없이 무료로 쓸 수 있고, 표준문서 변환을 빼면 설치할 것도 없습니다.</p>
     </section>
 
     <section class="g-card" id="g-faq" aria-labelledby="gFaqTitle">
@@ -1870,11 +1856,6 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
           </div>
         </details>
       </div>
-    </section>
-
-    <section class="g-card" id="g-news" aria-labelledby="gNewsTitle">
-      <h3 id="gNewsTitle"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>업데이트 소식</h3>
-      <ul class="g-news" id="gNews"></ul>
     </section>
 
     <section class="g-card g-contact" id="g-contact" aria-labelledby="gContactTitle">
@@ -6068,18 +6049,11 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     { id: "other",    name: "기타",      label: "기타 도구", icon: "grid",  tone: "#6355ef" }
   ];
   var NAV_ORDER = ["photo", "audio", "document", "video", "class"];
-  // 안내 menu: one page (panel-guide) with four sections; each hash scrolls to its section.
+  // 안내 menu: one page (panel-guide) with three sections; each hash scrolls to its section.
   var GUIDE = [
     { id: "about",   name: "사이트 소개",    el: "g-about" },
     { id: "faq",     name: "자주 묻는 질문", el: "g-faq" },
-    { id: "news",    name: "업데이트 소식",  el: "g-news" },
     { id: "contact", name: "건의하기",       el: "g-contact" }
-  ];
-  // 업데이트 소식: newest first. Add one line here whenever a tool is added or changed.
-  var NEWS = [
-    { date: "2026.11.11", items: ["안내 메뉴 추가 (사이트 소개, 자주 묻는 질문, 업데이트 소식, 건의하기)", "학급 도구에 시험 안내 화면 추가", "사이트 이름을 TeachersTool로 변경"] },
-    { date: "2026.11.10", items: ["새 디자인으로 사이트 개편", "문서 도구에 서명 만들기, PDF 합치기 추가", "음원 도구에 음원 키 변경 추가", "학급 도구에 사다리타기, 룰렛 돌리기 추가", "영상 도구에 영상에서 음원 추출, 영상 장면 캡처, 영상 자르기 추가"] },
-    { date: "", label: "처음부터", items: ["HEIC 변환, 사진 모자이크, PDF 용량 줄이기, 표준문서 변환, 음원 자르기, 음원 합치기"] }
   ];
   function guideOf(id) { for (var i = 0; i < GUIDE.length; i++) if (GUIDE[i].id === id) return GUIDE[i]; return null; }
   var TOOL_LIST = [
@@ -6185,17 +6159,6 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   }
   function Guide() {
     $("gJump").innerHTML = GUIDE.map(function (g) { return '<a href="#' + g.id + '" data-nav="' + g.id + '">' + esc(g.name) + "</a>"; }).join("");
-    $("gTools").innerHTML = CATEGORIES.map(function (c) {
-      var list = readyIn(c.id);
-      if (!list.length) return "";
-      return "<div><b>" + esc(c.label) + "</b>" + list.map(function (t) {
-        return '<a href="#' + t.id + '" data-nav="' + t.id + '">' + esc(t.name) + "</a>";
-      }).join("") + "</div>";
-    }).join("");
-    $("gNews").innerHTML = NEWS.map(function (n) {
-      var when = n.date ? '<time datetime="' + n.date.replace(/\./g, "-") + '">' + n.date + "</time>" : '<span class="g-date">' + esc(n.label || "") + "</span>";
-      return "<li>" + when + "<ul>" + n.items.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></li>";
-    }).join("");
   }
   function ToolCard(t) {
     if (!t.ready) {
