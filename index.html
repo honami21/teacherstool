@@ -234,6 +234,9 @@ a.tool-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-soft);
 .footer-right a { display: inline-flex; align-items: center; gap: 6px; color: #253047; font-weight: 600; text-decoration: none; }
 .footer-right a:hover { text-decoration: underline; }
 .footer-right .ig-icon { width: 18px; height: 18px; }
+.footer-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.footer-visits { color: #9aa1b1; font-size: 12px; font-variant-numeric: tabular-nums; }
+.footer-visits b { color: #5d667a; font-weight: 600; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1260px) {
@@ -1806,6 +1809,10 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
           <div class="g-a">네. 넣은 파일은 이 기기의 브라우저 안에서만 처리되고 서버로 보내지 않습니다. 사진 모자이크로 얼굴이나 이름을 가린 뒤 공유하는 용도로도 쓸 수 있습니다.</div>
         </details>
         <details>
+          <summary><span>방문 통계는 무엇을 보내나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="g-a">방문자 수를 세려고 통계 서비스(GoatCounter)에 어느 화면을 열었는지 같은 방문 기록만 보냅니다. 넣은 파일과 입력한 내용은 보내지 않으며, 쿠키도 쓰지 않습니다.</div>
+        </details>
+        <details>
           <summary><span>넣은 파일이 어딘가에 저장되나요?</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
           <div class="g-a">파일은 저장되지 않습니다. 창을 닫거나 새로고침하면 넣었던 파일과 결과가 모두 사라지니, 결과는 저장 버튼으로 먼저 받아 두세요.
             <ul>
@@ -1873,7 +1880,10 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 
   <footer class="site-footer">
     <div class="wrap footer-in">
-      <span class="footer-brand">Teachers<b>Tool</b></span>
+      <div class="footer-left">
+        <span class="footer-brand">Teachers<b>Tool</b></span>
+        <span class="footer-visits" id="visitCount" hidden></span>
+      </div>
       <div class="footer-right">
         <span>수업과 업무에 필요한 작은 도구들</span>
         <span class="footer-links"><a href="#about" data-nav="about">사이트 소개</a><a href="#contact" data-nav="contact">건의하기</a></span>
@@ -6360,6 +6370,55 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     else if (current === "home" || current === "guide" || current === "convert" || current === "sign" || current === "ladder" || current === "roulette" || current === "exam") return;
     else addMosaic(files);
   });
+})();
+</script>
+<script>
+/* 방문 통계(GoatCounter): 실제 사이트 주소에서만 집계하고, 화면(#도구)마다 따로 셉니다. 파일이나 입력 내용은 보내지 않습니다. */
+(function () {
+  var GC = "https://teacherstool.goatcounter.com";
+  var live = location.hostname === "honami21.github.io";
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function getJSON(url) {
+    // 아직 방문이 없으면 GoatCounter가 404와 함께 0을 돌려줍니다. 설정이 꺼져 있으면 403입니다.
+    return fetch(url).then(function (r) { if (!r.ok && r.status !== 404) throw r.status; return r.json(); });
+  }
+  // 하단 방문자 수: 불러오지 못하면(설정 꺼짐, 차단, 오프라인) 조용히 숨긴 채로 둡니다.
+  function showVisits() {
+    var el = document.getElementById("visitCount");
+    if (!el || !window.fetch) return;
+    var d = new Date(), today = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+    getJSON(GC + "/counter/TOTAL.json").then(function (total) {
+      if (!total || total.count == null) return;
+      el.innerHTML = "누적 방문 <b>" + total.count + "</b>";
+      el.hidden = false;
+      return getJSON(GC + "/counter/TOTAL.json?start=" + today + "&end=" + today).then(function (t) {
+        if (t && t.count != null) el.innerHTML = "오늘 <b>" + t.count + "</b> · 누적 방문 <b>" + total.count + "</b>";
+      }).catch(function () {});
+    }).catch(function () {});
+  }
+  showVisits();
+  if (!live) return;
+  function screenTitle(name) {
+    var a = document.querySelector('[data-nav="' + name + '"]');
+    var t = a && a.textContent.replace(/\s+/g, " ").trim();
+    return t ? t + " - TeachersTool" : document.title;
+  }
+  function countView() {
+    var name = location.hash.slice(1);
+    if (!window.goatcounter || !window.goatcounter.count) return;
+    window.goatcounter.count({
+      path: location.pathname + (name ? "#" + name : ""),
+      title: name ? screenTitle(name) : document.title
+    });
+  }
+  window.goatcounter = { no_onload: true };
+  window.addEventListener("hashchange", countView);
+  var s = document.createElement("script");
+  s.async = true;
+  s.src = "https://gc.zgo.at/count.js";
+  s.setAttribute("data-goatcounter", GC + "/count");
+  s.onload = countView;
+  document.body.appendChild(s);
 })();
 </script>
 </body>
