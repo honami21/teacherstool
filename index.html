@@ -1771,6 +1771,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
         </div>
       </div>
       <div class="field"><label class="check"><input type="checkbox" id="exDark"> 어두운 화면</label></div>
+      <div class="field"><button type="button" class="btn small" id="exResetAll">모두 처음으로</button></div>
     </div>
     <div class="ex-form">
       <div class="ex-row2">
@@ -1868,6 +1869,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
       <div class="settings">
         <div class="field"><label class="check"><input type="checkbox" id="tmSound" checked> 끝나면 알림음</label></div>
         <div class="field"><label class="check"><input type="checkbox" id="tmDark"> 어두운 화면</label></div>
+        <div class="field"><button type="button" class="btn small" id="tmResetAll">모두 처음으로</button></div>
       </div>
     </div>
     <div class="tm-stage" id="tmStage">
@@ -1890,7 +1892,7 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     </div>
     <ul class="foot">
       <li>1분 남으면 주황색, 10초 남으면 빨간색으로 바뀌고, 끝나면 알림음과 함께 "시간 종료!"가 깜빡입니다. 알림음은 기기 소리가 켜져 있어야 들립니다.</li>
-      <li>타이머가 도는 동안에도 −1분, +1분으로 시간을 줄이거나 늘릴 수 있습니다. 시간을 새로 정하려면 일시정지하거나 "처음으로"를 누르세요.</li>
+      <li>타이머가 도는 동안에도 −1분, +1분으로 시간을 줄이거나 늘릴 수 있습니다. 시간을 새로 정하려면 일시정지하거나 "처음으로"를 누르세요. 제목과 설정까지 모두 지우려면 위의 "모두 처음으로"를 두 번 누르세요.</li>
       <li>"크게 보기"를 누르면 교실 TV나 전자칠판에 타이머만 꽉 차게 띄울 수 있습니다. 타이머가 돌거나 크게 띄워 둔 동안에는 화면이 저절로 꺼지지 않게 합니다. 스페이스바로 시작과 일시정지, Esc 키로 크게 보기를 닫을 수 있습니다.</li>
       <li>다른 메뉴로 옮겨 가도 타이머는 계속 돌아갑니다. 마지막에 쓴 제목과 시간은 이 기기에만 저장됩니다.</li>
     </ul>
@@ -6184,6 +6186,32 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
     $(id).addEventListener("input", function () { exPeople(id); exSave(); exPaint(); });
   });
   $("exDark").addEventListener("change", function () { ex.dark = this.checked; exSave(); exPaint(); });
+  // "모두 처음으로" erases what was typed, so like the ladder's button the first press only asks
+  // and a second press within 3 seconds does it.
+  function confirmPress(btn, label, run) {
+    var timer = 0;
+    btn.addEventListener("click", function () {
+      if (!timer) {
+        btn.textContent = "한 번 더 누르면 초기화";
+        btn.classList.add("primary");
+        timer = setTimeout(function () { timer = 0; btn.textContent = label; btn.classList.remove("primary"); }, 3000);
+        return;
+      }
+      clearTimeout(timer); timer = 0;
+      btn.textContent = label; btn.classList.remove("primary");
+      run();
+    });
+  }
+  confirmPress($("exResetAll"), "모두 처음으로", function () {
+    ex.title = ""; ex.room = ""; ex.total = ""; ex.take = ""; ex.abs = ""; ex.absWho = ""; ex.notes = "";
+    ex.dark = false; ex.qStart = "09:00"; ex.qLen = 40; ex.qGap = 10;
+    ex.periods = [{ subj: "", s: "09:00", e: "09:40" }, { subj: "", s: "09:50", e: "10:30" }];
+    $("exTitle").value = ""; $("exRoom").value = ""; $("exTotal").value = ""; $("exTake").value = ""; $("exAbs").value = "";
+    $("exAbsWho").value = ""; $("exNotes").value = ""; $("exDark").checked = false;
+    $("exQStart").value = ex.qStart; $("exQLen").value = ex.qLen; $("exQGap").value = ex.qGap;
+    exRows(); exPeople(""); exSave(); exPaint();
+    toast("시험 안내를 처음 상태로 되돌렸습니다.");
+  });
   (function () {
     var stage = $("exStage");
     var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
@@ -6435,6 +6463,12 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
   $("tmMinus1").addEventListener("click", function () { tmAdd(-60000); });
   $("tmSound").addEventListener("change", function () { tm.sound = this.checked; tmSave(); if (tm.sound) tmCtx(); });
   $("tmDark").addEventListener("change", function () { tm.dark = this.checked; tmSave(); tmPaint(); });
+  confirmPress($("tmResetAll"), "모두 처음으로", function () {
+    tm.title = ""; tm.total = 300; tm.sound = true; tm.dark = false;
+    $("tmTitle").value = ""; $("tmSound").checked = true; $("tmDark").checked = false;
+    tmFields(); tmSave(); tmReset();
+    toast("타이머를 처음 상태로 되돌렸습니다.");
+  });
   document.addEventListener("keydown", function (e) {
     // space starts and pauses, unless the teacher is typing somewhere
     if (current !== "timer" || e.key !== " " || e.ctrlKey || e.metaKey || e.altKey) return;
