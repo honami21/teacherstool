@@ -915,9 +915,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .key-ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 0 2px; }
 
 /* ---------- Guide page (사이트 소개 · 자주 묻는 질문 · 건의하기) ---------- */
-/* with the 안내 menu there are seven top items: let them shrink instead of pushing the header wider than the screen */
+/* with the 안내 menu and 쉬는 시간 there are eight top items: they shrink toward their text but never below it, so a wide label (학급 운영) never runs under its neighbour */
 .top-nav { flex: 0 1 auto; min-width: 0; }
-.nav-group { flex: 0 1 auto; width: 140px; min-width: 0; }
+.nav-group { flex: 0 1 auto; width: 140px; min-width: max-content; }
 .g-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .g-jump a { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--fg); font-size: 14px; font-weight: 700; text-decoration: none; }
 .g-jump a:hover { border-color: #b5a9fb; background: #fbfaff; }
