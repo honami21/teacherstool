@@ -6633,8 +6633,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     { id: "document", name: "문서",      label: "문서 도구", icon: "file",  tone: "#544bf2" },
     { id: "audio",    name: "음원",      label: "음원 도구", icon: "audio", tone: "#9b41ed" },
     { id: "video",    name: "영상",      label: "영상 도구", icon: "video", tone: "#9d47f2" },
-    { id: "class",    name: "학급 운영", label: "학급 운영", icon: "users", tone: "#12af71" },
-    { id: "other",    name: "기타",      label: "기타 도구", icon: "grid",  tone: "#6355ef" }
+    { id: "class",    name: "학급 운영", label: "학급 운영", icon: "users", tone: "#12af71" }
   ];
   // Category page text: keep it general (no tool names) so new tools need no rewrite.
   var CAT_INFO = {
@@ -6643,7 +6642,6 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     document: { tint: "lilac",  desc: "공문, 제출 서류, 결재 파일처럼 업무 문서를 다루다 자주 막히는 일을 덜어 주는 도구예요. 용량, 형식, 파일 정리처럼 번거로운 손질을 몇 번의 클릭으로 끝낼 수 있어요." },
     video:    { tint: "purple", desc: "수업이나 행사 영상을 필요한 만큼, 필요한 모양으로 쓰고 싶을 때 쓰는 도구예요. 큰 영상도 서버에 올리지 않고 기기 안에서 처리해요." },
     "class":  { tint: "green",  desc: "학급을 꾸려 가며 매일 생기는 크고 작은 일을 돕는 도구예요. 순서 정하기, 시간 안내처럼 반복되는 일을 학생들과 함께 공정하고 빠르게 처리할 수 있어요. 큰 글씨와 단순한 화면으로 만들어 스마트칠판이나 교실 TV에 띄우면 모두가 함께 보며 쓰기 좋아요." },
-    other:    { tint: "lilac",  desc: "다른 분류에 딱 맞지 않지만 학교 일에 자주 필요한 도구를 모아 두는 곳이에요. 필요한 도구를 차근차근 채워 갈게요." }
   };
   var NAV_ORDER = ["photo", "audio", "document", "video", "class"];
   // 안내 menu: one page (panel-guide) with three sections; each hash scrolls to its section.
@@ -6796,7 +6794,8 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     $("catEmpty").hidden = list.length > 0;
     $("catOthers").innerHTML = CATEGORIES.filter(function (o) { return o.id !== cid; }).map(function (o) {
       return '<a href="#cat-' + o.id + '" data-nav="cat-' + o.id + '" style="--tone:' + o.tone + '">' + icon(o.icon) + esc(o.label) + "</a>";
-    }).join("") + '<a href="#all" data-nav="all">' + icon("grid") + "전체 도구</a>";
+    }).join("") + '<a href="#break" data-nav="break" style="--tone:#ff922e">' + icon("game") + "쉬는 시간</a>" +
+      '<a href="#all" data-nav="all">' + icon("grid") + "전체 도구</a>";
   }
 
   /* ---- home state: featured, all, or one category ---- */
@@ -6959,8 +6958,8 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
 
   Header();
   Guide();
-  // Home category cards: 기타 도구 (nothing ready yet) gives its slot to the 쉬는 시간 page.
-  $("categoryGrid").innerHTML = CATEGORIES.filter(function (c) { return c.id !== "other"; }).map(ToolCategory).join("") +
+  // Home category cards: the tool categories, then the 쉬는 시간 page.
+  $("categoryGrid").innerHTML = CATEGORIES.map(ToolCategory).join("") +
     '<a class="category-card" href="#break" data-nav="break" style="--tone:#ff922e">' +
     '<span class="category-icon">' + icon("game") + "</span>" +
     '<span class="category-text"><strong>쉬는 시간</strong><small>교실 게임</small></span>' +
