@@ -73,7 +73,7 @@ a { color: inherit; }
 .lab { display: inline-block; padding: 3px 8px 5px; border-radius: 9px; background: linear-gradient(120deg, #5544e9, #7940ed); color: #fff; letter-spacing: -1px; }
 
 .top-nav { display: flex; align-items: center; gap: 4px; margin-inline: auto; white-space: nowrap; }
-.nav-group { position: relative; flex: none; width: 140px; }
+.nav-group, .nav-slot { position: relative; flex: none; width: 140px; }
 .nav-item {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 10px 15px; border: 0; border-radius: 999px;
@@ -246,7 +246,7 @@ a.tool-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-soft);
   :root { --gutter: 28px; }
   .header-in { gap: 16px; }
   :root { --nav-pad: 10px; }
-  .nav-group { flex: 0 1 118px; width: auto; min-width: 0; }
+  .nav-group, .nav-slot { flex: 0 1 118px; width: auto; min-width: 0; }
   .top-nav { gap: 0; flex: 1 1 auto; min-width: 0; justify-content: center; }
   .nav-item { padding-inline: 10px; font-size: 14px; }
   .brand-word { font-size: 24px; }
@@ -916,9 +916,9 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .key-ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 0 2px; }
 
 /* ---------- Guide page (사이트 소개 · 자주 묻는 질문 · 건의하기) ---------- */
-/* with the 안내 menu and 쉬는 시간 there are eight top items: they shrink toward their text but never below it, so a wide label (학급 운영) never runs under its neighbour */
+/* with the 안내 menu and 쉬는 시간 there are seven top items, each in a slot of the same width: they shrink toward their text but never below it, so a wide label (학급 운영) never runs under its neighbour */
 .top-nav { flex: 0 1 auto; min-width: 0; }
-.nav-group { flex: 0 1 auto; width: 140px; min-width: max-content; }
+.nav-group, .nav-slot { flex: 0 1 auto; width: 140px; min-width: max-content; }
 .g-jump { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .g-jump a { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--fg); font-size: 14px; font-weight: 700; text-decoration: none; }
 .g-jump a:hover { border-color: #b5a9fb; background: #fbfaff; }
@@ -7097,8 +7097,8 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
         SubLinks(cid) + "</div></div>";
     });
     // 쉬는 시간: a single page (no submenu), right after 학급 운영
-    html += '<a class="nav-item" href="#break" data-nav="break">쉬는 시간</a>';
-    html += '<a class="nav-item" href="#all" data-nav="all">전체 도구</a>';
+    // it sits in a slot as wide as the category menus, so every top item is spaced the same
+    html += '<div class="nav-slot"><a class="nav-item" href="#break" data-nav="break">쉬는 시간</a></div>';
     // 안내 comes first, before the tool categories
     html = '<div class="nav-group">' +
       '<button type="button" class="nav-item" data-group="guide" aria-expanded="false" aria-controls="sub-guide">안내' + icon("chev", "chev") + "</button>" +
