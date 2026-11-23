@@ -435,6 +435,49 @@ div.thumb { display: grid; place-items: center; font-family: var(--font-data); f
 .pm-pages { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 7px; font-size: 13px; color: var(--muted); }
 .pm-pages .time-in { width: 10em; text-align: left; }
 .pm-pages .time-in.bad { border-color: var(--err); }
+/* PDF page extract: range previews on the left, range settings on the right (stacked on phones) */
+.ps-file { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 12px 16px; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--r); }
+.ps-file .info { flex: 1 1 200px; }
+.ps-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 20px; align-items: start; }
+.ps-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; min-width: 0; }
+.ps-group { padding: 12px 14px 14px; background: var(--sunken); border: 1.5px dashed var(--line); border-radius: var(--r); min-width: 0; }
+.ps-group.bad { border-color: var(--err); }
+.ps-group-title { margin: 0 0 10px; text-align: center; font-weight: 700; }
+.ps-group-title span { margin-left: 4px; font-family: var(--font-data); font-size: 12.5px; font-weight: 500; color: var(--muted); }
+.ps-group.bad .ps-group-title span { font-family: var(--font-text); color: var(--err); }
+.ps-pages { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.ps-page { flex: 0 1 112px; min-width: 0; padding: 8px 8px 6px; background: #fff; border-radius: 10px; box-shadow: var(--shadow-soft); text-align: center; }
+.ps-page .pv { display: grid; place-items: center; aspect-ratio: 3 / 4; }
+.ps-page img { display: block; max-width: 100%; max-height: 100%; border: 1px solid var(--line); background: #fff; }
+.ps-page .ph { width: 100%; height: 100%; background: var(--sunken); border-radius: 4px; }
+.ps-page .no { display: block; margin-top: 5px; font-family: var(--font-data); font-size: 12.5px; color: var(--muted); }
+.ps-dots { flex: none; color: var(--muted); font-weight: 700; letter-spacing: 2px; }
+.ps-side { display: flex; flex-direction: column; gap: 14px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); box-shadow: var(--shadow-soft); position: sticky; top: 16px; }
+.ps-side-title { margin: 0; font-weight: 700; }
+.ps-range { padding: 12px 0; border-top: 1px solid var(--line); }
+.ps-range:first-child { border-top: 0; padding-top: 0; }
+.ps-range-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ps-badge { padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 700; }
+.ps-range-head .x { margin-left: auto; }
+.ps-nums { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 13px; color: var(--muted); }
+.ps-nums label { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.ps-nums .time-in { width: 5.2em; }
+.ps-nums .time-in.bad { border-color: var(--err); }
+.ps-msg { margin-top: 6px; font-size: 12.5px; color: var(--err); }
+.ps-add { align-self: center; border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.ps-add:hover { background: var(--accent-soft); }
+.ps-join { white-space: normal; align-items: flex-start; line-height: 1.4; }
+.ps-join input { flex: none; margin-top: 1px; }
+.ps-total { font-weight: 600; font-variant-numeric: tabular-nums; }
+.ps-go { padding: 13px 16px; font-size: 16px; border-radius: 10px; }
+@media (max-width: 860px) {
+  .ps-layout { grid-template-columns: minmax(0, 1fr); }
+  .ps-side { position: static; order: -1; }
+}
+@media (max-width: 420px) {
+  .ps-groups { grid-template-columns: minmax(0, 1fr); }
+}
+
 .list.manual .row { grid-template-columns: minmax(0, 1fr) auto; }
 .list.manual img.thumb { grid-column: 1 / -1; width: 100%; height: auto; max-height: 70vh; object-fit: contain; }
 
@@ -1232,6 +1275,43 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
       <li>"넣을 쪽" 칸을 비워 두면 모든 쪽이 들어갑니다. 1-3, 5처럼 적으면 그 쪽만 적은 순서대로 들어가고, 7-처럼 적으면 7쪽부터 끝까지입니다.</li>
       <li>암호가 걸린 PDF는 합칠 수 없습니다. 열 때 암호를 묻지 않더라도 인쇄·편집 제한 암호가 걸린 파일은 그 제한을 풀어서 다시 저장해야 합니다.</li>
       <li>책갈피(목차)와 입력 양식 칸은 합친 파일에서 빠지거나 제대로 동작하지 않을 수 있습니다.</li>
+    </ul>
+  </section>
+
+  <!-- ===== PDF page extract ===== -->
+  <section class="panel" id="panel-pdfsplit" hidden>
+    <div>
+      <p class="eyebrow">문서</p>
+      <h2>PDF 페이지 추출</h2>
+      <p class="sub">PDF에서 필요한 쪽만 범위로 골라 새 PDF로 저장합니다. 범위를 여러 개 정해 따로따로 받거나 한 파일로 합칠 수 있고, 글자와 화질은 원본 그대로 유지됩니다.</p>
+    </div>
+    <div class="drop" id="psDrop" role="group" aria-label="쪽을 뽑을 PDF 파일 올리기">
+      <strong>PDF 파일을 여기에 끌어다 놓으세요</strong>
+      <span>한 번에 PDF 한 개를 열 수 있습니다</span>
+      <button type="button" class="pick" id="psPick">파일 선택</button>
+      <input type="file" id="psInput" accept=".pdf,application/pdf" hidden>
+    </div>
+    <div id="psWork" class="panel" hidden>
+      <div class="ps-file">
+        <div class="info"><div class="name" id="psName"></div><div class="meta" id="psMeta"></div></div>
+        <button type="button" class="btn" id="psOther">다른 PDF 열기</button>
+      </div>
+      <div class="ps-layout">
+        <div class="ps-groups" id="psGroups" aria-label="범위별 미리보기"></div>
+        <div class="ps-side">
+          <p class="ps-side-title">추출할 범위</p>
+          <div id="psRanges"></div>
+          <button type="button" class="btn ps-add" id="psAdd">+ 범위 추가</button>
+          <label class="check ps-join"><input type="checkbox" id="psJoin"> 모든 범위를 PDF 한 파일로 합치기</label>
+          <div class="ps-total" id="psTotal" aria-live="polite"></div>
+          <button type="button" class="btn primary ps-go" id="psExport" disabled>PDF 추출하기</button>
+        </div>
+      </div>
+    </div>
+    <ul class="foot">
+      <li>범위마다 시작 쪽과 끝 쪽을 적습니다. 한 쪽만 뽑으려면 두 칸에 같은 번호를 적으면 됩니다.</li>
+      <li>"한 파일로 합치기"를 켜면 모든 범위가 적은 순서대로 이어진 PDF 한 개가 됩니다. 끄면 범위마다 따로 만들고, 범위가 여러 개면 ZIP 하나로 묶어 받습니다.</li>
+      <li>암호가 걸린 PDF는 열 수 없습니다. 책갈피(목차)와 입력 양식 칸은 뽑은 파일에서 빠지거나 제대로 동작하지 않을 수 있습니다.</li>
     </ul>
   </section>
 
@@ -3328,6 +3408,255 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     PM.busy = false;
     btn.textContent = "합쳐서 저장";
     pmRefresh();
+  });
+
+  /* ================= PDF page extract ================= */
+  // Copies chosen page ranges with pdf-lib (no re-rendering, so text stays selectable).
+  // pdf.js draws the first and last page of each range as a preview.
+  var PS = { file: null, bytes: null, src: null, view: null, pages: 0, ranges: [], thumbs: {}, queue: Promise.resolve(), busy: false, loading: false, tok: 0, timer: 0 };
+
+  function psRangeOf(r) {
+    var a = String(r.a).trim(), b = String(r.b).trim();
+    if (!/^\d+$/.test(a) || !/^\d+$/.test(b)) return null;
+    var s = Number(a), e = Number(b);
+    if (s < 1 || e < 1 || s > PS.pages || e > PS.pages || s > e) return null;
+    return { s: s, e: e };
+  }
+  function psWhy(r) {
+    var a = String(r.a).trim(), b = String(r.b).trim();
+    if (!/^\d+$/.test(a) || !/^\d+$/.test(b)) return "쪽 번호를 적어 주세요";
+    if (Number(a) > Number(b)) return "시작 쪽이 끝 쪽보다 뒤에 있어요";
+    return "1~" + PS.pages + "쪽 사이로 적어 주세요";
+  }
+  function psName(r) { return r.s === r.e ? r.s + "쪽" : r.s + "-" + r.e + "쪽"; }
+
+  async function openPdfSplit(fileList) {
+    var all = Array.prototype.slice.call(fileList || []);
+    var f = all.filter(isPdfFile)[0];
+    if (!f) { if (all.length) toast("PDF 파일을 올려 주세요."); return; }
+    if (PS.busy || PS.loading) return;
+    if (all.length > 1) toast("PDF는 한 번에 한 개만 열 수 있어 첫 파일만 열었습니다.");
+    PS.loading = true;
+    var tok = ++PS.tok;
+    try {
+      await loadPdfLibs();
+      var bytes = new Uint8Array(await f.arrayBuffer());
+      var src;
+      try { src = await window.PDFLib.PDFDocument.load(bytes, { updateMetadata: false }); }
+      catch (e) { throw { userMessage: e && /encrypt/i.test(e.message || "") ? "암호가 걸린 PDF는 열 수 없습니다." : "PDF를 열지 못했습니다. 손상된 파일일 수 있습니다." }; }
+      var n = src.getPageCount();
+      if (!n) throw { userMessage: "쪽이 없는 PDF입니다." };
+      if (tok !== PS.tok) return;
+      if (PS.view) { try { PS.view.destroy(); } catch (e) {} }
+      PS.file = f; PS.bytes = bytes; PS.src = src; PS.pages = n; PS.view = null;
+      PS.thumbs = {}; PS.queue = Promise.resolve();
+      PS.ranges = [{ a: "1", b: String(n) }];
+      $("psJoin").checked = false;
+      window.pdfjsLib.getDocument({
+        data: bytes.slice(), isEvalSupported: false,
+        cMapUrl: PDFJS_ASSETS + "cmaps/", cMapPacked: true,
+        standardFontDataUrl: PDFJS_ASSETS + "standard_fonts/"
+      }).promise.then(function (doc) {
+        if (tok !== PS.tok) { doc.destroy(); return; }
+        PS.view = doc;
+        psPreview();
+      }, function () { /* previews stay as plain boxes */ });
+      $("psName").textContent = f.name;
+      $("psMeta").textContent = n + "쪽 · " + fmtSize(f.size);
+      $("psDrop").hidden = true;
+      $("psWork").hidden = false;
+      psRanges();
+    } catch (e) {
+      toast(e.userMessage || "PDF를 열지 못했습니다.");
+    } finally {
+      PS.loading = false;
+    }
+  }
+  wireDrop($("psDrop"), $("psInput"), $("psPick"), openPdfSplit);
+  $("psOther").addEventListener("click", function () { if (!PS.busy) $("psInput").click(); });
+
+  // Renders one page preview (cached), one at a time so a long PDF does not stall the page.
+  function psThumb(p) {
+    if (PS.thumbs[p]) return Promise.resolve(PS.thumbs[p]);
+    var doc = PS.view, tok = PS.tok;
+    var job = PS.queue.then(async function () {
+      if (PS.thumbs[p]) return PS.thumbs[p];
+      if (!doc || tok !== PS.tok) return null;
+      var page = await doc.getPage(p);
+      var base = page.getViewport({ scale: 1 });
+      var scale = Math.min(3, 240 / Math.max(base.width, base.height));
+      var vp = page.getViewport({ scale: scale });
+      var c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(vp.width));
+      c.height = Math.max(1, Math.round(vp.height));
+      var ctx = c.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, c.width, c.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      page.cleanup();
+      if (tok !== PS.tok) return null;
+      PS.thumbs[p] = c.toDataURL("image/jpeg", 0.82);
+      return PS.thumbs[p];
+    });
+    PS.queue = job.catch(function () {});
+    return job.catch(function () { return null; });
+  }
+
+  // Right side: one start/end pair per range. Rebuilt only when a range is added or removed, so typing keeps focus.
+  function psRanges() {
+    var box = $("psRanges");
+    box.textContent = "";
+    PS.ranges.forEach(function (r, i) {
+      var d = document.createElement("div");
+      d.className = "ps-range";
+      d.dataset.i = i;
+      d.innerHTML = '<div class="ps-range-head"><span class="ps-badge">범위 ' + (i + 1) + '</span>' +
+        '<button type="button" class="btn ghost x" data-rm="1" aria-label="범위 ' + (i + 1) + ' 지우기">×</button></div>' +
+        '<div class="ps-nums"><label>시작 <input type="number" class="time-in" data-k="a" inputmode="numeric" min="1" max="' + PS.pages + '" aria-label="범위 ' + (i + 1) + ' 시작 쪽"></label>' +
+        '<span>~</span><label><input type="number" class="time-in" data-k="b" inputmode="numeric" min="1" max="' + PS.pages + '" aria-label="범위 ' + (i + 1) + ' 끝 쪽"> 쪽</label></div>' +
+        '<div class="ps-msg" hidden></div>';
+      d.querySelector('[data-k="a"]').value = r.a;
+      d.querySelector('[data-k="b"]').value = r.b;
+      d.querySelector("[data-rm]").hidden = PS.ranges.length < 2;
+      box.appendChild(d);
+    });
+    psState();
+    psPreview();
+  }
+  function psState() {
+    var total = 0, bad = false;
+    $("psRanges").querySelectorAll(".ps-range").forEach(function (d) {
+      var r = PS.ranges[Number(d.dataset.i)], ok = psRangeOf(r), msg = d.querySelector(".ps-msg");
+      d.querySelectorAll(".time-in").forEach(function (inp) { inp.classList.toggle("bad", !ok); inp.disabled = PS.busy; });
+      d.querySelector("[data-rm]").disabled = PS.busy;
+      msg.hidden = !!ok;
+      msg.textContent = ok ? "" : psWhy(r);
+      if (ok) total += ok.e - ok.s + 1; else bad = true;
+    });
+    var n = PS.ranges.length, join = $("psJoin").checked;
+    $("psTotal").textContent = bad ? "범위의 쪽 번호를 확인해 주세요" :
+      "범위 " + n + "개 · 모두 " + total + "쪽 → " + (join || n === 1 ? "PDF 1개" : "PDF " + n + "개 (ZIP)");
+    $("psExport").disabled = bad || PS.busy;
+    $("psAdd").disabled = PS.busy;
+    $("psOther").disabled = PS.busy;
+    $("psJoin").disabled = PS.busy;
+  }
+
+  // Left side: each range as a dashed box with its first page … last page.
+  function psPreview() {
+    var box = $("psGroups");
+    box.textContent = "";
+    PS.ranges.forEach(function (r, i) {
+      var ok = psRangeOf(r);
+      var g = document.createElement("div");
+      g.className = "ps-group" + (ok ? "" : " bad");
+      var t = document.createElement("p");
+      t.className = "ps-group-title";
+      t.textContent = "범위 " + (i + 1);
+      var sp = document.createElement("span");
+      sp.textContent = ok ? (ok.s === ok.e ? "1쪽" : (ok.e - ok.s + 1) + "쪽") : "쪽 번호 확인";
+      t.appendChild(sp);
+      g.appendChild(t);
+      var row = document.createElement("div");
+      row.className = "ps-pages";
+      var list = ok ? (ok.s === ok.e ? [ok.s] : [ok.s, ok.e]) : [];
+      list.forEach(function (p, k) {
+        if (k === 1 && ok.e - ok.s > 1) {
+          var dots = document.createElement("span");
+          dots.className = "ps-dots";
+          dots.textContent = "…";
+          dots.setAttribute("aria-hidden", "true");
+          row.appendChild(dots);
+        }
+        var card = document.createElement("div");
+        card.className = "ps-page";
+        card.innerHTML = '<div class="pv"><div class="ph"></div></div><span class="no"></span>';
+        card.querySelector(".no").textContent = p;
+        row.appendChild(card);
+        var pv = card.querySelector(".pv");
+        function put(url) {
+          if (!url) return;
+          var img = document.createElement("img");
+          img.alt = p + "쪽 미리보기";
+          img.src = url;
+          pv.textContent = "";
+          pv.appendChild(img);
+        }
+        if (PS.thumbs[p]) put(PS.thumbs[p]);
+        else if (PS.view) psThumb(p).then(put);
+      });
+      g.appendChild(row);
+      box.appendChild(g);
+    });
+  }
+
+  $("psRanges").addEventListener("input", function (e) {
+    var k = e.target.dataset.k;
+    if (!k) return;
+    var r = PS.ranges[Number(e.target.closest(".ps-range").dataset.i)];
+    if (!r) return;
+    r[k] = e.target.value;
+    psState();
+    clearTimeout(PS.timer);
+    PS.timer = setTimeout(psPreview, 250);
+  });
+  $("psRanges").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-rm]");
+    if (!btn || PS.busy || PS.ranges.length < 2) return;
+    PS.ranges.splice(Number(btn.closest(".ps-range").dataset.i), 1);
+    psRanges();
+  });
+  $("psAdd").addEventListener("click", function () {
+    if (PS.busy || !PS.pages) return;
+    var last = psRangeOf(PS.ranges[PS.ranges.length - 1]);
+    var s = last && last.e < PS.pages ? last.e + 1 : 1;
+    PS.ranges.push({ a: String(s), b: String(PS.pages) });
+    psRanges();
+    var inputs = $("psRanges").querySelectorAll('[data-k="a"]');
+    if (inputs.length) inputs[inputs.length - 1].focus();
+  });
+  $("psJoin").addEventListener("change", psState);
+
+  $("psExport").addEventListener("click", async function () {
+    if (PS.busy || !PS.src) return;
+    var list = PS.ranges.map(psRangeOf);
+    if (list.some(function (r) { return !r; })) return;
+    var btn = $("psExport"), base = baseName(PS.file.name), join = $("psJoin").checked || list.length === 1;
+    PS.busy = true; psState(); btn.disabled = true;
+    try {
+      await loadPdfLibs();
+      var PDFLib = window.PDFLib;
+      var make = async function (ranges) {
+        var out = await PDFLib.PDFDocument.create();
+        for (var i = 0; i < ranges.length; i++) {
+          var idx = [];
+          for (var p = ranges[i].s; p <= ranges[i].e; p++) idx.push(p - 1);
+          var pages = await out.copyPages(PS.src, idx);
+          pages.forEach(function (pg) { out.addPage(pg); });
+          await new Promise(function (r) { setTimeout(r, 0); });
+        }
+        out.setProducer("TeachersTool");
+        return new Blob([await out.save()], { type: "application/pdf" });
+      };
+      if (join) {
+        btn.textContent = "만드는 중…";
+        var name = base + "_" + (list.length === 1 ? psName(list[0]) : "추출") + ".pdf";
+        await saveFile(name, await make(list));
+      } else {
+        var entries = [];
+        for (var i = 0; i < list.length; i++) {
+          btn.textContent = "만드는 중… " + (i + 1) + "/" + list.length;
+          entries.push({ name: base + "_" + psName(list[i]) + ".pdf", blob: await make([list[i]]) });
+        }
+        btn.textContent = "ZIP으로 묶는 중…";
+        await saveZip(entries, base + "_추출.zip");
+      }
+    } catch (e) {
+      toast("PDF를 만들지 못했습니다. 범위를 나눠서 다시 해 보세요.");
+    }
+    PS.busy = false;
+    btn.textContent = "PDF 추출하기";
+    psState();
   });
 
   /* ================= Mosaic ================= */
@@ -7018,6 +7347,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     { id: "shrink",  name: "이미지 용량 줄이기", desc: "화질은 그대로, 용량만 작게", category: "photo",  tint: "green",  icon: "shrink",  short: "용량 줄이기", ready: true },
     { id: "pdf",     name: "PDF 용량 줄이기", desc: "파일 크기 가볍게",          category: "document", tint: "green",  icon: "file",    short: "PDF", ready: true,  featured: true },
     { id: "pdfmerge", name: "PDF 합치기",     desc: "여러 PDF를 하나로",         category: "document", tint: "lilac",  icon: "files",   short: "PDF 합치기", ready: true },
+    { id: "pdfsplit", name: "PDF 페이지 추출", desc: "원하는 쪽만 골라내기", category: "document", tint: "orange", icon: "pdfout",  short: "페이지 추출", ready: true },
     { id: "audio",   name: "음원 자르기",     desc: "원하는 구간만",             category: "audio",    tint: "purple", icon: "wave",    short: "자르기", ready: true,  featured: true },
     { id: "merge",   name: "음원 합치기",     desc: "여러 곡을 하나로",          category: "audio",    tint: "lilac",  icon: "merge",   short: "합치기", ready: true,  featured: true },
     { id: "pitch",   name: "음원 키 변경",    desc: "빠르기는 그대로, 음높이만",  category: "audio",    tint: "pink",   icon: "pitch",   short: "키 변경", ready: true },
@@ -7048,7 +7378,8 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     video: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4Z"/>',
     capture: '<path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><circle cx="12" cy="12" r="3.5"/>',
     extract: '<rect x="2" y="5" width="13" height="14" rx="2"/><path d="m7 9.5 4 2.5-4 2.5Z"/><path d="M18.5 9v6M21.5 7v10"/>',
-    scissors: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
+    pdfout: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5"/><path d="M14 3v4h4v4"/><path d="M15 17h6M18 14l3 3-3 3"/>',
+        scissors: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
     game: '<rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".9"/><circle cx="18" cy="13.8" r=".9"/>',
     users: '<circle cx="8.5" cy="8" r="3.2"/><path d="M2.5 20v-1a6 6 0 0 1 12 0v1"/><circle cx="17" cy="9" r="2.6"/><path d="M15.2 13.6A4.8 4.8 0 0 1 21.5 18.2V20"/>',
     layout: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/>',
@@ -7360,6 +7691,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     else if (current === "shrink") addShrink(files);
     else if (current === "pdf") addPdfs(files);
     else if (current === "pdfmerge") addPdfMerge(files);
+    else if (current === "pdfsplit") openPdfSplit(files);
     else if (current === "audio") loadAudio(files[0]);
     else if (current === "merge") addMerge(files);
     else if (current === "pitch") openPitch(files);
