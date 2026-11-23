@@ -478,6 +478,21 @@ div.thumb { display: grid; place-items: center; font-family: var(--font-data); f
   .ps-groups { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* File conversion pages (to PDF, from PDF) */
+.seg.wrap { flex-wrap: wrap; }
+.map.cv-map td { white-space: normal; }
+.map.cv-map td:first-child { white-space: nowrap; }
+.map.cv-map td:last-child { min-width: 12em; }
+.cv-map .ext { white-space: nowrap; display: inline-block; margin: 2px 0; }
+.tp-ext { padding-top: 16px; }
+@media (max-width: 560px) {
+  .map.cv-map th, .map.cv-map td { padding: 10px 10px; }
+  .map.cv-map td:last-child { min-width: 0; }
+}
+.cv-opts { display: flex; flex-direction: column; gap: 14px; }
+.cv-range { width: 10em; text-align: left; }
+.cv-range.bad { border-color: var(--err); }
+.cv-hint { font-size: 12.5px; color: var(--err); }
 .list.manual .row { grid-template-columns: minmax(0, 1fr) auto; }
 .list.manual img.thumb { grid-column: 1 / -1; width: 100%; height: auto; max-height: 70vh; object-fit: contain; }
 
@@ -1315,6 +1330,133 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     </ul>
   </section>
 
+  <!-- ===== Files to PDF ===== -->
+  <section class="panel" id="panel-topdf" hidden>
+    <div>
+      <p class="eyebrow">문서</p>
+      <h2>PDF로 변환</h2>
+      <p class="sub">사진, 텍스트, 워드, 엑셀 파일을 PDF로 바꿉니다. 여러 파일을 정한 순서대로 PDF 한 개로 묶을 수도 있고, 파일은 기기 밖으로 나가지 않습니다.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="map cv-map">
+        <thead><tr><th>올릴 수 있는 파일</th><th>확장자</th><th>바뀌는 모양</th></tr></thead>
+        <tbody>
+          <tr><td>사진</td><td><span class="ext">.jpg</span> <span class="ext">.png</span> <span class="ext">.webp</span> <span class="ext">.gif</span> <span class="ext">.bmp</span> <span class="ext">.heic</span></td><td>사진 한 장이 한 쪽이 됩니다</td></tr>
+          <tr><td>텍스트</td><td><span class="ext">.txt</span></td><td>글자가 A4 쪽에 차례로 들어갑니다</td></tr>
+          <tr><td>워드</td><td><span class="ext">.docx</span></td><td>글, 제목, 표, 그림이 들어갑니다</td></tr>
+          <tr><td>엑셀</td><td><span class="ext">.xlsx</span> <span class="ext">.xls</span> <span class="ext">.csv</span></td><td>시트마다 표로 들어갑니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="drop" id="tpDrop" role="group" aria-label="PDF로 바꿀 파일 올리기">
+      <strong>PDF로 바꿀 파일을 여기에 끌어다 놓으세요</strong>
+      <span>여러 개를 한꺼번에 놓아도 되고, 종류가 달라도 함께 묶을 수 있습니다</span>
+      <button type="button" class="pick" id="tpPick">파일 선택</button>
+      <input type="file" id="tpInput" multiple accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.heic,.heif,.txt,.docx,.xlsx,.xls,.csv,image/*" hidden>
+    </div>
+    <div class="settings">
+      <div class="field">
+        <span class="label" id="tpPaperLabel">용지</span>
+        <div class="seg wrap" role="radiogroup" aria-labelledby="tpPaperLabel">
+          <label><input type="radio" name="tppaper" value="auto" checked><span>A4 방향 자동</span></label>
+          <label><input type="radio" name="tppaper" value="port"><span>A4 세로</span></label>
+          <label><input type="radio" name="tppaper" value="land"><span>A4 가로</span></label>
+          <label><input type="radio" name="tppaper" value="fit"><span>사진 크기 그대로</span></label>
+        </div>
+      </div>
+    </div>
+    <div id="tpWork" class="panel" hidden>
+      <ul class="list" id="tpList" aria-label="PDF에 넣을 순서"></ul>
+      <div class="bar">
+        <div class="count" id="tpCount" aria-live="polite"></div>
+        <label class="check" id="tpJoinWrap"><input type="checkbox" id="tpJoin" checked> PDF 한 개로 묶기</label>
+        <button type="button" class="btn ghost" id="tpClear">목록 비우기</button>
+        <button type="button" class="btn primary" id="tpExport" disabled>PDF로 변환</button>
+      </div>
+    </div>
+    <ul class="foot">
+      <li>목록의 ↑ ↓ 버튼으로 순서를 바꿉니다. "PDF 한 개로 묶기"를 끄면 파일마다 PDF를 따로 만들고, 여러 개면 ZIP 하나로 받습니다.</li>
+      <li>"A4 방향 자동"은 가로로 긴 사진과 폭이 넓은 엑셀 시트를 A4 가로 쪽에 넣습니다. "사진 크기 그대로"는 사진을 여백 없이 원래 비율의 쪽에 넣고, 문서는 A4 세로로 넣습니다.</li>
+      <li>워드와 엑셀은 원본과 똑같지 않습니다. 머리말과 꼬리말, 글상자, 쪽 나눔 위치, 셀 색과 병합, 차트는 달라지거나 빠질 수 있습니다.</li>
+      <li>텍스트, 워드, 엑셀은 글자가 그림으로 들어가서 PDF에서 글자를 선택하거나 검색할 수 없습니다.</li>
+      <li>한글(<span class="ext">.hwp</span> <span class="ext">.hwpx</span>)과 파워포인트(<span class="ext">.pptx</span>), 옛 워드(<span class="ext">.doc</span>)는 브라우저에서 모양을 살려 바꿀 수 없습니다. 그 프로그램에서 "PDF로 저장"(또는 "다른 이름으로 저장"에서 PDF 선택)을 이용해 주세요.</li>
+    </ul>
+  </section>
+
+  <!-- ===== PDF to other formats ===== -->
+  <section class="panel" id="panel-pdfconv" hidden>
+    <div>
+      <p class="eyebrow">문서</p>
+      <h2>PDF에서 변환</h2>
+      <p class="sub">PDF를 그림, 파워포인트, 워드, 텍스트 파일로 바꿉니다. 바꿀 쪽만 골라 담을 수 있고, 파일은 기기 밖으로 나가지 않습니다.</p>
+    </div>
+    <div class="table-scroll">
+      <table class="map cv-map">
+        <thead><tr><th>바꿀 형식</th><th>확장자</th><th>바뀌는 모양</th></tr></thead>
+        <tbody>
+          <tr><td>그림</td><td><span class="ext">.jpg</span> <span class="ext">.png</span></td><td>쪽마다 그림 한 장, 여러 장이면 ZIP</td></tr>
+          <tr><td>파워포인트</td><td><span class="ext">.pptx</span></td><td>쪽마다 슬라이드 한 장 (글자는 고칠 수 없는 그림)</td></tr>
+          <tr><td>워드</td><td><span class="ext">.docx</span></td><td>모양 그대로(쪽 그림) 또는 글자만(고칠 수 있음)</td></tr>
+          <tr><td>텍스트</td><td><span class="ext">.txt</span></td><td>PDF 속 글자만 뽑아냅니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="drop" id="pcDrop" role="group" aria-label="바꿀 PDF 파일 올리기">
+      <strong>PDF 파일을 여기에 끌어다 놓으세요</strong>
+      <span>한 번에 PDF 한 개를 열 수 있습니다</span>
+      <button type="button" class="pick" id="pcPick">파일 선택</button>
+      <input type="file" id="pcInput" accept=".pdf,application/pdf" hidden>
+    </div>
+    <div id="pcWork" class="panel" hidden>
+      <div class="ps-file">
+        <span class="pm-thumb" id="pcThumb"><div class="thumb">PDF</div></span>
+        <div class="info"><div class="name" id="pcName"></div><div class="meta" id="pcMeta"></div></div>
+        <button type="button" class="btn" id="pcOther">다른 PDF 열기</button>
+      </div>
+      <div class="cv-opts">
+        <div class="field">
+          <span class="label" id="pcFmtLabel">바꿀 형식</span>
+          <div class="seg wrap" role="radiogroup" aria-labelledby="pcFmtLabel">
+            <label><input type="radio" name="pcfmt" value="jpg" checked><span>JPG 그림</span></label>
+            <label><input type="radio" name="pcfmt" value="png"><span>PNG 그림</span></label>
+            <label><input type="radio" name="pcfmt" value="pptx"><span>파워포인트</span></label>
+            <label><input type="radio" name="pcfmt" value="docx"><span>워드</span></label>
+            <label><input type="radio" name="pcfmt" value="txt"><span>텍스트</span></label>
+          </div>
+        </div>
+        <div class="field" id="pcDocField" hidden>
+          <span class="label" id="pcDocLabel">워드 방식</span>
+          <div class="seg wrap" role="radiogroup" aria-labelledby="pcDocLabel">
+            <label><input type="radio" name="pcdoc" value="img" checked><span>모양 그대로</span></label>
+            <label><input type="radio" name="pcdoc" value="text"><span>글자만 (고칠 수 있음)</span></label>
+          </div>
+        </div>
+        <div class="field" id="pcDpiField">
+          <span class="label" id="pcDpiLabel">화질</span>
+          <div class="seg" role="radiogroup" aria-labelledby="pcDpiLabel">
+            <label><input type="radio" name="pcdpi" value="150" checked><span>보통</span></label>
+            <label><input type="radio" name="pcdpi" value="220"><span>선명하게</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="pcRange">바꿀 쪽</label>
+          <input type="text" class="time-in cv-range" id="pcRange" inputmode="numeric" autocomplete="off" placeholder="전체" spellcheck="false">
+          <span class="cv-hint" id="pcRangeMsg"></span>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="pcCount" aria-live="polite"></div>
+        <button type="button" class="btn primary" id="pcExport" disabled>변환하기</button>
+      </div>
+    </div>
+    <ul class="foot">
+      <li>"바꿀 쪽" 칸을 비워 두면 모든 쪽을 바꿉니다. 1-3, 5처럼 적으면 그 쪽만, 7-처럼 적으면 7쪽부터 끝까지 바꿉니다.</li>
+      <li>그림, 파워포인트, 워드 "모양 그대로"는 쪽을 그림으로 옮겨서 원본과 똑같이 보이지만 글자를 고칠 수는 없습니다.</li>
+      <li>워드 "글자만"과 텍스트는 PDF 속 글자를 뽑아 줄 단위로 옮깁니다. 표와 그림, 글꼴은 빠지고, 단이 나뉜 문서는 글 순서가 섞일 수 있습니다.</li>
+      <li>스캔한 PDF는 글자 정보가 없는 그림이라 글자를 뽑을 수 없습니다. 이럴 때는 그림이나 "모양 그대로"를 골라 주세요.</li>
+      <li>한글(<span class="ext">.hwp</span>)과 엑셀(<span class="ext">.xlsx</span>)로는 표 모양을 되살릴 수 없어 바꿀 수 없습니다. 암호가 걸린 PDF도 열 수 없습니다.</li>
+    </ul>
+  </section>
   <!-- ===== Standard document converter (downloadable Windows program) ===== -->
   <section class="panel" id="panel-convert" hidden>
     <div>
@@ -3657,6 +3799,620 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     PS.busy = false;
     btn.textContent = "PDF 추출하기";
     psState();
+  });
+
+  /* ================= Files to PDF ================= */
+  // Photos are drawn straight onto PDF pages with pdf-lib. Text, Word (mammoth) and Excel (SheetJS) are laid out as
+  // HTML in a hidden frame, drawn page by page with html2canvas, and cut between lines so no line is split.
+  var H2C_URL = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+  var MAMMOTH_URL = "https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js";
+  var SHEETJS_URL = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+  var PPTXGEN_URL = "https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.min.js";
+  var A4 = [595.28, 841.89];
+  var TP = { items: [], seq: 0, busy: false };
+  var TP_LABEL = { img: "사진", txt: "텍스트", docx: "워드", sheet: "엑셀" };
+
+  function tpKind(f) {
+    var n = f.name.toLowerCase();
+    if (/\.(jpe?g|png|webp|gif|bmp|heic|heif)$/.test(n) || (/^image\//.test(f.type || "") && !/svg/.test(f.type))) return "img";
+    if (/\.(txt|text|md)$/.test(n) || f.type === "text/plain") return "txt";
+    if (/\.docx$/.test(n)) return "docx";
+    if (/\.(xlsx|xlsm|xls|csv)$/.test(n)) return "sheet";
+    if (/\.(hwp|hwpx)$/.test(n)) return "hwp";
+    if (/\.(pptx?|ppsx?|key)$/.test(n)) return "ppt";
+    if (/\.doc$/.test(n)) return "doc";
+    if (/\.pdf$/.test(n)) return "pdf";
+    return "other";
+  }
+  function extOf(name) { var m = /\.([^.]+)$/.exec(name); return m ? m[1].toUpperCase().slice(0, 5) : "FILE"; }
+
+  function addToPdf(fileList) {
+    if (TP.busy) return;
+    var all = Array.prototype.slice.call(fileList || []);
+    var skip = { hwp: 0, ppt: 0, doc: 0, pdf: 0, other: 0 };
+    all.forEach(function (f) {
+      var kind = tpKind(f);
+      if (!TP_LABEL[kind]) { skip[kind]++; return; }
+      var it = { id: ++TP.seq, file: f, kind: kind, thumb: null };
+      TP.items.push(it);
+      if (kind === "img" && !/\.(heic|heif)$/i.test(f.name)) tpThumb(it);
+    });
+    var msg = [];
+    if (skip.hwp) msg.push("한글 파일은 한글 프로그램의 \"PDF로 저장\"을 이용해 주세요");
+    if (skip.ppt) msg.push("파워포인트 파일은 파워포인트의 \"PDF로 저장\"을 이용해 주세요");
+    if (skip.doc) msg.push("옛 워드(.doc) 파일은 워드에서 PDF로 저장하거나 .docx로 바꿔 올려 주세요");
+    if (skip.pdf) msg.push("이미 PDF인 파일은 뺐습니다");
+    if (skip.other) msg.push("바꿀 수 없는 파일 " + skip.other + "개는 뺐습니다");
+    if (msg.length) toast(msg.join(". ") + ".");
+    tpRefresh();
+  }
+  wireDrop($("tpDrop"), $("tpInput"), $("tpPick"), addToPdf);
+
+  async function tpThumb(it) {
+    try {
+      var bmp = await createImageBitmap(it.file);
+      it.thumb = thumbOf(bmp, bmp.width, bmp.height);
+      bmp.close && bmp.close();
+      var ph = $("tpList").querySelector('.row[data-id="' + it.id + '"] div.thumb');
+      if (ph) { var img = document.createElement("img"); img.className = "thumb"; img.alt = ""; img.src = it.thumb; ph.replaceWith(img); }
+    } catch (e) { /* keeps the plain box */ }
+  }
+
+  function tpRefresh() {
+    $("tpWork").hidden = !TP.items.length;
+    var list = $("tpList");
+    list.innerHTML = "";
+    TP.items.forEach(function (it, i) {
+      var li = document.createElement("li");
+      li.className = "row";
+      li.dataset.id = it.id;
+      li.innerHTML = '<span class="pm-thumb">' + (it.thumb ? '<img class="thumb" alt="">' : '<div class="thumb"></div>') +
+        '<span class="pm-no">' + (i + 1) + "</span></span>" +
+        '<div class="info"><div class="name"></div><div class="meta"></div></div>' +
+        '<div class="acts"><button type="button" class="btn small" data-mv="-1" aria-label="위로">↑</button>' +
+        '<button type="button" class="btn small" data-mv="1" aria-label="아래로">↓</button>' +
+        '<button type="button" class="btn ghost x" data-rm="1" aria-label="목록에서 빼기">×</button></div>';
+      if (it.thumb) li.querySelector("img").src = it.thumb;
+      else { li.querySelector("div.thumb").textContent = extOf(it.file.name); li.querySelector("div.thumb").classList.add("tp-ext"); }
+      li.querySelector(".name").textContent = it.file.name;
+      li.querySelector(".meta").textContent = TP_LABEL[it.kind] + " · " + fmtSize(it.file.size);
+      li.querySelector('[data-mv="-1"]').disabled = i === 0 || TP.busy;
+      li.querySelector('[data-mv="1"]').disabled = i === TP.items.length - 1 || TP.busy;
+      li.querySelector("[data-rm]").disabled = TP.busy;
+      list.appendChild(li);
+    });
+    var n = TP.items.length;
+    $("tpCount").textContent = n ? n + "개 파일" : "";
+    $("tpJoinWrap").hidden = n < 2;
+    $("tpExport").disabled = !n || TP.busy;
+    $("tpClear").disabled = TP.busy;
+  }
+  $("tpList").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn || TP.busy) return;
+    var id = Number(btn.closest(".row").dataset.id);
+    var i = TP.items.findIndex(function (it) { return it.id === id; });
+    if (i < 0) return;
+    if (btn.dataset.rm) TP.items.splice(i, 1);
+    else {
+      var j = i + Number(btn.dataset.mv);
+      if (j < 0 || j >= TP.items.length) return;
+      var t = TP.items[i]; TP.items[i] = TP.items[j]; TP.items[j] = t;
+    }
+    tpRefresh();
+  });
+  $("tpClear").addEventListener("click", function () { if (!TP.busy) { TP.items = []; tpRefresh(); } });
+
+  function radioVal(name) { var r = document.querySelector('input[name="' + name + '"]:checked'); return r ? r.value : ""; }
+  function tick() { return new Promise(function (r) { setTimeout(r, 0); }); }
+
+  function decodeTextBytes(u8) {
+    if (u8[0] === 0xFF && u8[1] === 0xFE) return new TextDecoder("utf-16le").decode(u8);
+    if (u8[0] === 0xFE && u8[1] === 0xFF) return new TextDecoder("utf-16be").decode(u8);
+    try { return new TextDecoder("utf-8", { fatal: true }).decode(u8); } catch (e) {}
+    try { return new TextDecoder("euc-kr").decode(u8); } catch (e) { return new TextDecoder().decode(u8); }
+  }
+  function escHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  async function tpImage(doc, file, paper) {
+    var bmp = await decodeImage(file);
+    try {
+      var w = bmp.width, h = bmp.height;
+      var k = Math.min(1, 3508 / Math.max(w, h), Math.sqrt(MAX_AREA / (w * h)));
+      var c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(w * k));
+      c.height = Math.max(1, Math.round(h * k));
+      var ctx = c.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(bmp, 0, 0, c.width, c.height);
+      var blob = await canvasBlob(c, "image/jpeg", 0.9);
+      c.width = c.height = 1;
+      var jpg = await doc.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+      var page;
+      if (paper === "fit") {
+        var pw = w * 0.75, ph = h * 0.75, lim = Math.min(1, 14000 / Math.max(pw, ph));
+        pw *= lim; ph *= lim;
+        page = doc.addPage([pw, ph]);
+        page.drawImage(jpg, { x: 0, y: 0, width: pw, height: ph });
+        return;
+      }
+      var land = paper === "land" || (paper === "auto" && w > h);
+      var size = land ? [A4[1], A4[0]] : A4.slice();
+      var m = 28, bw = size[0] - 2 * m, bh = size[1] - 2 * m;
+      var s = Math.min(bw / w, bh / h);
+      page = doc.addPage(size);
+      page.drawImage(jpg, { x: (size[0] - w * s) / 2, y: (size[1] - h * s) / 2, width: w * s, height: h * s });
+    } finally {
+      bmp.close && bmp.close();
+    }
+  }
+
+  var TP_CSS =
+    "html,body{margin:0;background:#fff}" +
+    "#c{font-family:'Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR','Noto Sans CJK KR',sans-serif;font-size:14.5px;line-height:1.65;color:#111;word-break:keep-all;overflow-wrap:break-word;background:#fff}" +
+    "#c p{margin:0 0 .55em}#c h1{font-size:1.75em;line-height:1.35;margin:.3em 0 .5em}#c h2{font-size:1.45em;line-height:1.35;margin:.5em 0 .45em}" +
+    "#c h3{font-size:1.2em;margin:.5em 0 .4em}#c h4,#c h5,#c h6{font-size:1.05em;margin:.5em 0 .35em}" +
+    "#c ul,#c ol{margin:0 0 .6em;padding-left:1.7em}#c li{margin:.1em 0}#c img{max-width:100%;height:auto}" +
+    "#c table{border-collapse:collapse;margin:.3em 0 .9em}#c td,#c th{border:1px solid #555;padding:4px 7px;vertical-align:top}" +
+    "#c td p,#c th p{margin:0}#c a{color:#1a56c4}" +
+    "#c pre.t{margin:0;white-space:pre-wrap;font-family:inherit;tab-size:4}" +
+    "#c.sheet{font-size:12.5px;line-height:1.4}#c.sheet table{margin:0}#c.sheet td{border:1px solid #999;padding:3px 6px;white-space:nowrap}" +
+    "#c .sh{font-size:15px;font-weight:700;margin:0 0 8px}";
+
+  // Lays HTML out at A4 content width and adds it to the PDF as page pictures. Wide content (big sheets) is
+  // shrunk to fit the width; with "auto", it goes on a landscape page first.
+  async function tpHtml(doc, bodyHtml, cls, paper, onPage) {
+    await loadScript(H2C_URL);
+    if (!window.html2canvas) throw new Error("no html2canvas");
+    var frame = document.createElement("iframe");
+    frame.setAttribute("aria-hidden", "true");
+    frame.tabIndex = -1;
+    frame.style.cssText = "position:fixed;left:-20000px;top:0;width:1400px;height:1000px;border:0;opacity:0;pointer-events:none";
+    document.body.appendChild(frame);
+    try {
+      var d = frame.contentDocument;
+      d.open();
+      d.write('<!doctype html><html><head><meta charset="utf-8"><style>' + TP_CSS + '</style></head><body><div id="c" class="' + cls + '">' + bodyHtml + "</div></body></html>");
+      d.close();
+      var c = d.getElementById("c");
+      await Promise.all(Array.prototype.map.call(d.images, function (im) {
+        return im.complete ? null : new Promise(function (r) { im.onload = im.onerror = r; setTimeout(r, 8000); });
+      }));
+      try { if (d.fonts && d.fonts.ready) await d.fonts.ready; } catch (e) {}
+      var PX = 96 / 72, margin = 54;
+      var land = paper === "land";
+      function layout() {
+        var size = land ? [A4[1], A4[0]] : A4.slice();
+        var cw = Math.round((size[0] - 2 * margin) * PX);
+        c.style.width = cw + "px";
+        return { size: size, cw: cw, full: Math.max(cw, c.scrollWidth) };
+      }
+      var L = layout();
+      if (paper === "auto" && L.full > L.cw * 1.04) { land = true; L = layout(); }
+      if (L.full > L.cw) c.style.width = L.full + "px";
+      frame.style.width = (L.full + 40) + "px";
+      var k = L.cw / L.full;
+      var total = c.scrollHeight;
+      if (total < 2 || !c.textContent.trim() && !d.images.length) throw { userMessage: "내용이 없는 파일입니다." };
+      var boxH = L.size[1] - 2 * margin;
+      var sliceH = Math.floor(boxH * PX / k);
+      var scale = Math.min(2, 2400 / L.full);
+      var y = 0, count = 0;
+      while (y < total - 1 && count < 400) {
+        var h = Math.min(sliceH, total - y);
+        var cv = await window.html2canvas(c, { y: y, width: L.full, height: h, scale: scale, backgroundColor: "#ffffff", logging: false, useCORS: true, windowWidth: L.full + 40, windowHeight: Math.max(1000, h + 40) });
+        var cutPx = cv.height;
+        if (y + h < total - 1) cutPx = findCut(cv);
+        var cut = document.createElement("canvas");
+        cut.width = cv.width;
+        cut.height = Math.max(1, cutPx);
+        var cx = cut.getContext("2d");
+        cx.fillStyle = "#ffffff";
+        cx.fillRect(0, 0, cut.width, cut.height);
+        cx.drawImage(cv, 0, 0);
+        var blob = await canvasBlob(cut, "image/jpeg", 0.85);
+        var jpg = await doc.embedJpg(new Uint8Array(await blob.arrayBuffer()));
+        var cssH = cutPx / scale;
+        var drawW = L.size[0] - 2 * margin, drawH = cssH * k / PX;
+        var page = doc.addPage(L.size);
+        page.drawImage(jpg, { x: margin, y: L.size[1] - margin - drawH, width: drawW, height: drawH });
+        cv.width = cv.height = cut.width = cut.height = 1;
+        y += Math.max(1, cssH);
+        count++;
+        if (onPage) onPage(count);
+        await tick();
+      }
+    } finally {
+      frame.remove();
+    }
+  }
+  // Finds a blank strip near the bottom of a page picture so the page ends between lines, not through one.
+  function findCut(cv) {
+    var H = cv.height, W = cv.width, from = Math.floor(H * 0.75);
+    var data = cv.getContext("2d").getImageData(0, from, W, H - from).data;
+    var rows = H - from, best = H, bestInk = Infinity, run = 0;
+    var need = Math.max(3, Math.round(H / 600));
+    for (var r = rows - 1; r >= 0; r--) {
+      var ink = 0, o = r * W * 4;
+      for (var x = 0; x < W; x++, o += 4) if (data[o] < 225 || data[o + 1] < 225 || data[o + 2] < 225) ink++;
+      if (ink === 0) { run++; if (run >= need) return from + r + Math.floor(run / 2); }
+      else run = 0;
+      if (ink < bestInk) { bestInk = ink; best = from + r; }
+    }
+    return best;
+  }
+
+  async function tpAppend(doc, it, paper, onPage) {
+    if (it.kind === "img") { await tpImage(doc, it.file, paper); return; }
+    var docPaper = paper === "fit" ? "port" : paper;
+    var bytes = new Uint8Array(await it.file.arrayBuffer());
+    if (it.kind === "txt") {
+      var text = decodeTextBytes(bytes).replace(/\r\n?/g, "\n");
+      await tpHtml(doc, '<pre class="t">' + escHtml(text) + "</pre>", "", docPaper === "auto" ? "port" : docPaper, onPage);
+    } else if (it.kind === "docx") {
+      await loadScript(MAMMOTH_URL);
+      if (!window.mammoth) throw new Error("no mammoth");
+      var res;
+      try { res = await window.mammoth.convertToHtml({ arrayBuffer: bytes.buffer }); }
+      catch (e) { throw { userMessage: "워드 파일을 열지 못했습니다. 손상되었거나 암호가 걸린 파일일 수 있습니다." }; }
+      await tpHtml(doc, res.value, "", docPaper === "auto" ? "port" : docPaper, onPage);
+    } else if (it.kind === "sheet") {
+      await loadScript(SHEETJS_URL);
+      if (!window.XLSX) throw new Error("no xlsx");
+      var wb;
+      try {
+        wb = /\.csv$/i.test(it.file.name) ? window.XLSX.read(decodeTextBytes(bytes), { type: "string" }) : window.XLSX.read(bytes, { type: "array" });
+      } catch (e) { throw { userMessage: "엑셀 파일을 열지 못했습니다. 손상되었거나 암호가 걸린 파일일 수 있습니다." }; }
+      var any = false;
+      for (var i = 0; i < wb.SheetNames.length; i++) {
+        var ws = wb.Sheets[wb.SheetNames[i]];
+        if (!ws || !ws["!ref"]) continue;
+        var html = window.XLSX.utils.sheet_to_html(ws, { header: "", footer: "" });
+        var m = /<table[\s\S]*<\/table>/i.exec(html);
+        if (!m) continue;
+        var title = wb.SheetNames.length > 1 ? '<p class="sh">' + escHtml(wb.SheetNames[i]) + "</p>" : "";
+        try { await tpHtml(doc, title + m[0], "sheet", docPaper, onPage); any = true; }
+        catch (e) { if (!(e && e.userMessage)) throw e; }
+      }
+      if (!any) throw { userMessage: "내용이 있는 시트가 없습니다." };
+    }
+  }
+
+  $("tpExport").addEventListener("click", async function () {
+    if (!TP.items.length || TP.busy) return;
+    var btn = $("tpExport");
+    TP.busy = true; tpRefresh(); btn.disabled = true;
+    var items = TP.items.slice(), paper = radioVal("tppaper");
+    var join = items.length === 1 || $("tpJoin").checked;
+    var failed = [], firstErr = "";
+    try {
+      await loadPdfLibs();
+      var PDFLib = window.PDFLib;
+      var joined = join ? await PDFLib.PDFDocument.create() : null;
+      var outs = [];
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        var label = (items.length > 1 ? (i + 1) + "/" + items.length + " " : "");
+        btn.textContent = "변환 중… " + label;
+        var doc = joined || await PDFLib.PDFDocument.create();
+        var before = doc.getPageCount();
+        try {
+          await tpAppend(doc, it, paper, function (n) { btn.textContent = "변환 중… " + label + n + "쪽"; });
+        } catch (e) {
+          failed.push(it.file.name);
+          if (!firstErr) firstErr = (e && e.userMessage) || "";
+          // drop any pages this file added before it failed
+          while (doc.getPageCount() > before) doc.removePage(doc.getPageCount() - 1);
+          continue;
+        }
+        if (!joined) {
+          doc.setProducer("TeachersTool");
+          outs.push({ name: baseName(it.file.name) + ".pdf", blob: new Blob([await doc.save()], { type: "application/pdf" }) });
+        }
+        await tick();
+      }
+      btn.textContent = "파일 만드는 중…";
+      if (joined) {
+        if (joined.getPageCount()) {
+          joined.setProducer("TeachersTool");
+          var name = baseName(items[0].file.name) + (items.length > 1 ? "_묶음" : "") + ".pdf";
+          await saveFile(name, new Blob([await joined.save()], { type: "application/pdf" }));
+        }
+      } else if (outs.length === 1) await saveFile(outs[0].name, outs[0].blob);
+      else if (outs.length) await saveZip(outs, "PDF_변환.zip");
+      if (failed.length) {
+        var why = failed.length === items.length ? "PDF로 바꾸지 못했습니다." : failed.length + "개 파일(" + failed.slice(0, 2).join(", ") + (failed.length > 2 ? " 등" : "") + ")은 빼고 만들었습니다.";
+        toast((firstErr ? firstErr + " " : "") + why);
+      }
+    } catch (e) {
+      toast((e && e.userMessage) || "PDF로 바꾸지 못했습니다. 인터넷 연결을 확인한 뒤 다시 눌러 주세요.");
+    }
+    TP.busy = false;
+    btn.textContent = "PDF로 변환";
+    tpRefresh();
+  });
+
+  /* ================= PDF to other formats ================= */
+  // pdf.js draws pages (pictures, PowerPoint, Word picture mode) or reads the text layer (Word text mode, .txt).
+  var PC = { file: null, doc: null, pages: 0, busy: false, tok: 0 };
+  var PC_NAME = { jpg: "JPG", png: "PNG", pptx: "파워포인트", docx: "워드", txt: "텍스트" };
+
+  async function openPdfConv(fileList) {
+    var all = Array.prototype.slice.call(fileList || []);
+    var f = all.filter(isPdfFile)[0];
+    if (!f) { if (all.length) toast("PDF 파일을 올려 주세요."); return; }
+    if (PC.busy) return;
+    if (all.length > 1) toast("PDF는 한 번에 한 개만 열 수 있어 첫 파일만 열었습니다.");
+    var tok = ++PC.tok;
+    try {
+      await loadPdfLibs();
+      var doc;
+      try {
+        doc = await window.pdfjsLib.getDocument({
+          data: new Uint8Array(await f.arrayBuffer()), isEvalSupported: false,
+          cMapUrl: PDFJS_ASSETS + "cmaps/", cMapPacked: true,
+          standardFontDataUrl: PDFJS_ASSETS + "standard_fonts/"
+        }).promise;
+      } catch (e) {
+        throw { userMessage: e && e.name === "PasswordException" ? "암호가 걸린 PDF는 열 수 없습니다." : "PDF를 열지 못했습니다. 손상된 파일일 수 있습니다." };
+      }
+      if (tok !== PC.tok) { doc.destroy(); return; }
+      if (PC.doc) { try { PC.doc.destroy(); } catch (e) {} }
+      PC.file = f; PC.doc = doc; PC.pages = doc.numPages;
+      $("pcName").textContent = f.name;
+      $("pcMeta").textContent = PC.pages + "쪽 · " + fmtSize(f.size);
+      $("pcThumb").innerHTML = '<div class="thumb">PDF</div>';
+      $("pcRange").value = "";
+      $("pcDrop").hidden = true;
+      $("pcWork").hidden = false;
+      pcSync();
+      try {
+        var r = await pcRender(1, 40, "image/jpeg", 112);
+        if (tok === PC.tok) {
+          var img = document.createElement("img");
+          img.className = "thumb"; img.alt = ""; img.src = await blobToDataUrl(r.blob);
+          $("pcThumb").innerHTML = ""; $("pcThumb").appendChild(img);
+        }
+      } catch (e) { /* plain box stays */ }
+    } catch (e) {
+      toast(e.userMessage || "PDF를 열지 못했습니다.");
+    }
+  }
+  wireDrop($("pcDrop"), $("pcInput"), $("pcPick"), openPdfConv);
+  $("pcOther").addEventListener("click", function () { if (!PC.busy) $("pcInput").click(); });
+
+  function pcPicked() { return parsePages($("pcRange").value, PC.pages); }
+  function pcSync() {
+    var fmt = radioVal("pcfmt"), mode = radioVal("pcdoc");
+    $("pcDocField").hidden = fmt !== "docx";
+    $("pcDpiField").hidden = fmt === "txt" || (fmt === "docx" && mode === "text");
+    var picked = pcPicked();
+    $("pcRange").classList.toggle("bad", !picked);
+    $("pcRangeMsg").textContent = picked ? "" : "쪽 번호를 확인해 주세요 (1~" + PC.pages + "쪽)";
+    $("pcCount").textContent = picked ? picked.length + "쪽 → " + PC_NAME[fmt] : "";
+    var btn = $("pcExport");
+    if (!PC.busy) btn.textContent = PC_NAME[fmt] + "로 변환";
+    btn.disabled = !picked || PC.busy || !PC.doc;
+    document.querySelectorAll('#pcWork input').forEach(function (el) { el.disabled = PC.busy; });
+    $("pcOther").disabled = PC.busy;
+  }
+  document.querySelectorAll('input[name="pcfmt"], input[name="pcdoc"]').forEach(function (r) { r.addEventListener("change", pcSync); });
+  $("pcRange").addEventListener("input", pcSync);
+
+  // Draws one page at the given dpi (or to fit `box` pixels). Returns the picture and the page size in points.
+  async function pcRender(no, dpi, type, box) {
+    var page = await PC.doc.getPage(no);
+    var base = page.getViewport({ scale: 1 });
+    var s = box ? box / Math.max(base.width, base.height) : dpi / 72;
+    var area = base.width * base.height * s * s;
+    if (area > PDF_MAX_AREA) s *= Math.sqrt(PDF_MAX_AREA / area);
+    var vp = page.getViewport({ scale: s });
+    var c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(vp.width));
+    c.height = Math.max(1, Math.round(vp.height));
+    var ctx = c.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, c.width, c.height);
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    page.cleanup();
+    var blob = await canvasBlob(c, type, type === "image/jpeg" ? 0.9 : undefined);
+    var out = { blob: blob, w: base.width, h: base.height, pw: c.width, ph: c.height };
+    c.width = c.height = 1;
+    return out;
+  }
+
+  // Reads a page's text layer into lines (top to bottom, left to right), with "" between blocks far apart.
+  async function pcText(no) {
+    var page = await PC.doc.getPage(no);
+    var vp = page.getViewport({ scale: 1 });
+    var tc = await page.getTextContent();
+    var Util = window.pdfjsLib.Util;
+    var items = [];
+    tc.items.forEach(function (it) {
+      if (!it.str || !it.str.trim()) return;
+      var t = Util.transform(vp.transform, it.transform);
+      var fh = Math.hypot(t[2], t[3]) || 10;
+      var wv = it.width * (Math.hypot(t[0], t[1]) / (Math.hypot(it.transform[0], it.transform[1]) || 1));
+      items.push({ s: it.str, x: t[4], y: t[5], h: fh, w: wv });
+    });
+    page.cleanup();
+    items.sort(function (a, b) { return a.y - b.y || a.x - b.x; });
+    var lines = [];
+    items.forEach(function (it) {
+      var L = lines[lines.length - 1];
+      if (L && Math.abs(it.y - L.y) < Math.max(L.h, it.h) * 0.5) L.items.push(it);
+      else lines.push({ y: it.y, h: it.h, items: [it] });
+    });
+    var out = [], prev = null;
+    lines.forEach(function (L) {
+      L.items.sort(function (a, b) { return a.x - b.x; });
+      var s = "", end = null;
+      L.items.forEach(function (it) {
+        if (end !== null && it.x - end > it.h * 0.22 && !/\s$/.test(s) && !/^\s/.test(it.s)) s += " ";
+        s += it.s;
+        end = it.x + it.w;
+      });
+      s = s.replace(/\s+$/, "");
+      if (prev && L.y - prev.y > Math.max(prev.h, L.h) * 1.9) out.push("");
+      out.push(s);
+      prev = L;
+    });
+    return out;
+  }
+
+  function xmlEsc(s) {
+    return String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, "")
+      .replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+
+  // A small Word file built by hand: page pictures (one per page) or plain paragraphs.
+  async function buildDocx(body, media, sect) {
+    var zip = new JSZip();
+    var W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+    var R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+    zip.file("[Content_Types].xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/>' +
+      '<Default Extension="jpeg" ContentType="image/jpeg"/>' +
+      '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+      '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
+      '</Types>');
+    zip.file("_rels/.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="' + R + '/officeDocument" Target="word/document.xml"/></Relationships>');
+    var rels = '<Relationship Id="rIdS" Type="' + R + '/styles" Target="styles.xml"/>';
+    media.forEach(function (m, i) {
+      zip.file("word/media/image" + (i + 1) + ".jpeg", m);
+      rels += '<Relationship Id="rIdI' + (i + 1) + '" Type="' + R + '/image" Target="media/image' + (i + 1) + '.jpeg"/>';
+    });
+    zip.file("word/_rels/document.xml.rels", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + rels + '</Relationships>');
+    zip.file("word/styles.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<w:styles xmlns:w="' + W + '"><w:docDefaults><w:rPrDefault><w:rPr>' +
+      '<w:rFonts w:ascii="Malgun Gothic" w:hAnsi="Malgun Gothic" w:eastAsia="Malgun Gothic" w:cs="Malgun Gothic"/>' +
+      '<w:sz w:val="21"/><w:szCs w:val="21"/><w:lang w:val="ko-KR" w:eastAsia="ko-KR"/></w:rPr></w:rPrDefault>' +
+      '<w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
+      '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>');
+    zip.file("word/document.xml", '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<w:document xmlns:w="' + W + '" xmlns:r="' + R + '" ' +
+      'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" ' +
+      'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ' +
+      'xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>' + body +
+      '<w:sectPr><w:pgSz w:w="' + sect.w + '" w:h="' + sect.h + '"' + (sect.w > sect.h ? ' w:orient="landscape"' : "") + '/>' +
+      '<w:pgMar w:top="' + sect.m + '" w:right="' + sect.m + '" w:bottom="' + sect.m + '" w:left="' + sect.m + '" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr>' +
+      '</w:body></w:document>');
+    return zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression: "DEFLATE" });
+  }
+  function docxPicture(i, cx, cy, breakBefore) {
+    var n = i + 1;
+    return '<w:p><w:pPr>' + (breakBefore ? "<w:pageBreakBefore/>" : "") + '<w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr>' +
+      '<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + cx + '" cy="' + cy + '"/>' +
+      '<wp:docPr id="' + n + '" name="Page ' + n + '"/><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr>' +
+      '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic>' +
+      '<pic:nvPicPr><pic:cNvPr id="' + n + '" name="page' + n + '.jpeg"/><pic:cNvPicPr/></pic:nvPicPr>' +
+      '<pic:blipFill><a:blip r:embed="rIdI' + n + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>' +
+      '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>' +
+      '</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>';
+  }
+
+  $("pcExport").addEventListener("click", async function () {
+    var picked = pcPicked();
+    if (!picked || PC.busy || !PC.doc) return;
+    var btn = $("pcExport");
+    var fmt = radioVal("pcfmt"), mode = radioVal("pcdoc"), dpi = Number(radioVal("pcdpi")) || 150;
+    var base = baseName(PC.file.name), n = picked.length;
+    PC.busy = true; pcSync(); btn.disabled = true;
+    function step(i) { btn.textContent = "변환 중… " + i + "/" + n + "쪽"; }
+    try {
+      if (fmt === "jpg" || fmt === "png") {
+        var type = fmt === "png" ? "image/png" : "image/jpeg", files = [];
+        var pad = String(PC.pages).length;
+        for (var i = 0; i < n; i++) {
+          step(i + 1);
+          var r = await pcRender(picked[i] + 1, dpi, type);
+          var no = String(picked[i] + 1);
+          while (no.length < pad) no = "0" + no;
+          files.push({ name: base + "_" + no + "쪽." + fmt, blob: r.blob });
+          await tick();
+        }
+        btn.textContent = "파일 만드는 중…";
+        if (files.length === 1) await saveFile(files[0].name, files[0].blob);
+        else await saveZip(files, base + "_그림.zip");
+      } else if (fmt === "pptx") {
+        btn.textContent = "파워포인트 도구를 불러오는 중…";
+        try { await loadScript(PPTXGEN_URL); } catch (e) { throw { userMessage: "파워포인트 도구를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요." }; }
+        if (!window.PptxGenJS) throw { userMessage: "파워포인트 도구를 불러오지 못했습니다." };
+        var first = await PC.doc.getPage(picked[0] + 1);
+        var fv = first.getViewport({ scale: 1 });
+        var sw = fv.width / 72, sh = fv.height / 72, lim = Math.min(1, 56 / Math.max(sw, sh));
+        sw *= lim; sh *= lim;
+        if (Math.min(sw, sh) < 1) { var up = 1 / Math.min(sw, sh); sw *= up; sh *= up; }
+        var pres = new window.PptxGenJS();
+        pres.defineLayout({ name: "PDF", width: sw, height: sh });
+        pres.layout = "PDF";
+        for (var j = 0; j < n; j++) {
+          step(j + 1);
+          var pr = await pcRender(picked[j] + 1, dpi, "image/jpeg");
+          var k = Math.min(sw / pr.w, sh / pr.h), iw = pr.w * k, ih = pr.h * k;
+          pres.addSlide().addImage({ data: await blobToDataUrl(pr.blob), x: (sw - iw) / 2, y: (sh - ih) / 2, w: iw, h: ih });
+          await tick();
+        }
+        btn.textContent = "파일 만드는 중…";
+        var pptx = await pres.write({ outputType: "blob" });
+        await saveFile(base + ".pptx", new Blob([pptx], { type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }));
+      } else if (fmt === "docx" && mode === "img") {
+        var media = [], body = "", sect = null, EMU = 12700;
+        for (var q = 0; q < n; q++) {
+          step(q + 1);
+          var dr = await pcRender(picked[q] + 1, dpi, "image/jpeg");
+          if (!sect) sect = { w: Math.round(dr.w * 20), h: Math.round(dr.h * 20), m: 0, pw: dr.w, ph: dr.h };
+          var f = Math.min(sect.pw / dr.w, sect.ph / dr.h) * 0.985;
+          media.push(dr.blob);
+          body += docxPicture(q, Math.round(dr.w * f * EMU), Math.round(dr.h * f * EMU), q > 0);
+          await tick();
+        }
+        btn.textContent = "파일 만드는 중…";
+        await saveFile(base + ".docx", await buildDocx(body, media, sect));
+      } else {
+        var pagesText = [], chars = 0;
+        for (var t = 0; t < n; t++) {
+          step(t + 1);
+          var lines = await pcText(picked[t] + 1);
+          chars += lines.join("").replace(/\s/g, "").length;
+          pagesText.push(lines);
+          if (t % 5 === 4) await tick();
+        }
+        if (!chars) throw { userMessage: "이 PDF에는 글자 정보가 없습니다. 스캔한 PDF라면 그림이나 워드 \"모양 그대로\"를 골라 주세요." };
+        btn.textContent = "파일 만드는 중…";
+        if (fmt === "txt") {
+          var txt = pagesText.map(function (ls, idx) {
+            return (n > 1 ? "[" + (picked[idx] + 1) + "쪽]\r\n" : "") + ls.join("\r\n");
+          }).join("\r\n\r\n");
+          await saveFile(base + ".txt", new Blob(["﻿" + txt], { type: "text/plain;charset=utf-8" }));
+        } else {
+          var fp = await PC.doc.getPage(picked[0] + 1), fvp = fp.getViewport({ scale: 1 });
+          var tb = "";
+          pagesText.forEach(function (ls, idx) {
+            // a gap between blocks becomes space above the next paragraph instead of an empty line
+            var gap = false, first = true;
+            ls.forEach(function (line) {
+              if (!line) { gap = true; return; }
+              var pPr = (idx > 0 && first ? "<w:pageBreakBefore/>" : "") + (gap && !first ? '<w:spacing w:before="200"/>' : "");
+              tb += "<w:p>" + (pPr ? "<w:pPr>" + pPr + "</w:pPr>" : "") + '<w:r><w:t xml:space="preserve">' + xmlEsc(line) + "</w:t></w:r></w:p>";
+              gap = false; first = false;
+            });
+            if (!ls.length && idx > 0) tb += "<w:p><w:pPr><w:pageBreakBefore/></w:pPr></w:p>";
+          });
+          await saveFile(base + ".docx", await buildDocx(tb, [], { w: Math.round(fvp.width * 20), h: Math.round(fvp.height * 20), m: 1134 }));
+        }
+      }
+    } catch (e) {
+      toast((e && e.userMessage) || "변환하지 못했습니다. 쪽 수가 많으면 몇 쪽씩 나눠서 바꿔 보세요.");
+    }
+    PC.busy = false;
+    pcSync();
   });
 
   /* ================= Mosaic ================= */
@@ -7348,6 +8104,8 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     { id: "pdf",     name: "PDF 용량 줄이기", desc: "파일 크기 가볍게",          category: "document", tint: "green",  icon: "file",    short: "PDF", ready: true,  featured: true },
     { id: "pdfmerge", name: "PDF 합치기",     desc: "여러 PDF를 하나로",         category: "document", tint: "lilac",  icon: "files",   short: "PDF 합치기", ready: true },
     { id: "pdfsplit", name: "PDF 페이지 추출", desc: "원하는 쪽만 골라내기", category: "document", tint: "orange", icon: "pdfout",  short: "페이지 추출", ready: true },
+    { id: "topdf",   name: "PDF로 변환",      desc: "사진과 문서를 PDF로",       category: "document", tint: "blue",   icon: "topdf",   short: "PDF로 변환", ready: true },
+    { id: "pdfconv", name: "PDF에서 변환", desc: "PDF를 그림, PPT, 워드로", category: "document", tint: "purple", icon: "frompdf", short: "PDF 변환", ready: true },
     { id: "audio",   name: "음원 자르기",     desc: "원하는 구간만",             category: "audio",    tint: "purple", icon: "wave",    short: "자르기", ready: true,  featured: true },
     { id: "merge",   name: "음원 합치기",     desc: "여러 곡을 하나로",          category: "audio",    tint: "lilac",  icon: "merge",   short: "합치기", ready: true,  featured: true },
     { id: "pitch",   name: "음원 키 변경",    desc: "빠르기는 그대로, 음높이만",  category: "audio",    tint: "pink",   icon: "pitch",   short: "키 변경", ready: true },
@@ -7378,6 +8136,8 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     video: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4Z"/>',
     capture: '<path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><circle cx="12" cy="12" r="3.5"/>',
     extract: '<rect x="2" y="5" width="13" height="14" rx="2"/><path d="m7 9.5 4 2.5-4 2.5Z"/><path d="M18.5 9v6M21.5 7v10"/>',
+    topdf: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 11v6M9 14l3 3 3-3"/>',
+    frompdf: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 3v5h5v3"/><path d="M15 15h6l-2-2M21 19h-6l2 2"/>',
     pdfout: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5"/><path d="M14 3v4h4v4"/><path d="M15 17h6M18 14l3 3-3 3"/>',
         scissors: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
     game: '<rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".9"/><circle cx="18" cy="13.8" r=".9"/>',
@@ -7692,6 +8452,8 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     else if (current === "pdf") addPdfs(files);
     else if (current === "pdfmerge") addPdfMerge(files);
     else if (current === "pdfsplit") openPdfSplit(files);
+    else if (current === "topdf") addToPdf(files);
+    else if (current === "pdfconv") openPdfConv(files);
     else if (current === "audio") loadAudio(files[0]);
     else if (current === "merge") addMerge(files);
     else if (current === "pitch") openPitch(files);
