@@ -563,6 +563,39 @@ div.thumb { display: grid; place-items: center; font-family: var(--font-data); f
 .stage-msg { color: var(--muted); padding: 24px 16px; text-align: center; }
 #mOut { display: block; max-width: 100%; border-radius: var(--r); border: 1px solid var(--line); }
 
+/* Photo crop & resize */
+.cr-tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.cr-stage { position: relative; padding: 14px; background-color: #eef0f5; }
+#crCanvas { display: block; max-width: 100%; touch-action: none; cursor: crosshair; user-select: none; -webkit-user-select: none; }
+.cr-dims { font-family: var(--font-data); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cr-select {
+  padding: 7px 30px 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235b6277' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center;
+  -webkit-appearance: none; appearance: none;
+  font: inherit; font-size: 14px; color: var(--fg);
+  max-width: 100%;
+}
+.cr-wh { display: inline-flex; align-items: center; gap: 6px; }
+.cr-wh .time-in { width: 6.2em; }
+.cr-size { display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--r); }
+.cr-size h3, .cr-result h3 { margin: 0; font-size: 15px; }
+.cr-hint { margin: 0; font-size: 13px; color: var(--muted); word-break: keep-all; }
+.cr-result { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 20px; }
+.cr-prev {
+  display: grid; place-items: center;
+  width: 180px; height: 180px; flex: none;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background-color: #fff;
+  background-image: linear-gradient(45deg, #e9ebf1 25%, transparent 25%, transparent 75%, #e9ebf1 75%), linear-gradient(45deg, #e9ebf1 25%, transparent 25%, transparent 75%, #e9ebf1 75%);
+  background-size: 16px 16px; background-position: 0 0, 8px 8px;
+}
+.cr-prev canvas { display: block; max-width: 164px; max-height: 164px; }
+.cr-result-info { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1 1 220px; }
+.cr-out-dims { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+#crOut { display: block; max-width: 100%; border-radius: var(--r); border: 1px solid var(--line); background: #fff; }
+
 /* Video frame capture */
 .v-why strong { display: block; margin-bottom: 4px; }
 .v-why ul { margin: 0; padding-left: 1.2em; }
@@ -1905,6 +1938,135 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
   </section>
 
   <!-- ===== Mosaic ===== -->
+  <!-- Photo crop & resize -->
+  <section class="panel" id="panel-crop" hidden>
+    <div>
+      <p class="eyebrow">사진</p>
+      <h2>사진 자르기·크기 조절</h2>
+      <p class="sub">필요한 부분만 잘라 내고, 증명사진이나 SNS 같은 표준 크기 또는 원하는 가로·세로 크기로 바꿉니다. 동그라미, 별, 하트 같은 모양으로 자르면 바깥이 투명한 <span class="ext">.png</span>로 저장됩니다.</p>
+    </div>
+    <div class="drop" id="crDrop" role="group" aria-label="자를 사진 올리기">
+      <strong>사진을 여기에 끌어다 놓으세요</strong>
+      <span>PNG, JPG, WebP, HEIC 사진 한 장을 올립니다</span>
+      <button type="button" class="pick" id="crPick">파일 선택</button>
+      <input type="file" id="crInput" accept="image/*,.heic,.heif" hidden>
+    </div>
+    <div id="crWork" class="panel" hidden>
+      <div class="settings">
+        <div class="field">
+          <span class="label" id="crAspLabel">자르는 비율</span>
+          <div class="seg wrap" role="radiogroup" aria-labelledby="crAspLabel" id="crAsp">
+            <label><input type="radio" name="crasp" value="free" checked><span>자유</span></label>
+            <label><input type="radio" name="crasp" value="orig"><span>원본 비율</span></label>
+            <label><input type="radio" name="crasp" value="1"><span>1:1</span></label>
+            <label><input type="radio" name="crasp" value="0.75"><span>3:4</span></label>
+            <label><input type="radio" name="crasp" value="1.3333333"><span>4:3</span></label>
+            <label><input type="radio" name="crasp" value="1.7777778"><span>16:9</span></label>
+            <label><input type="radio" name="crasp" value="0.5625"><span>9:16</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label" id="crShapeLabel">모양</span>
+          <div class="seg wrap" role="radiogroup" aria-labelledby="crShapeLabel" id="crShape">
+            <label><input type="radio" name="crshape" value="rect" checked><span>네모</span></label>
+            <label><input type="radio" name="crshape" value="round"><span>둥근 네모</span></label>
+            <label><input type="radio" name="crshape" value="ellipse"><span>동그라미</span></label>
+            <label><input type="radio" name="crshape" value="triangle"><span>세모</span></label>
+            <label><input type="radio" name="crshape" value="star"><span>별</span></label>
+            <label><input type="radio" name="crshape" value="heart"><span>하트</span></label>
+            <label><input type="radio" name="crshape" value="diamond"><span>마름모</span></label>
+            <label><input type="radio" name="crshape" value="hexagon"><span>육각형</span></label>
+          </div>
+        </div>
+        <div class="field cr-tools">
+          <button type="button" class="btn small" id="crRotL">↺ 왼쪽으로 돌리기</button>
+          <button type="button" class="btn small" id="crRotR">↻ 오른쪽으로 돌리기</button>
+          <button type="button" class="btn small" id="crFlip">좌우 뒤집기</button>
+          <button type="button" class="btn small ghost" id="crReset">처음으로</button>
+        </div>
+      </div>
+      <div class="stage cr-stage" id="crStage">
+        <canvas id="crCanvas" width="2" height="2" aria-label="자르기 화면. 틀 안을 끌면 옮겨지고, 모서리와 가장자리를 끌면 크기가 바뀝니다." hidden></canvas>
+        <div class="stage-msg" id="crMsg">사진을 불러오는 중…</div>
+      </div>
+      <div class="cr-dims" id="crDims" aria-live="polite"></div>
+      <div class="cr-size">
+        <h3>크기 조절</h3>
+        <div class="settings">
+          <div class="field">
+            <div class="seg" role="radiogroup" aria-label="크기 정하는 방법" id="crMode">
+              <label><input type="radio" name="crmode" value="keep" checked><span>자른 크기 그대로</span></label>
+              <label><input type="radio" name="crmode" value="std"><span>표준 크기</span></label>
+              <label><input type="radio" name="crmode" value="custom"><span>직접 입력</span></label>
+            </div>
+          </div>
+          <div class="field" id="crStdBox" hidden>
+            <select class="cr-select" id="crStd" aria-label="표준 크기">
+              <optgroup label="사진 인쇄 (300dpi)">
+                <option value="354x472x300">증명사진·반명함 3×4cm</option>
+                <option value="413x531x300">여권사진 3.5×4.5cm</option>
+                <option value="591x827x300">명함판 5×7cm</option>
+              </optgroup>
+              <optgroup label="SNS·영상">
+                <option value="1080x1080">인스타그램 정사각형 1080×1080</option>
+                <option value="1080x1350">인스타그램 세로 1080×1350</option>
+                <option value="1080x1920">스토리·릴스·쇼츠 1080×1920</option>
+                <option value="1280x720">유튜브 썸네일 1280×720</option>
+              </optgroup>
+              <optgroup label="문서 (300dpi)">
+                <option value="2480x3508x300">A4 세로 21×29.7cm</option>
+                <option value="3508x2480x300">A4 가로 29.7×21cm</option>
+              </optgroup>
+            </select>
+            <div class="seg" role="radiogroup" aria-label="자른 사진을 맞추는 방법">
+              <label><input type="radio" name="crfit" value="pad" checked><span>여백 넣기</span></label>
+              <label><input type="radio" name="crfit" value="cover"><span>꽉 채우기</span></label>
+              <label><input type="radio" name="crfit" value="stretch"><span>늘리기</span></label>
+            </div>
+            <button type="button" class="btn small" id="crSnap">틀을 이 비율로 맞추기</button>
+          </div>
+          <div class="field" id="crCustomBox" hidden>
+            <span class="cr-wh">
+              <input type="number" class="time-in" id="crW" min="1" max="10000" step="1" aria-label="가로(px)">
+              <span>×</span>
+              <input type="number" class="time-in" id="crH" min="1" max="10000" step="1" aria-label="세로(px)">
+              <span class="cr-dims">px</span>
+            </span>
+            <label class="check"><input type="checkbox" id="crLock" checked> 비율 유지</label>
+          </div>
+        </div>
+        <p class="cr-hint" id="crModeHint"></p>
+      </div>
+      <div class="cr-result">
+        <div class="cr-prev"><canvas id="crPrev" width="2" height="2" aria-label="저장될 모습 미리보기"></canvas></div>
+        <div class="cr-result-info">
+          <h3>저장될 모습</h3>
+          <div class="cr-out-dims" id="crOutDims"></div>
+          <div class="field">
+            <span class="label" id="crFmtLabel">저장 형식</span>
+            <div class="seg" role="radiogroup" aria-labelledby="crFmtLabel">
+              <label><input type="radio" name="crfmt" id="crFmtPng" value="png" checked><span>PNG</span></label>
+              <label><input type="radio" name="crfmt" id="crFmtJpg" value="jpg"><span>JPG</span></label>
+            </div>
+          </div>
+          <p class="cr-hint" id="crFmtHint"></p>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="crName"></div>
+        <button type="button" class="btn ghost" id="crOther">다른 사진 열기</button>
+        <button type="button" class="btn primary" id="crSave">저장</button>
+      </div>
+      <img id="crOut" alt="자르고 크기를 바꾼 결과 사진" hidden>
+    </div>
+    <ul class="foot">
+      <li>틀 안을 끌면 위치가 옮겨지고, 모서리와 가장자리를 끌면 크기가 바뀝니다. 틀 바깥을 끌면 새로 그립니다.</li>
+      <li>표준 크기는 자른 사진을 그 크기로 바꿉니다. 비율이 다르면 "여백 넣기"(사진 전체가 들어가고 남는 곳은 여백), "꽉 채우기"(가장자리를 조금 잘라 꽉 채움), "늘리기"(사진을 늘려 맞춤) 중에서 고릅니다. "틀을 이 비율로 맞추기"를 누르면 처음부터 그 비율로 자를 수 있습니다.</li>
+      <li>직접 입력에서 "비율 유지"를 끄면 가로와 세로를 따로 정해 사진을 늘리거나 줄일 수 있습니다.</li>
+      <li>네모가 아닌 모양은 바깥이 PNG에서는 투명, JPG에서는 흰색으로 저장됩니다.</li>
+      <li>인쇄용 크기(증명사진, A4)는 300dpi 정보가 함께 들어가 인쇄할 때 실제 크기로 나옵니다.</li>
+    </ul>
+  </section>
   <section class="panel" id="panel-mosaic" hidden>
     <div>
       <p class="eyebrow">사진</p>
@@ -4680,6 +4842,595 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
   }
   wireDrop($("mDrop"), $("mInput"), $("mPick"), addMosaic);
   manualHooks.push(mRefresh);
+
+  /* ================= Photo crop & resize ================= */
+  var CR = { file: null, bmp: null, src: null, disp: null, rot: 0, flip: false,
+             box: null, asp: "free", shape: "rect", mode: "keep", drag: null, k: 1, busy: false, prevT: 0 };
+  var crCanvas = $("crCanvas"), crCtx = crCanvas.getContext("2d");
+  var CR_MAX_SIDE = 10000;
+
+  // Shapes are drawn inside the box (x, y, w, h); star and polygons are scaled to fill it.
+  // Adds the shape to the current path (callers start the path themselves, so it can be cut out of a bigger one).
+  function crPath(ctx, shape, x, y, w, h) {
+    function poly(pts) {
+      var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+      pts.forEach(function (p) { minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]); });
+      pts.forEach(function (p, i) {
+        var px = x + (p[0] - minX) / (maxX - minX) * w, py = y + (p[1] - minY) / (maxY - minY) * h;
+        if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+      });
+      ctx.closePath();
+    }
+    if (shape === "ellipse") {
+      ctx.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+    } else if (shape === "round") {
+      var r = Math.min(w, h) * 0.14;
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    } else if (shape === "triangle") {
+      poly([[0.5, 0], [1, 1], [0, 1]]);
+    } else if (shape === "diamond") {
+      poly([[0.5, 0], [1, 0.5], [0.5, 1], [0, 0.5]]);
+    } else if (shape === "hexagon") {
+      var hx = [];
+      for (var i = 0; i < 6; i++) { var a = Math.PI / 3 * i; hx.push([Math.cos(a), Math.sin(a)]); }
+      poly(hx);
+    } else if (shape === "star") {
+      var st = [];
+      for (var j = 0; j < 10; j++) {
+        var ang = -Math.PI / 2 + Math.PI / 5 * j, rr = j % 2 ? 0.4 : 1;
+        st.push([Math.cos(ang) * rr, Math.sin(ang) * rr]);
+      }
+      poly(st);
+    } else if (shape === "heart") {
+      function P(u, v) { return [x + u * w, y + v * h]; }
+      var p0 = P(0.5, 0.27);
+      ctx.moveTo(p0[0], p0[1]);
+      var c = [
+        [0.5, 0.1, 0.36, 0, 0.23, 0], [0.09, 0, 0, 0.12, 0, 0.29],
+        [0, 0.56, 0.3, 0.76, 0.5, 1], [0.7, 0.76, 1, 0.56, 1, 0.29],
+        [1, 0.12, 0.91, 0, 0.77, 0], [0.64, 0, 0.5, 0.1, 0.5, 0.27]
+      ];
+      c.forEach(function (s) {
+        var a1 = P(s[0], s[1]), a2 = P(s[2], s[3]), a3 = P(s[4], s[5]);
+        ctx.bezierCurveTo(a1[0], a1[1], a2[0], a2[1], a3[0], a3[1]);
+      });
+      ctx.closePath();
+    } else {
+      ctx.rect(x, y, w, h);
+    }
+  }
+
+  // The ratio (width / height) the crop frame must keep, or 0 when it is free.
+  function crRatio() {
+    if (CR.asp === "free") return 0;
+    if (CR.asp === "orig") return CR.src.width / CR.src.height;
+    return +CR.asp;
+  }
+  function crStd() {
+    var v = $("crStd").value.split("x");
+    return { w: +v[0], h: +v[1], dpi: +(v[2] || 0) };
+  }
+
+  // Draws the turned/flipped photo once at full size; the crop works in its pixels.
+  function crBuildSource() {
+    var b = CR.bmp, turn = CR.rot % 180 !== 0;
+    var w = turn ? b.height : b.width, h = turn ? b.width : b.height;
+    var c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    var x = c.getContext("2d");
+    x.translate(w / 2, h / 2);
+    x.rotate(CR.rot * Math.PI / 180);
+    if (CR.flip) x.scale(-1, 1);
+    x.drawImage(b, -b.width / 2, -b.height / 2);
+    CR.src = c;
+    // a smaller copy for the screen and the preview
+    var k = Math.min(1, 1600 / Math.max(w, h));
+    var d = document.createElement("canvas");
+    d.width = Math.max(1, Math.round(w * k)); d.height = Math.max(1, Math.round(h * k));
+    var dx = d.getContext("2d");
+    dx.imageSmoothingQuality = "high";
+    dx.drawImage(c, 0, 0, d.width, d.height);
+    CR.disp = d;
+  }
+
+  // Largest frame of ratio r centred on (cx, cy) that stays inside the photo.
+  function crFitBox(r, cx, cy, full) {
+    var W = CR.src.width, H = CR.src.height;
+    if (cx == null) { cx = W / 2; cy = H / 2; }
+    var w, h;
+    if (!r) { w = W * 0.8; h = H * 0.8; if (full) { w = W; h = H; } }
+    else if (W / H > r) { h = H; w = h * r; } else { w = W; h = w / r; }
+    if (r && !full) { w *= 0.9; h *= 0.9; }
+    var x = Math.min(Math.max(0, cx - w / 2), W - w), y = Math.min(Math.max(0, cy - h / 2), H - h);
+    return { x: x, y: y, w: w, h: h };
+  }
+  function crApplyRatio() {
+    var r = crRatio();
+    if (!r) { crDraw(); return; }
+    var b = CR.box;
+    if (b && Math.abs(b.w / b.h - r) < 0.002) { crDraw(); return; }
+    CR.box = crFitBox(r, b ? b.x + b.w / 2 : null, b ? b.y + b.h / 2 : null, false);
+    crDraw();
+  }
+
+  function crLayout() {
+    if (!CR.disp) return;
+    var stage = $("crStage");
+    var maxW = Math.max(120, stage.clientWidth - 28);
+    var maxH = Math.max(240, Math.min(window.innerHeight * 0.68, 720));
+    var k = Math.min(maxW / CR.src.width, maxH / CR.src.height, 3);
+    var cssW = Math.max(1, Math.round(CR.src.width * k)), cssH = Math.max(1, Math.round(CR.src.height * k));
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    crCanvas.style.width = cssW + "px";
+    crCanvas.style.height = cssH + "px";
+    crCanvas.width = Math.round(cssW * dpr);
+    crCanvas.height = Math.round(cssH * dpr);
+    CR.k = k; CR.dpr = dpr;
+    crDraw();
+  }
+
+  function crDraw() {
+    if (!CR.disp || !CR.box) return;
+    var ctx = crCtx, s = CR.k * CR.dpr, b = CR.box;
+    var W = crCanvas.width, H = crCanvas.height;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(CR.disp, 0, 0, W, H);
+    var x = b.x * s, y = b.y * s, w = b.w * s, h = b.h * s;
+    // dim everything outside the shape
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, H);
+    crPath(ctx, CR.shape, x, y, w, h);
+    ctx.fillStyle = "rgba(20, 24, 40, 0.55)";
+    ctx.fill("evenodd");
+    ctx.restore();
+    var lw = CR.dpr;
+    // frame
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = "rgba(255,255,255,0.9)";
+    ctx.setLineDash(CR.shape === "rect" ? [] : [5 * lw, 4 * lw]);
+    ctx.strokeRect(x, y, w, h);
+    ctx.setLineDash([]);
+    // thirds
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.beginPath();
+    for (var i = 1; i < 3; i++) {
+      ctx.moveTo(x + w * i / 3, y); ctx.lineTo(x + w * i / 3, y + h);
+      ctx.moveTo(x, y + h * i / 3); ctx.lineTo(x + w, y + h * i / 3);
+    }
+    ctx.stroke();
+    if (CR.shape !== "rect") {
+      ctx.lineWidth = 2 * lw;
+      ctx.strokeStyle = "#ffffff";
+      ctx.beginPath();
+      crPath(ctx, CR.shape, x, y, w, h);
+      ctx.stroke();
+    }
+    // handles
+    var hs = 7 * lw;
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#5b45f2";
+    ctx.lineWidth = 1.5 * lw;
+    crHandles(b).forEach(function (p) {
+      ctx.beginPath();
+      ctx.rect(p.x * s - hs / 2, p.y * s - hs / 2, hs, hs);
+      ctx.fill(); ctx.stroke();
+    });
+    crInfo();
+  }
+  function crHandles(b) {
+    var out = [
+      { id: "nw", x: b.x, y: b.y }, { id: "ne", x: b.x + b.w, y: b.y },
+      { id: "sw", x: b.x, y: b.y + b.h }, { id: "se", x: b.x + b.w, y: b.y + b.h }
+    ];
+    out.push(
+      { id: "n", x: b.x + b.w / 2, y: b.y }, { id: "s", x: b.x + b.w / 2, y: b.y + b.h },
+      { id: "w", x: b.x, y: b.y + b.h / 2 }, { id: "e", x: b.x + b.w, y: b.y + b.h / 2 });
+    return out;
+  }
+
+  function crPoint(e) {
+    var r = crCanvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / CR.k, y: (e.clientY - r.top) / CR.k };
+  }
+  function crHit(p, touch) {
+    var tol = (touch ? 22 : 12) / CR.k, b = CR.box, best = null, bd = 1e9;
+    crHandles(b).forEach(function (h) {
+      var d = Math.max(Math.abs(h.x - p.x), Math.abs(h.y - p.y));
+      // corners win over edge midpoints at the same distance
+      if (d <= tol && (d < bd - 0.01 || (Math.abs(d - bd) < 0.01 && h.id.length === 2))) { bd = d; best = h.id; }
+    });
+    if (best) return best;
+    if (p.x > b.x && p.x < b.x + b.w && p.y > b.y && p.y < b.y + b.h) return "move";
+    return "new";
+  }
+  var CR_CURSOR = { nw: "nwse-resize", se: "nwse-resize", ne: "nesw-resize", sw: "nesw-resize", n: "ns-resize", s: "ns-resize", e: "ew-resize", w: "ew-resize", move: "move", "new": "crosshair" };
+
+  // Resizes the frame from an anchor point toward the pointer, keeping the ratio when one is set.
+  function crFromAnchor(ax, ay, px, py, r) {
+    var W = CR.src.width, H = CR.src.height, MIN = Math.max(4, 8 / CR.k);
+    var sx = px >= ax ? 1 : -1, sy = py >= ay ? 1 : -1;
+    var maxW = sx > 0 ? W - ax : ax, maxH = sy > 0 ? H - ay : ay;
+    var w = Math.abs(px - ax), h = Math.abs(py - ay);
+    if (r) {
+      w = Math.max(w, h * r);
+      w = Math.min(w, maxW, maxH * r);
+      w = Math.max(w, MIN);
+      h = w / r;
+    } else {
+      w = Math.min(Math.max(w, MIN), maxW);
+      h = Math.min(Math.max(h, MIN), maxH);
+    }
+    return { x: sx > 0 ? ax : ax - w, y: sy > 0 ? ay : ay - h, w: w, h: h };
+  }
+  function crMove(p) {
+    var d = CR.drag, b0 = d.box, r = crRatio(), W = CR.src.width, H = CR.src.height;
+    var MIN = Math.max(4, 8 / CR.k), b;
+    if (d.mode === "move") {
+      b = { x: b0.x + p.x - d.p.x, y: b0.y + p.y - d.p.y, w: b0.w, h: b0.h };
+      b.x = Math.min(Math.max(0, b.x), W - b.w);
+      b.y = Math.min(Math.max(0, b.y), H - b.h);
+    } else if (d.mode === "new") {
+      var ax = Math.min(Math.max(0, d.p.x), W), ay = Math.min(Math.max(0, d.p.y), H);
+      b = crFromAnchor(ax, ay, Math.min(Math.max(0, p.x), W), Math.min(Math.max(0, p.y), H), r);
+    } else if (d.mode.length === 2) {
+      var ax2 = d.mode.indexOf("w") >= 0 ? b0.x + b0.w : b0.x;
+      var ay2 = d.mode.indexOf("n") >= 0 ? b0.y + b0.h : b0.y;
+      b = crFromAnchor(ax2, ay2, Math.min(Math.max(0, p.x), W), Math.min(Math.max(0, p.y), H), r);
+    } else {
+      var x1 = b0.x, y1 = b0.y, x2 = b0.x + b0.w, y2 = b0.y + b0.h;
+      if (d.mode === "e") x2 = Math.min(W, Math.max(x1 + MIN, p.x));
+      if (d.mode === "w") x1 = Math.max(0, Math.min(x2 - MIN, p.x));
+      if (d.mode === "s") y2 = Math.min(H, Math.max(y1 + MIN, p.y));
+      if (d.mode === "n") y1 = Math.max(0, Math.min(y2 - MIN, p.y));
+      b = { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
+      if (r) {
+        var cx = b0.x + b0.w / 2, cy = b0.y + b0.h / 2;
+        if (d.mode === "e" || d.mode === "w") {
+          var lim = 2 * Math.min(cy, H - cy) * r;
+          if (b.w > lim) { b.w = lim; if (d.mode === "w") b.x = x2 - lim; }
+          b.h = b.w / r; b.y = cy - b.h / 2;
+        } else {
+          var limH = 2 * Math.min(cx, W - cx) / r;
+          if (b.h > limH) { b.h = limH; if (d.mode === "n") b.y = y2 - limH; }
+          b.w = b.h * r; b.x = cx - b.w / 2;
+        }
+      }
+    }
+    CR.box = b;
+    crDraw();
+  }
+  crCanvas.addEventListener("pointerdown", function (e) {
+    if (!CR.box) return;
+    e.preventDefault();
+    var p = crPoint(e), mode = crHit(p, e.pointerType !== "mouse");
+    CR.drag = { mode: mode, p: p, box: { x: CR.box.x, y: CR.box.y, w: CR.box.w, h: CR.box.h }, id: e.pointerId };
+    try { crCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  crCanvas.addEventListener("pointermove", function (e) {
+    if (!CR.box) return;
+    if (!CR.drag) { if (e.pointerType === "mouse") crCanvas.style.cursor = CR_CURSOR[crHit(crPoint(e), false)]; return; }
+    if (e.pointerId !== CR.drag.id) return;
+    crMove(crPoint(e));
+  });
+  function crEnd(e) {
+    if (!CR.drag || e.pointerId !== CR.drag.id) return;
+    // a plain click outside the frame keeps the old frame
+    if (CR.drag.mode === "new" && (CR.box.w < 3 / CR.k || CR.box.h < 3 / CR.k)) CR.box = CR.drag.box;
+    CR.drag = null;
+    crDraw();
+    crPreview();
+  }
+  crCanvas.addEventListener("pointerup", crEnd);
+  crCanvas.addEventListener("pointercancel", crEnd);
+
+  /* ---- output size ---- */
+  function crCropPx() {
+    var b = CR.box;
+    return { w: Math.max(1, Math.round(b.w)), h: Math.max(1, Math.round(b.h)) };
+  }
+  function crOutSize() {
+    var c = crCropPx();
+    if (CR.mode === "std") { var s = crStd(); return { w: s.w, h: s.h, dpi: s.dpi }; }
+    if (CR.mode === "custom") {
+      var w = Math.round(+$("crW").value) || 0, h = Math.round(+$("crH").value) || 0;
+      if ($("crLock").checked) {
+        if (w > 0) h = Math.max(1, Math.round(w * c.h / c.w));
+        else if (h > 0) w = Math.max(1, Math.round(h * c.w / c.h));
+      }
+      if (!(w > 0 && h > 0)) return null;
+      return { w: w, h: h, dpi: 0 };
+    }
+    return { w: c.w, h: c.h, dpi: 0 };
+  }
+  function crFmt() { return $("crFmtJpg").checked ? "jpg" : "png"; }
+
+  function crInfo() {
+    if (!CR.box) return;
+    var c = crCropPx();
+    $("crDims").textContent = "자른 영역 " + c.w + " × " + c.h + " px  (원본 " + CR.src.width + " × " + CR.src.height + ")";
+    if (CR.mode === "custom" && $("crLock").checked && !CR.typing) {
+      var w = Math.round(+$("crW").value) || 0;
+      if (CR.lastTyped === "h") { var hh = Math.round(+$("crH").value) || 0; if (hh > 0) $("crW").value = Math.max(1, Math.round(hh * c.w / c.h)); }
+      else if (w > 0) $("crH").value = Math.max(1, Math.round(w * c.h / c.w));
+    }
+    var o = crOutSize(), bad = !o || o.w > CR_MAX_SIDE || o.h > CR_MAX_SIDE || o.w * o.h > MAX_AREA;
+    $("crOutDims").textContent = o ? o.w + " × " + o.h + " px" : "크기를 입력해 주세요";
+    var fmt = crFmt(), hint = [];
+    if (CR.shape !== "rect") hint.push(fmt === "png" ? "모양 바깥은 투명하게 저장됩니다." : "모양 바깥은 흰색으로 채워집니다. 투명하게 하려면 PNG를 고르세요.");
+    if (o && o.dpi) hint.push("인쇄용 " + o.dpi + "dpi 정보가 들어갑니다.");
+    if (o && !bad && CR.mode !== "keep") {
+      var c2 = crCropPx(), up = Math.max(o.w / c2.w, o.h / c2.h);
+      if (up > 1.5) hint.push("자른 부분보다 " + up.toFixed(1) + "배 크게 늘리므로 흐릿해 보일 수 있습니다.");
+    }
+    if (o && bad) hint.push("너무 커서 만들 수 없습니다. 가로·세로를 " + CR_MAX_SIDE + "px 아래로 줄여 주세요.");
+    $("crFmtHint").textContent = hint.join(" ");
+    $("crSave").disabled = !o || bad || CR.busy;
+    $("crName").textContent = CR.file ? CR.file.name : "";
+  }
+
+  // Shrinks a canvas by halves first, so a big reduction stays sharp instead of grainy.
+  function crScaled(src, sx, sy, sw, sh, ow, oh) {
+    var cur = src, cx = sx, cy = sy, cw = sw, ch = sh;
+    while (cw / 2 >= ow * 1.0001 || ch / 2 >= oh * 1.0001) {
+      var nw = cw / 2 >= ow ? Math.round(cw / 2) : Math.round(cw), nh = ch / 2 >= oh ? Math.round(ch / 2) : Math.round(ch);
+      var t = document.createElement("canvas");
+      t.width = Math.max(1, nw); t.height = Math.max(1, nh);
+      var tx = t.getContext("2d");
+      tx.imageSmoothingQuality = "high";
+      tx.drawImage(cur, cx, cy, cw, ch, 0, 0, t.width, t.height);
+      cur = t; cx = 0; cy = 0; cw = t.width; ch = t.height;
+    }
+    return { img: cur, x: cx, y: cy, w: cw, h: ch };
+  }
+  function crFit() { return CR.mode === "std" ? crRadio("crfit") : "stretch"; }
+  function crRender(src, scale, o, fmt) {
+    var b = CR.box, c = document.createElement("canvas");
+    c.width = o.w; c.height = o.h;
+    var ctx = c.getContext("2d");
+    if (fmt === "jpg") { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, o.w, o.h); }
+    // which part of the crop goes where in the output
+    var sx = b.x, sy = b.y, sw = b.w, sh = b.h, dx = 0, dy = 0, dw = o.w, dh = o.h, fit = crFit();
+    if (fit === "pad") {
+      var k = Math.min(o.w / b.w, o.h / b.h);
+      dw = Math.max(1, Math.round(b.w * k)); dh = Math.max(1, Math.round(b.h * k));
+      dx = Math.round((o.w - dw) / 2); dy = Math.round((o.h - dh) / 2);
+    } else if (fit === "cover") {
+      var k2 = Math.max(o.w / b.w, o.h / b.h);
+      sw = o.w / k2; sh = o.h / k2;
+      sx = b.x + (b.w - sw) / 2; sy = b.y + (b.h - sh) / 2;
+    }
+    if (CR.shape !== "rect") { ctx.beginPath(); crPath(ctx, CR.shape, dx, dy, dw, dh); ctx.clip(); }
+    var sc = crScaled(src, sx * scale, sy * scale, sw * scale, sh * scale, dw, dh);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(sc.img, sc.x, sc.y, sc.w, sc.h, dx, dy, dw, dh);
+    return c;
+  }
+
+  function crPreview() {
+    clearTimeout(CR.prevT);
+    CR.prevT = setTimeout(function () {
+      if (!CR.box) return;
+      var o = crOutSize(), pv = $("crPrev");
+      if (!o) { pv.width = 2; pv.height = 2; return; }
+      var k = Math.min(1, 164 * 2 / Math.max(o.w, o.h));
+      var po = { w: Math.max(1, Math.round(o.w * k)), h: Math.max(1, Math.round(o.h * k)) };
+      var c = crRender(CR.disp, CR.disp.width / CR.src.width, po, crFmt());
+      pv.width = po.w; pv.height = po.h;
+      var f = Math.min(164 / po.w, 164 / po.h);
+      pv.style.width = Math.max(1, Math.round(po.w * f)) + "px";
+      pv.style.height = Math.max(1, Math.round(po.h * f)) + "px";
+      pv.getContext("2d").drawImage(c, 0, 0);
+    }, 120);
+  }
+
+  // Writes the print resolution into the file so it prints at its real size.
+  function crSetDpi(bytes, fmt, dpi) {
+    if (fmt === "jpg") {
+      if (bytes[2] === 0xff && bytes[3] === 0xe0 && bytes[6] === 0x4a && bytes[7] === 0x46 && bytes[8] === 0x49 && bytes[9] === 0x46) {
+        bytes[13] = 1;
+        bytes[14] = dpi >> 8; bytes[15] = dpi & 255;
+        bytes[16] = dpi >> 8; bytes[17] = dpi & 255;
+      }
+      return bytes;
+    }
+    if (bytes[12] !== 0x49 || bytes[13] !== 0x48) return bytes; // IHDR must come first
+    var ppm = Math.round(dpi / 0.0254), body = new Uint8Array(9), dv = new DataView(body.buffer);
+    dv.setUint32(0, ppm); dv.setUint32(4, ppm); body[8] = 1;
+    var chunk = pngChunk("pHYs", body), out = new Uint8Array(bytes.length + chunk.length);
+    out.set(bytes.subarray(0, 33), 0);
+    out.set(chunk, 33);
+    out.set(bytes.subarray(33), 33 + chunk.length);
+    return out;
+  }
+
+  $("crSave").addEventListener("click", async function () {
+    var o = crOutSize();
+    if (!o || !CR.box || CR.busy) return;
+    var btn = $("crSave"), fmt = crFmt();
+    CR.busy = true; btn.disabled = true; btn.textContent = "만드는 중…";
+    try {
+      await new Promise(function (r) { setTimeout(r, 30); });
+      var c = crRender(CR.src, 1, o, fmt);
+      var blob = await canvasBlob(c, fmt === "jpg" ? "image/jpeg" : "image/png", 0.92);
+      if (!blob) throw new Error("too large");
+      if (o.dpi) blob = new Blob([crSetDpi(new Uint8Array(await blob.arrayBuffer()), fmt, o.dpi)], { type: blob.type });
+      var name = baseName(CR.file.name) + "_" + o.w + "x" + o.h + "." + fmt;
+      if (manual) {
+        var out = $("crOut");
+        out.src = await blobToDataUrl(blob);
+        out.hidden = false;
+        out.scrollIntoView({ block: "nearest" });
+      } else {
+        await saveFile(name, blob);
+      }
+    } catch (e) {
+      toast("이 사진은 만들지 못했습니다. 크기를 줄여 다시 해 보세요.");
+    } finally {
+      CR.busy = false; btn.textContent = "저장"; crInfo();
+    }
+  });
+
+  /* ---- settings ---- */
+  function crRadio(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ""; }
+  document.querySelectorAll('input[name="crasp"]').forEach(function (r) {
+    r.addEventListener("change", function () { CR.asp = r.value; if (CR.src) { crApplyRatio(); crPreview(); } });
+  });
+  document.querySelectorAll('input[name="crshape"]').forEach(function (r) {
+    r.addEventListener("change", function () {
+      CR.shape = r.value;
+      // round shapes look right in a square: start them square when the frame is free
+      if (CR.shape !== "rect" && CR.shape !== "round" && CR.asp === "free" && CR.mode !== "std") {
+        document.querySelector('input[name="crasp"][value="1"]').checked = true;
+        CR.asp = "1";
+        if (CR.src) crApplyRatio();
+      }
+      if (CR.shape !== "rect" && crFmt() === "jpg") $("crFmtPng").checked = true;
+      crDraw(); crPreview();
+    });
+  });
+  function crModeUI() {
+    CR.mode = crRadio("crmode");
+    $("crStdBox").hidden = CR.mode !== "std";
+    $("crCustomBox").hidden = CR.mode !== "custom";
+    var std = CR.mode === "std";
+    $("crModeHint").textContent = CR.mode === "keep" ? "자른 부분을 원래 해상도 그대로 저장합니다."
+      : std ? crStdHint()
+      : $("crLock").checked ? "가로나 세로 한쪽만 넣으면 나머지는 자른 비율에 맞춰집니다."
+      : "넣은 가로·세로에 맞춰 사진을 늘리거나 줄입니다.";
+  }
+  document.querySelectorAll('input[name="crmode"]').forEach(function (r) {
+    r.addEventListener("change", function () {
+      crModeUI();
+      if (CR.mode === "custom" && CR.box && !(+$("crW").value > 0)) {
+        var c = crCropPx(); $("crW").value = c.w; $("crH").value = c.h; CR.lastTyped = "w";
+      }
+      if (CR.src) crApplyRatio();
+      crInfo(); crPreview();
+    });
+  });
+  function crStdHint() {
+    var f = crRadio("crfit");
+    return f === "pad" ? "자른 사진 전체가 고른 크기 안에 들어가고, 비율이 달라 남는 곳은 여백(PNG는 투명, JPG는 흰색)이 됩니다."
+      : f === "cover" ? "고른 크기를 꽉 채우도록 자른 사진의 가장자리를 조금 더 잘라 냅니다."
+      : "자른 사진을 고른 크기에 맞게 늘리거나 줄입니다. 비율이 다르면 모양이 달라집니다.";
+  }
+  function crStdChanged() { crModeUI(); crInfo(); crPreview(); }
+  $("crStd").addEventListener("change", crStdChanged);
+  document.querySelectorAll('input[name="crfit"]').forEach(function (r) { r.addEventListener("change", crStdChanged); });
+  $("crSnap").addEventListener("click", function () {
+    if (!CR.src) return;
+    var st = crStd(), r = st.w / st.h;
+    document.querySelector('input[name="crasp"][value="free"]').checked = false;
+    document.querySelectorAll('input[name="crasp"]').forEach(function (x) { x.checked = false; });
+    CR.asp = String(r);
+    var b = CR.box;
+    CR.box = crFitBox(r, b.x + b.w / 2, b.y + b.h / 2, false);
+    crDraw(); crPreview();
+    toast("틀을 " + st.w + "×" + st.h + " 비율로 맞췄습니다. 틀을 옮겨 위치를 정하세요.");
+  });
+  ["crW", "crH"].forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      CR.lastTyped = id === "crW" ? "w" : "h";
+      if ($("crLock").checked && CR.box) {
+        var c = crCropPx(), v = Math.round(+$(id).value) || 0;
+        if (v > 0) {
+          if (id === "crW") $("crH").value = Math.max(1, Math.round(v * c.h / c.w));
+          else $("crW").value = Math.max(1, Math.round(v * c.w / c.h));
+        }
+      }
+      CR.typing = true; crInfo(); CR.typing = false; crPreview();
+    });
+  });
+  $("crLock").addEventListener("change", function () { crModeUI(); crInfo(); crPreview(); });
+  document.querySelectorAll('input[name="crfmt"]').forEach(function (r) {
+    r.addEventListener("change", function () { crInfo(); crPreview(); });
+  });
+
+  function crTurn(rot, flip) {
+    if (!CR.bmp) return;
+    var b = CR.box, W = CR.src.width, H = CR.src.height, nb;
+    if (b) {
+      // carry the frame along with the photo
+      if (rot !== CR.rot) {
+        var cw = ((rot - CR.rot) + 360) % 360 === 90;
+        nb = cw ? { x: H - b.y - b.h, y: b.x, w: b.h, h: b.w } : { x: b.y, y: W - b.x - b.w, w: b.h, h: b.w };
+      } else if (flip !== CR.flip) {
+        nb = { x: W - b.x - b.w, y: b.y, w: b.w, h: b.h };
+      }
+    }
+    CR.rot = rot; CR.flip = flip;
+    crBuildSource();
+    CR.box = nb || crFitBox(0, null, null, true);
+    var r = crRatio();
+    if (r && Math.abs(CR.box.w / CR.box.h - r) > 0.002) CR.box = crFitBox(r, CR.box.x + CR.box.w / 2, CR.box.y + CR.box.h / 2, false);
+    crLayout(); crPreview();
+  }
+  $("crRotL").addEventListener("click", function () { crTurn((CR.rot + 270) % 360, CR.flip); });
+  $("crRotR").addEventListener("click", function () { crTurn((CR.rot + 90) % 360, CR.flip); });
+  $("crFlip").addEventListener("click", function () { crTurn(CR.rot, !CR.flip); });
+  $("crReset").addEventListener("click", function () {
+    if (!CR.bmp) return;
+    CR.rot = 0; CR.flip = false;
+    crBuildSource();
+    CR.box = null;
+    var r = crRatio();
+    CR.box = r ? crFitBox(r, null, null, false) : crFitBox(0, null, null, true);
+    crLayout(); crPreview();
+  });
+  $("crOther").addEventListener("click", function () { $("crInput").click(); });
+
+  async function openCrop(files) {
+    var list = await expandPhotos(files);
+    if (!list.length) return;
+    if (list.length > 1) toast("사진은 한 장씩 자릅니다. 첫 번째 사진을 열었습니다.");
+    var file = list[0];
+    $("crWork").hidden = false;
+    $("crOut").hidden = true;
+    crCanvas.hidden = true;
+    $("crMsg").hidden = false;
+    $("crMsg").textContent = "사진을 불러오는 중…";
+    try {
+      var bmp = await decodeImage(file);
+      if (bmp.width * bmp.height > MAX_AREA) {
+        // iPhone/iPad browsers cannot hold pictures this big: open a slightly smaller copy instead
+        var k = Math.sqrt(MAX_AREA * 0.98 / (bmp.width * bmp.height));
+        var small = document.createElement("canvas");
+        small.width = Math.max(1, Math.floor(bmp.width * k));
+        small.height = Math.max(1, Math.floor(bmp.height * k));
+        var sctx = small.getContext("2d");
+        sctx.imageSmoothingQuality = "high";
+        sctx.drawImage(bmp, 0, 0, small.width, small.height);
+        toast("사진이 커서 " + small.width + "×" + small.height + "로 줄여서 열었습니다. 원본 크기는 PC에서 편집할 수 있습니다.");
+        if (bmp.close) bmp.close();
+        bmp = small;
+      }
+      if (CR.bmp && CR.bmp.close) CR.bmp.close();
+      CR.file = file; CR.bmp = bmp; CR.rot = 0; CR.flip = false;
+      crBuildSource();
+      var r = crRatio();
+      CR.box = r ? crFitBox(r, null, null, false) : crFitBox(0, null, null, true);
+      $("crMsg").hidden = true;
+      crCanvas.hidden = false;
+      if (CR.mode === "custom") { var c = crCropPx(); $("crW").value = c.w; $("crH").value = c.h; CR.lastTyped = "w"; }
+      crLayout(); crPreview();
+      $("crWork").scrollIntoView({ block: "start", behavior: "smooth" });
+    } catch (e) {
+      $("crMsg").textContent = (e && e.userMessage) || "사진으로 열 수 없는 파일입니다.";
+      if (!CR.bmp) $("crSave").disabled = true;
+    }
+  }
+  wireDrop($("crDrop"), $("crInput"), $("crPick"), openCrop);
+  window.addEventListener("resize", function () { if (current === "crop") crLayout(); });
+  crModeUI();
 
   /* ================= Audio ================= */
   var A = { buf: null, file: null, start: 0, end: 0, mode: "keep", peaks: null, ctx: null, src: null,
@@ -8101,6 +8852,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     { id: "heic",    name: "HEIC 변환",       desc: "아이폰 사진을 JPG로",       category: "photo",    tint: "blue",   icon: "image",   short: "변환", ready: true,  featured: true },
     { id: "mosaic",  name: "사진 모자이크",   desc: "개인정보 안전하게",         category: "photo",    tint: "orange", icon: "mosaic",  short: "모자이크", ready: true,  featured: true },
     { id: "shrink",  name: "이미지 용량 줄이기", desc: "화질은 그대로, 용량만 작게", category: "photo",  tint: "green",  icon: "shrink",  short: "용량 줄이기", ready: true },
+    { id: "crop",    name: "사진 자르기·크기 조절", desc: "모양 자르기, 표준 크기 맞춤", category: "photo", tint: "purple", icon: "crop", short: "자르기·크기", ready: true },
     { id: "pdf",     name: "PDF 용량 줄이기", desc: "파일 크기 가볍게",          category: "document", tint: "green",  icon: "file",    short: "PDF", ready: true,  featured: true },
     { id: "pdfmerge", name: "PDF 합치기",     desc: "여러 PDF를 하나로",         category: "document", tint: "lilac",  icon: "files",   short: "PDF 합치기", ready: true },
     { id: "pdfsplit", name: "PDF 페이지 추출", desc: "원하는 쪽만 골라내기", category: "document", tint: "orange", icon: "pdfout",  short: "페이지 추출", ready: true },
@@ -8125,6 +8877,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
   ];
 
   var ICONS = {
+    crop: '<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
     image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 16-5.5-5.5L5 21"/>',
     shrink: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path d="m9 9 3 3 3-3M9 15l3-3 3 3"/>',
     mosaic: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
@@ -8309,6 +9062,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     if (current === "break" && !$("brFrame").getAttribute("src")) $("brFrame").src = $("brFrame").dataset.src;
     if (current === "audio") drawWave(); else stopAudio();
     if (current === "sign") sResize();
+    if (current === "crop") crLayout();
     if (current !== "merge") stopMerge();
     if (current !== "pitch") stopPitch();
     if (current !== "extract") stopExtract();
@@ -8449,6 +9203,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     var files = e.clipboardData.files;
     if (current === "heic") heic.add(await expandPhotos(files));
     else if (current === "shrink") addShrink(files);
+    else if (current === "crop") openCrop(files);
     else if (current === "pdf") addPdfs(files);
     else if (current === "pdfmerge") addPdfMerge(files);
     else if (current === "pdfsplit") openPdfSplit(files);
