@@ -1005,6 +1005,15 @@ ul.foot { color: var(--muted); font-size: 13px; margin: 0; padding-left: 1.2em; 
 .key-range { max-width: 460px; width: 100%; margin: 0 auto; }
 .key-range input[type="range"] { width: 100%; }
 .key-ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 0 2px; }
+.sp-presets { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.sp-presets .btn { font-family: var(--font-data); }
+.sp-presets .btn.on { border-color: var(--accent); background: var(--accent-soft); color: var(--fg); font-weight: 600; }
+.sp-bpm { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; padding: 12px 14px; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--r); }
+.sp-bpm-note { flex: 1 1 100%; margin: 0; font-size: 13.5px; color: var(--muted); }
+.sp-bpm-note b { color: var(--fg); }
+#spTap.on { border-color: var(--accent); background: var(--accent-soft); }
+#spCanvas { display: block; width: 100%; height: 150px; touch-action: pan-y; cursor: pointer; }
+.sp-steps-in { width: 10em; }
 
 /* ---------- Guide page (사이트 소개 · 자주 묻는 질문 · 건의하기) ---------- */
 /* with the 안내 menu and 쉬는 시간 there are seven top items, each in a slot of the same width: they shrink toward their text but never below it, so a wide label (학급 운영) never runs under its neighbour */
@@ -1748,6 +1757,112 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
       <li>반음 1칸은 피아노 건반 한 칸입니다. +2는 "도"를 "레"로, −12는 한 옥타브 아래로 바꿉니다.</li>
       <li>±3 안쪽은 자연스럽게 들리지만, 많이 바꿀수록 목소리가 어색해집니다. 올리면 가늘게, 내리면 굵게 변하고, 북이나 박수 같은 소리는 조금 뭉개질 수 있습니다.</li>
       <li>바꾸는 계산은 이 기기에서 합니다. 4분짜리 곡은 컴퓨터에서 보통 20초 안팎이 걸리고, 휴대폰은 더 걸릴 수 있습니다.</li>
+      <li>MP3는 192kbps로 저장되고, WAV는 음질 손실이 없지만 용량이 큽니다.</li>
+    </ul>
+  </section>
+
+  <!-- ===== Audio speed ===== -->
+  <section class="panel" id="panel-speed" hidden>
+    <div>
+      <p class="eyebrow">음원</p>
+      <h2>음원 속도 조절</h2>
+      <p class="sub">음높이는 그대로 두고 빠르기만 느리게 하거나 빠르게 합니다. 율동이나 합창을 처음 익힐 때 느리게 연습하고, 익숙해지면 조금씩 원래 빠르기로 올려 갈 수 있습니다.</p>
+    </div>
+    <div class="drop" id="spDrop" role="group" aria-label="빠르기를 바꿀 음원 파일 올리기">
+      <strong>음원 파일을 여기에 끌어다 놓으세요</strong>
+      <span>MP3, M4A, WAV 등 한 번에 한 곡씩 작업합니다</span>
+      <button type="button" class="pick" id="spPick">파일 선택</button>
+      <input type="file" id="spInput" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.flac" hidden>
+    </div>
+    <div id="spWork" class="panel" hidden>
+      <div class="key-box">
+        <button type="button" class="btn key-step" id="spDown" aria-label="5% 느리게">−</button>
+        <div class="key-val">
+          <strong id="spVal" aria-live="polite">100%</strong>
+          <small id="spValSub">원래 빠르기</small>
+        </div>
+        <button type="button" class="btn key-step" id="spUp" aria-label="5% 빠르게">+</button>
+      </div>
+      <div class="key-range">
+        <input type="range" id="spRange" min="-100" max="100" step="1" value="0" aria-label="빠르기 (50%부터 200%까지)">
+        <div class="key-ticks" aria-hidden="true"><span>50%</span><span>100%</span><span>200%</span></div>
+      </div>
+      <div class="sp-presets" role="group" aria-label="자주 쓰는 빠르기">
+        <button type="button" class="btn small" data-sp="50">50%</button>
+        <button type="button" class="btn small" data-sp="70">70%</button>
+        <button type="button" class="btn small" data-sp="80">80%</button>
+        <button type="button" class="btn small" data-sp="90">90%</button>
+        <button type="button" class="btn small" data-sp="100">100%</button>
+        <button type="button" class="btn small" data-sp="110">110%</button>
+        <button type="button" class="btn small" data-sp="120">120%</button>
+        <button type="button" class="btn small" data-sp="150">150%</button>
+      </div>
+      <div class="sp-bpm">
+        <div class="field">
+          <label class="label" for="spBpm">원곡 BPM</label>
+          <input type="number" class="time-in sec-in" id="spBpm" min="30" max="300" step="1" inputmode="decimal">
+          <button type="button" class="btn small" id="spHalf" title="반으로">÷2</button>
+          <button type="button" class="btn small" id="spDouble" title="두 배로">×2</button>
+          <button type="button" class="btn small" id="spTap">박자 두드리기</button>
+        </div>
+        <div class="field">
+          <label class="label" for="spTarget">바꾼 BPM</label>
+          <input type="number" class="time-in sec-in" id="spTarget" min="15" max="600" step="1" inputmode="decimal">
+        </div>
+        <p class="sp-bpm-note" id="spBpmNote" aria-live="polite"></p>
+      </div>
+      <div class="wave"><canvas id="spCanvas" width="2" height="2" aria-label="음원 파형. 노란 손잡이를 끌어 연습할 구간을 정합니다."></canvas></div>
+      <div class="settings">
+        <div class="field">
+          <label class="label" for="spStart">구간</label>
+          <input type="text" class="time-in" id="spStart" inputmode="decimal" aria-label="구간 시작 (분:초)">
+          <span class="label">부터</span>
+          <input type="text" class="time-in" id="spEnd" inputmode="decimal" aria-label="구간 끝 (분:초)">
+          <span class="label">까지</span>
+          <button type="button" class="btn small" id="spAll">곡 전체로</button>
+        </div>
+        <div class="field">
+          <label class="check"><input type="checkbox" id="spLoop" checked> 구간 반복해서 듣기</label>
+        </div>
+      </div>
+      <div class="transport">
+        <button type="button" class="btn" id="spPlay">▶ 바뀐 빠르기로 듣기</button>
+        <button type="button" class="btn" id="spOrig">▶ 원래 빠르기로 듣기</button>
+        <span class="val" id="spTime">00:00.00 / 00:00.00</span>
+      </div>
+      <div class="settings sp-save">
+        <div class="field">
+          <span class="label" id="spScopeLabel">저장할 부분</span>
+          <div class="seg" role="radiogroup" aria-labelledby="spScopeLabel">
+            <label><input type="radio" name="spscope" id="spScopeAll" value="all" checked><span>곡 전체</span></label>
+            <label><input type="radio" name="spscope" id="spScopeSel" value="sel"><span>선택 구간만</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label" id="spFmtLabel">저장 형식</span>
+          <div class="seg mono" role="radiogroup" aria-labelledby="spFmtLabel">
+            <label><input type="radio" name="spfmt" id="spfmtMp3" value="mp3" checked><span>MP3</span></label>
+            <label><input type="radio" name="spfmt" id="spfmtWav" value="wav"><span>WAV</span></label>
+          </div>
+        </div>
+        <div class="field sp-steps">
+          <label class="check"><input type="checkbox" id="spStepsOn"> 단계별 연습판 만들기</label>
+          <input type="text" class="time-in sp-steps-in" id="spSteps" value="70 80 90 100" aria-label="단계별 빠르기 (%, 띄어쓰기로 구분)">
+          <span class="label">%</span>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="spCount" aria-live="polite"></div>
+        <button type="button" class="btn primary" id="spExport">저장하기</button>
+      </div>
+      <div class="note" id="spZipNote" hidden>Claude 화면에서는 음원 파일을 바로 저장할 수 없어서, 결과를 ZIP 파일에 담아 저장합니다. ZIP을 풀면 음원 파일이 들어 있습니다.</div>
+    </div>
+    <ul class="foot">
+      <li>80%는 원래보다 조금 느리게, 120%는 조금 빠르게입니다. 80%에서 120% 사이는 아주 자연스럽고, 많이 바꿀수록 소리가 울리거나 뭉개질 수 있습니다.</li>
+      <li>BPM은 곡을 열 때 저절로 잽니다. 박이 뚜렷하지 않은 곡은 틀리거나 절반, 두 배로 잡힐 수 있으니, 그럴 때는 ÷2, ×2를 누르거나 "박자 두드리기"를 박자에 맞춰 네 번 이상 눌러 주세요.</li>
+      <li>노란 손잡이로 구간을 정하면 그 부분만 반복해서 들을 수 있습니다. 어려운 대목만 느리게 연습할 때 쓰고, 그 구간만 저장할 수도 있습니다.</li>
+      <li>단계별 연습판은 적어 둔 빠르기마다 파일을 하나씩 만들어 ZIP 하나에 담습니다. 파일 이름 앞에 1단계, 2단계가 붙습니다.</li>
+      <li>듣기는 브라우저가 바로 바꿔 들려주고, 저장할 때는 이 기기에서 따로 계산합니다. 그래서 저장한 소리는 미리 들은 소리와 아주 조금 다를 수 있습니다. 4분짜리 곡은 컴퓨터에서 보통 20초 안팎이 걸리고, 휴대폰은 더 걸릴 수 있습니다.</li>
       <li>MP3는 192kbps로 저장되고, WAV는 음질 손실이 없지만 용량이 큽니다.</li>
     </ul>
   </section>
@@ -6223,6 +6338,406 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
   });
   pRefresh();
 
+  /* ================= Audio speed ================= */
+  // Reuses decodeFile(), computePeaks(), cssVar(), fmtTime(), parseTime(), pvStretch(), encodeWav() and encodeMp3() from the audio tools above.
+  // Listening uses the browser's own player (playbackRate with preservesPitch), so a new speed is heard at once;
+  // saving stretches the samples here with the same phase vocoder as the key changer, without the resampling step.
+  var SP = { file: null, buf: null, url: "", el: null, peaks: null, pct: 100, start: 0, end: 0, cursor: 0, drag: null,
+             raf: 0, playing: "", token: 0, busy: false, bpm: 0, bpmFrom: "", taps: [] };
+  var SP_MIN = 50, SP_MAX = 200, SP_SEL = 0.2;
+  var spCanvas = $("spCanvas"), spCtx = spCanvas.getContext("2d");
+  if (settings.afmt === "wav") $("spfmtWav").checked = true;
+  if (inViewer) $("spZipNote").hidden = false;
+
+  function spFactor(p) { return String(+(p / 100).toFixed(2)); }
+  function spSelected() { return $("spScopeSel").checked; }
+  function spDrawWave() {
+    if (!SP.buf || $("panel-speed").hidden) return;
+    var dpr = window.devicePixelRatio || 1;
+    var cw = Math.max(50, Math.round(spCanvas.clientWidth * dpr)), ch = Math.round(150 * dpr);
+    if (spCanvas.width !== cw || spCanvas.height !== ch) { spCanvas.width = cw; spCanvas.height = ch; }
+    var dur = SP.buf.duration, mid = ch * 0.44, amp = ch * 0.38;
+    var kept = cssVar("--accent"), rest = cssVar("--line"), ink = cssVar("--fg"), muted = cssVar("--muted"), handle = cssVar("--handle");
+    spCtx.clearRect(0, 0, cw, ch);
+    var bar = Math.max(2, Math.round(2 * dpr)), gap = bar + Math.max(1, Math.round(dpr));
+    for (var x = 0; x < cw; x += gap) {
+      var t = x / cw * dur, p = SP.peaks[Math.min(PEAKS - 1, Math.floor(x / cw * PEAKS))], h = Math.max(dpr, p * amp);
+      spCtx.fillStyle = t >= SP.start && t <= SP.end ? kept : rest;
+      spCtx.fillRect(x, mid - h, bar, h * 2);
+    }
+    var steps = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 1800], step = steps[steps.length - 1];
+    for (var i = 0; i < steps.length; i++) { if (dur / steps[i] <= Math.max(3, spCanvas.clientWidth / 90)) { step = steps[i]; break; } }
+    spCtx.fillStyle = muted;
+    spCtx.font = Math.round(10.5 * dpr) + "px ui-monospace, Menlo, Consolas, monospace";
+    spCtx.textAlign = "center";
+    for (var tt = step; tt < dur; tt += step) {
+      var tx = tt / dur * cw, mm = Math.floor(tt / 60), ss = Math.round(tt - mm * 60);
+      spCtx.fillRect(tx, ch - 16 * dpr, dpr, 4 * dpr);
+      spCtx.fillText((mm < 10 ? "0" : "") + mm + ":" + (ss < 10 ? "0" : "") + ss, tx, ch - 2 * dpr);
+    }
+    var x0 = SP.start / dur * cw, x1 = SP.end / dur * cw, hw = 7 * dpr, top = dpr, boxH = ch - 20 * dpr;
+    x0 = Math.max(hw / 2, x0); x1 = Math.min(cw - hw / 2, x1);
+    spCtx.strokeStyle = handle; spCtx.lineWidth = 2 * dpr;
+    spCtx.strokeRect(x0, top, Math.max(1, x1 - x0), boxH);
+    spCtx.fillStyle = handle;
+    spCtx.fillRect(x0 - hw / 2, top, hw, boxH);
+    spCtx.fillRect(x1 - hw / 2, top, hw, boxH);
+    spCtx.fillStyle = ink;
+    spCtx.fillRect(SP.cursor / dur * cw - dpr / 2, top, dpr, boxH);
+  }
+
+  function spRefresh(msg, skipInputs) {
+    var p = SP.pct;
+    $("spVal").textContent = p + "%";
+    $("spValSub").textContent = p === 100 ? "원래 빠르기" : spFactor(p) + "배 · 원래보다 " + (p < 100 ? "느리게" : "빠르게");
+    $("spRange").value = Math.round(100 * Math.log(p / 100) / Math.LN2);
+    $("spDown").disabled = p <= SP_MIN;
+    $("spUp").disabled = p >= SP_MAX;
+    document.querySelectorAll("#panel-speed [data-sp]").forEach(function (b) { b.classList.toggle("on", Number(b.dataset.sp) === p); });
+    if (!SP.buf) return;
+    if (!skipInputs) { $("spStart").value = fmtTime(SP.start); $("spEnd").value = fmtTime(SP.end); }
+    // BPM
+    var bpmIn = $("spBpm"), tgIn = $("spTarget");
+    if (document.activeElement !== bpmIn) bpmIn.value = SP.bpm ? Math.round(SP.bpm) : "";
+    if (document.activeElement !== tgIn) tgIn.value = SP.bpm ? Math.round(SP.bpm * p / 100) : "";
+    tgIn.disabled = !SP.bpm;
+    $("spHalf").disabled = !SP.bpm || SP.bpm / 2 < 30;
+    $("spDouble").disabled = !SP.bpm || SP.bpm * 2 > 300;
+    var note = $("spBpmNote");
+    if (SP.bpmFrom === "busy") note.textContent = "BPM을 재는 중…";
+    else if (!SP.bpm) note.textContent = "박이 뚜렷하지 않아 BPM을 재지 못했습니다. 박자 두드리기로 재거나 직접 적어 주세요.";
+    else {
+      var from = SP.bpmFrom === "auto" ? "자동으로 잰 값" : SP.bpmFrom === "tap" ? "두드려 잰 값" : "직접 적은 값";
+      note.innerHTML = "원곡 약 <b>" + Math.round(SP.bpm) + " BPM</b>(" + from + ") → 바꾼 빠르기 <b>" + Math.round(SP.bpm * p / 100) + " BPM</b>";
+    }
+    $("spTime").textContent = fmtTime(SP.cursor) + " / " + fmtTime(SP.buf.duration);
+    var whole = SP.buf.duration, sel = SP.end - SP.start, k = 100 / p;
+    var line = SP.file.name + " · 곡 길이 " + fmtTime(whole) + (p === 100 ? "" : " → " + fmtTime(whole * k));
+    if (sel < whole - 0.01) line += " · 구간 " + fmtTime(sel) + (p === 100 ? "" : " → " + fmtTime(sel * k));
+    $("spCount").textContent = msg || line;
+    $("spPlay").textContent = SP.playing === "speed" ? "■ 멈춤" : "▶ 바뀐 빠르기로 듣기";
+    $("spOrig").textContent = SP.playing === "orig" ? "■ 멈춤" : "▶ 원래 빠르기로 듣기";
+    $("spExport").disabled = SP.busy;
+    spDrawWave();
+  }
+
+  function spSetPct(p) {
+    p = Math.max(SP_MIN, Math.min(SP_MAX, Math.round(p)));
+    if (!isFinite(p)) return;
+    SP.pct = p;
+    if (SP.el && SP.playing === "speed") SP.el.playbackRate = p / 100;
+    spRefresh();
+  }
+  $("spDown").addEventListener("click", function () { spSetPct(SP.pct - (SP.pct % 5 || 5)); });
+  $("spUp").addEventListener("click", function () { spSetPct(SP.pct + 5 - SP.pct % 5); });
+  $("spRange").addEventListener("input", function () {
+    var raw = 100 * Math.pow(2, Number($("spRange").value) / 100);
+    spSetPct(Math.round(raw / 5) * 5);
+  });
+  document.querySelectorAll("#panel-speed [data-sp]").forEach(function (b) {
+    b.addEventListener("click", function () { spSetPct(Number(b.dataset.sp)); });
+  });
+
+  // ---- BPM: spectral flux of the first two minutes, then autocorrelation with a gentle preference for 120 BPM ----
+  function spFFT(n) {
+    var rev = new Uint32Array(n), cs = new Float64Array(n / 2), sn = new Float64Array(n / 2), bits = Math.round(Math.log(n) / Math.LN2);
+    for (var i = 0; i < n; i++) { var r = 0; for (var b = 0; b < bits; b++) r = (r << 1) | ((i >> b) & 1); rev[i] = r; }
+    for (var k = 0; k < n / 2; k++) { cs[k] = Math.cos(2 * Math.PI * k / n); sn[k] = -Math.sin(2 * Math.PI * k / n); }
+    return function (re, im) {
+      for (var i = 0; i < n; i++) { var j = rev[i]; if (j > i) { var t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; } }
+      for (var size = 2; size <= n; size <<= 1) {
+        var half = size >> 1, step = n / size;
+        for (var s = 0; s < n; s += size) for (var q = 0, w = 0; q < half; q++, w += step) {
+          var a = s + q, c = a + half, xr = re[c] * cs[w] - im[c] * sn[w], xi = re[c] * sn[w] + im[c] * cs[w];
+          re[c] = re[a] - xr; im[c] = im[a] - xi; re[a] += xr; im[a] += xi;
+        }
+      }
+    };
+  }
+  function spDetectBpm(buf) {
+    var sr = buf.sampleRate, N = 1024, H = 512, len = buf.length;
+    var c0 = buf.getChannelData(0), c1 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : null;
+    var a = Math.min(Math.floor(len * 0.1), Math.floor(30 * sr)), b = Math.min(len, a + Math.floor(120 * sr));
+    if (b - a < 10 * sr) { a = 0; b = Math.min(len, Math.floor(120 * sr)); }
+    if (b - a < 4 * sr) return 0;
+    var frames = Math.floor((b - a - N) / H), fft = spFFT(N), re = new Float64Array(N), im = new Float64Array(N);
+    var win = new Float64Array(N), bins = Math.min(N / 2, Math.round(10000 / sr * N)), prev = new Float64Array(bins), env = new Float64Array(frames);
+    for (var i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+    for (var f = 0; f < frames; f++) {
+      var o = a + f * H;
+      for (i = 0; i < N; i++) { re[i] = (c1 ? (c0[o + i] + c1[o + i]) * 0.5 : c0[o + i]) * win[i]; im[i] = 0; }
+      fft(re, im);
+      var flux = 0;
+      for (var k = 1; k < bins; k++) {
+        var m = Math.log(1 + 100 * Math.sqrt(re[k] * re[k] + im[k] * im[k]));
+        if (f && m > prev[k]) flux += m - prev[k];
+        prev[k] = m;
+      }
+      env[f] = flux;
+    }
+    // remove the slowly moving level so only the attacks are left
+    var fps = sr / H, w = Math.round(fps * 0.4), on = new Float64Array(frames), cum = new Float64Array(frames + 1);
+    for (f = 0; f < frames; f++) cum[f + 1] = cum[f] + env[f];
+    for (f = 0; f < frames; f++) {
+      var lo = Math.max(0, f - w), hi = Math.min(frames, f + w + 1);
+      on[f] = Math.max(0, env[f] - (cum[hi] - cum[lo]) / (hi - lo));
+    }
+    var minLag = Math.floor(fps * 60 / 240), maxLag = Math.min(frames - 1, Math.ceil(fps * 60 / 40) * 4);
+    var ac = new Float64Array(maxLag + 2);
+    for (var lag = minLag; lag <= maxLag + 1 && lag < frames; lag++) {
+      var acc = 0;
+      for (i = 0; i + lag < frames; i++) acc += on[i] * on[i + lag];
+      ac[lag] = acc / (frames - lag);
+    }
+    var best = 0, bestLag = 0, top = Math.ceil(fps * 60 / 50);
+    for (lag = Math.floor(fps * 60 / 210); lag <= top && lag * 2 <= maxLag; lag++) {
+      var bpm = 60 * fps / lag, oct = Math.log(bpm / 120) / Math.LN2;
+      var sc = (ac[lag] + 0.5 * ac[lag * 2] + (lag * 4 <= maxLag ? 0.25 * ac[lag * 4] : 0)) * Math.exp(-0.5 * oct * oct / 0.8);
+      if (sc > best) { best = sc; bestLag = lag; }
+    }
+    if (!bestLag || best <= 0) return 0;
+    var y0 = ac[bestLag - 1], y1 = ac[bestLag], y2 = ac[bestLag + 1], d = y0 - 2 * y1 + y2, shift = d < 0 ? 0.5 * (y0 - y2) / d : 0;
+    var res = 60 * fps / (bestLag + Math.max(-0.5, Math.min(0.5, shift)));
+    return res >= 40 && res <= 240 ? res : 0;
+  }
+  function spSetBpm(v, from) {
+    SP.bpm = v > 0 ? Math.max(30, Math.min(300, v)) : 0;
+    SP.bpmFrom = from;
+    spRefresh();
+  }
+  $("spBpm").addEventListener("change", function () {
+    var v = Number($("spBpm").value);
+    if (isFinite(v) && v >= 30 && v <= 300) spSetBpm(v, "typed"); else spRefresh();
+  });
+  $("spTarget").addEventListener("change", function () {
+    var v = Number($("spTarget").value);
+    if (SP.bpm && isFinite(v) && v > 0) {
+      var p = v / SP.bpm * 100;
+      if (p < SP_MIN || p > SP_MAX) toast("빠르기는 " + SP_MIN + "%에서 " + SP_MAX + "% 사이로만 바꿀 수 있습니다.");
+      spSetPct(p);
+    } else spRefresh();
+  });
+  $("spHalf").addEventListener("click", function () { if (SP.bpm) spSetBpm(SP.bpm / 2, SP.bpmFrom); });
+  $("spDouble").addEventListener("click", function () { if (SP.bpm) spSetBpm(SP.bpm * 2, SP.bpmFrom); });
+  var spTapTimer = 0;
+  $("spTap").addEventListener("click", function () {
+    var now = performance.now(), t = SP.taps;
+    if (t.length && now - t[t.length - 1] > 2000) t.length = 0;
+    t.push(now);
+    if (t.length > 12) t.shift();
+    var btn = $("spTap");
+    btn.classList.add("on");
+    clearTimeout(spTapTimer);
+    spTapTimer = setTimeout(function () { btn.classList.remove("on"); btn.textContent = "박자 두드리기"; }, 2200);
+    if (t.length < 4) { btn.textContent = "계속 두드리기 (" + t.length + ")"; return; }
+    var gaps = [];
+    for (var i = 1; i < t.length; i++) gaps.push(t[i] - t[i - 1]);
+    gaps.sort(function (x, y) { return x - y; });
+    btn.textContent = "두드리는 중 (" + t.length + ")";
+    spSetBpm(60000 / gaps[gaps.length >> 1], "tap");
+  });
+
+  // ---- listening ----
+  function stopSpeed() {
+    cancelAnimationFrame(SP.raf);
+    if (SP.el) { try { SP.el.pause(); } catch (e) {} }
+    if (SP.playing) { SP.playing = ""; spRefresh(null, true); }
+  }
+  function spLoopTick() {
+    var el = SP.el;
+    if (!SP.playing || !el) return;
+    var c = el.currentTime;
+    if (c >= SP.end - 0.01 || c < SP.start - 0.3) {
+      if ($("spLoop").checked || c < SP.start - 0.3) { el.currentTime = SP.start; c = SP.start; if (el.paused) el.play().catch(function () {}); }
+      else { stopSpeed(); SP.cursor = SP.start; spRefresh(null, true); return; }
+    }
+    SP.cursor = Math.min(SP.buf.duration, c);
+    $("spTime").textContent = fmtTime(SP.cursor) + " / " + fmtTime(SP.buf.duration);
+    spDrawWave();
+    SP.raf = requestAnimationFrame(spLoopTick);
+  }
+  function spPlay(kind) {
+    var was = SP.playing;
+    stopSpeed();
+    if (was === kind || !SP.el) return;
+    var el = SP.el;
+    el.preservesPitch = el.mozPreservesPitch = el.webkitPreservesPitch = true;
+    el.playbackRate = kind === "speed" ? SP.pct / 100 : 1;
+    var t = SP.cursor;
+    if (t < SP.start || t >= SP.end - 0.1) t = SP.start;
+    try { el.currentTime = t; } catch (e) {}
+    SP.cursor = t;
+    SP.playing = kind;
+    spRefresh(null, true);
+    var pr = el.play();
+    if (pr && pr.catch) pr.catch(function () { if (SP.playing === kind) { stopSpeed(); toast("이 브라우저에서는 들어 볼 수 없습니다."); } });
+    SP.raf = requestAnimationFrame(spLoopTick);
+  }
+  $("spPlay").addEventListener("click", function () { if (SP.buf) spPlay("speed"); });
+  $("spOrig").addEventListener("click", function () { if (SP.buf) spPlay("orig"); });
+
+  async function openSpeed(fileList) {
+    var file = fileList && fileList[0];
+    if (!file) return;
+    stopSpeed();
+    SP.token++; SP.busy = false;
+    toast("음원을 여는 중…");
+    var buf;
+    try { buf = await decodeFile(file); } catch (e) { toast("이 파일은 음원으로 열 수 없습니다."); return; }
+    if (SP.url) URL.revokeObjectURL(SP.url);
+    SP.url = URL.createObjectURL(file);
+    if (!SP.el) {
+      SP.el = new Audio();
+      SP.el.preload = "auto";
+      SP.el.addEventListener("ended", function () { if (SP.playing) spLoopTick(); });
+    }
+    SP.el.src = SP.url;
+    SP.file = file; SP.buf = buf; SP.peaks = computePeaks(buf);
+    SP.start = 0; SP.end = buf.duration; SP.cursor = 0; SP.taps = [];
+    SP.bpm = 0; SP.bpmFrom = "busy";
+    $("spWork").hidden = false;
+    spRefresh();
+    var token = SP.token;
+    setTimeout(function () {
+      var v = 0;
+      try { v = spDetectBpm(buf); } catch (e) {}
+      if (token === SP.token && SP.bpmFrom === "busy") spSetBpm(v, v ? "auto" : "");
+    }, 60);
+  }
+  wireDrop($("spDrop"), $("spInput"), $("spPick"), openSpeed);
+
+  // ---- section on the waveform ----
+  function spTimeAt(e) {
+    var r = spCanvas.getBoundingClientRect();
+    return Math.min(SP.buf.duration, Math.max(0, (e.clientX - r.left) / r.width * SP.buf.duration));
+  }
+  function spNearHandle(e) {
+    var r = spCanvas.getBoundingClientRect(), x = e.clientX - r.left;
+    var x0 = SP.start / SP.buf.duration * r.width, x1 = SP.end / SP.buf.duration * r.width;
+    var tol = e.pointerType === "touch" ? 22 : 10, d0 = Math.abs(x - x0), d1 = Math.abs(x - x1);
+    if (d0 > tol && d1 > tol) return null;
+    return d0 < d1 ? "start" : d1 < d0 ? "end" : (x < x0 ? "start" : "end");
+  }
+  spCanvas.addEventListener("pointerdown", function (e) {
+    if (!SP.buf || (e.button !== undefined && e.button > 0)) return;
+    var which = spNearHandle(e);
+    if (which) {
+      SP.drag = { id: e.pointerId, which: which };
+      try { spCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+      return;
+    }
+    var t = spTimeAt(e);
+    if (SP.playing) {
+      t = Math.max(SP.start, Math.min(SP.end - 0.1, t));
+      try { SP.el.currentTime = t; } catch (err) {}
+    }
+    SP.cursor = t;
+    spRefresh(null, true);
+  });
+  spCanvas.addEventListener("pointermove", function (e) {
+    if (!SP.buf) return;
+    if (!SP.drag) { spCanvas.style.cursor = spNearHandle(e) ? "ew-resize" : "pointer"; return; }
+    if (SP.drag.id !== e.pointerId) return;
+    var t = spTimeAt(e);
+    if (SP.drag.which === "start") { SP.start = Math.max(0, Math.min(t, SP.end - SP_SEL)); if (!SP.playing) SP.cursor = SP.start; }
+    else SP.end = Math.min(SP.buf.duration, Math.max(t, SP.start + SP_SEL));
+    spRefresh();
+  });
+  function spEndDrag(e) {
+    if (!SP.drag || SP.drag.id !== e.pointerId) return;
+    SP.drag = null;
+    // choosing a part of the song makes "save the section only" the natural next step
+    if (SP.end - SP.start < SP.buf.duration - 0.01) $("spScopeSel").checked = true;
+    spRefresh();
+  }
+  spCanvas.addEventListener("pointerup", spEndDrag);
+  spCanvas.addEventListener("pointercancel", spEndDrag);
+  window.addEventListener("resize", spDrawWave);
+  function spTimeInput(id, apply) {
+    $(id).addEventListener("change", function () {
+      var t = parseTime($(id).value);
+      if (SP.buf && isFinite(t)) {
+        apply(Math.min(SP.buf.duration, t));
+        if (!SP.playing) SP.cursor = SP.start;
+        if (SP.end - SP.start < SP.buf.duration - 0.01) $("spScopeSel").checked = true;
+      }
+      spRefresh();
+    });
+  }
+  spTimeInput("spStart", function (t) { SP.start = Math.max(0, Math.min(t, SP.end - SP_SEL)); });
+  spTimeInput("spEnd", function (t) { SP.end = Math.max(t, SP.start + SP_SEL); });
+  $("spAll").addEventListener("click", function () {
+    if (!SP.buf) return;
+    SP.start = 0; SP.end = SP.buf.duration;
+    if (!SP.playing) SP.cursor = 0;
+    $("spScopeAll").checked = true;
+    spRefresh();
+  });
+  document.querySelectorAll('input[name="spfmt"]').forEach(function (r) {
+    r.addEventListener("change", function () { settings.afmt = r.value; saveSettings(); });
+  });
+  $("spSteps").addEventListener("input", function () { $("spStepsOn").checked = true; });
+
+  // ---- saving ----
+  // Stretches the channels so they play at p percent of the original speed; the pitch stays the same.
+  async function spStretch(chans, p, progress) {
+    if (p === 100) return chans.map(function (c) { return new Float32Array(c); });
+    var alpha = 100 / p, pause = function () { return new Promise(function (r) { setTimeout(r, 0); }); };
+    var st = await pvStretch(chans, alpha, function (f) { progress(f); return pause(); });
+    var len = Math.round(chans[0].length * alpha), off = Math.round(st.offset);
+    return st.data.map(function (d) {
+      var out = new Float32Array(len);
+      out.set(d.subarray(off, Math.min(d.length, off + len)));
+      return out;
+    });
+  }
+  function spStepList() {
+    var seen = {}, list = [];
+    String($("spSteps").value).split(/[^0-9.]+/).forEach(function (s) {
+      var v = Math.round(Number(s));
+      if (!s || !isFinite(v) || v < SP_MIN || v > SP_MAX || seen[v]) return;
+      seen[v] = 1; list.push(v);
+    });
+    return list.slice(0, 8);
+  }
+  $("spExport").addEventListener("click", async function () {
+    if (!SP.buf || SP.busy) return;
+    var steps = $("spStepsOn").checked;
+    var speeds = steps ? spStepList() : [SP.pct];
+    if (!speeds.length) { toast("단계별 빠르기를 " + SP_MIN + "에서 " + SP_MAX + " 사이 숫자로 적어 주세요. 예: 70 80 90 100"); return; }
+    stopSpeed();
+    var token = SP.token, fmt = $("spfmtWav").checked ? "wav" : "mp3", sel = spSelected(), buf = SP.buf, sr = buf.sampleRate;
+    var a = sel ? Math.round(SP.start * sr) : 0, b = sel ? Math.min(buf.length, Math.round(SP.end * sr)) : buf.length;
+    var src = [];
+    for (var c = 0; c < Math.min(2, buf.numberOfChannels); c++) src.push(buf.getChannelData(c).subarray(a, b));
+    var base = baseName(SP.file.name), part = sel ? "_구간" : "", entries = [];
+    SP.busy = true; spRefresh();
+    try {
+      for (var i = 0; i < speeds.length; i++) {
+        var p = speeds[i], label = speeds.length > 1 ? (i + 1) + "/" + speeds.length + "단계 " : "";
+        var out = await spStretch(src, p, function (f) {
+          if (token !== SP.token) throw new Error("cancel");
+          spRefresh(label + p + "%로 바꾸는 중… " + Math.round(f * 100) + "%");
+        });
+        var res = { chans: out, sr: sr, len: out[0].length }, blob;
+        if (fmt === "mp3") blob = await encodeMp3(res, function (pct) {
+          if (token !== SP.token) throw new Error("cancel");
+          spRefresh(label + "MP3로 만드는 중… " + pct + "%");
+        });
+        else blob = encodeWav(res);
+        var name = base + (steps ? "_" + (i + 1) + "단계" : "") + "_속도" + p + "%" + part + "." + fmt;
+        entries.push({ name: name, blob: blob });
+      }
+      if (steps || inViewer) await saveZip(entries, base + (steps ? "_단계별 연습판" : "_속도" + speeds[0] + "%") + part + ".zip");
+      else await saveFile(entries[0].name, entries[0].blob);
+    } catch (e) {
+      if (!e || e.message !== "cancel") toast(fmt === "mp3" ? "MP3로 만들지 못했습니다. 저장 형식을 WAV로 바꿔 다시 해 보세요." : "음원을 만들지 못했습니다.");
+    }
+    if (token === SP.token) { SP.busy = false; spRefresh(); }
+  });
+  spRefresh();
+
   /* ================= Video to audio ================= */
   // Reuses decodeFile(), encodeMp3(), encodeWav() and audioCtx() from the audio tools above.
   // The browser's own audio decoder reads the sound track out of the video file; nothing is uploaded.
@@ -8861,6 +9376,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     { id: "audio",   name: "음원 자르기",     desc: "원하는 구간만",             category: "audio",    tint: "purple", icon: "wave",    short: "자르기", ready: true,  featured: true },
     { id: "merge",   name: "음원 합치기",     desc: "여러 곡을 하나로",          category: "audio",    tint: "lilac",  icon: "merge",   short: "합치기", ready: true,  featured: true },
     { id: "pitch",   name: "음원 키 변경",    desc: "빠르기는 그대로, 음높이만",  category: "audio",    tint: "pink",   icon: "pitch",   short: "키 변경", ready: true },
+    { id: "speed",   name: "음원 속도 조절",  desc: "음높이는 그대로, 빠르기만",  category: "audio",    tint: "teal",   icon: "speed",   short: "속도 조절", ready: true },
     { id: "convert", name: "표준문서 변환",   desc: "HWP DOC를 표준 형식으로",   category: "document", tint: "pink",   icon: "overlap", short: "표준문서", ready: true,  featured: true },
     { id: "sign",    name: "서명 만들기",     desc: "투명 배경 서명 PNG",        category: "document", tint: "sky",    icon: "pen",     short: "서명", ready: true },
     { id: "ladder",  name: "사다리타기",      desc: "순서와 당번 공정하게",      category: "class",    tint: "teal",   icon: "ladder",  short: "사다리", ready: true },
@@ -8899,6 +9415,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     merge: '<path d="M4 6c6 0 7 6 12 6M4 18c6 0 7-6 12-6h4"/><path d="m17 9 3 3-3 3"/>',
     files: '<path d="M8 2h6l4 4v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v4h4"/><path d="M6 6H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1"/><path d="M9 10h6M9 13h4"/>',
+    speed: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
     pitch: '<path d="M9 18V5l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/>',
     pen: '<path d="M15 4.5a2.1 2.1 0 0 1 3 3L8.5 17 5 18l1-3.5Z"/><path d="M3 21.5c2.5-1.2 4.5-1.2 6 0s3.5 1.2 6 0 4-1 6 0"/>',
     ladder: '<path d="M6 3v18M12 3v18M18 3v18M6 7h6M12 11h6M6 15h6M12 19h6"/>',
@@ -9065,6 +9582,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     if (current === "crop") crLayout();
     if (current !== "merge") stopMerge();
     if (current !== "pitch") stopPitch();
+    if (current !== "speed") stopSpeed(); else spDrawWave();
     if (current !== "extract") stopExtract();
     if (current !== "capture") stopCapture();
     if (current !== "vcut") stopVcut();
@@ -9212,6 +9730,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     else if (current === "audio") loadAudio(files[0]);
     else if (current === "merge") addMerge(files);
     else if (current === "pitch") openPitch(files);
+    else if (current === "speed") openSpeed(files);
     else if (current === "extract") openExtract(files);
     else if (current === "capture") openCapture(files);
     else if (current === "vcut") openVcut(files);
