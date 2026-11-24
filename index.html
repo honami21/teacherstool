@@ -596,6 +596,47 @@ div.thumb { display: grid; place-items: center; font-family: var(--font-data); f
 .cr-out-dims { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
 #crOut { display: block; max-width: 100%; border-radius: var(--r); border: 1px solid var(--line); background: #fff; }
 
+/* Background remover */
+.bg-ways { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.bg-box { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 16px; background: var(--sunken); border: 1px solid var(--line); border-radius: var(--r); }
+.bg-box h3 { margin: 0; font-size: 15px; }
+.bg-sliders { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+.bg-check { white-space: normal; word-break: keep-all; }
+.bg-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.bg-chips:empty { display: none; }
+.bg-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 13px; }
+.bg-chip i { width: 20px; height: 20px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); }
+.bg-chip button { width: 22px; height: 22px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 22px; }
+.bg-chip button:hover { background: var(--sunken); color: var(--fg); }
+.bg-progress { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); word-break: keep-all; }
+.bg-progress-bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.bg-progress-bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+.bg-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; }
+.bg-dot { display: inline-grid; place-items: center; width: 40px; height: 40px; }
+.bg-dot i { display: block; border-radius: 50%; border: 1.5px solid var(--accent); background: var(--accent-soft); }
+.bg-stage { position: relative; padding: 0; background-color: #eef0f5; }
+#bgCanvas { display: block; width: 100%; touch-action: none; user-select: none; -webkit-user-select: none; cursor: none; }
+#bgCanvas.is-pick { cursor: crosshair; }
+#bgCanvas.is-move { cursor: grab; }
+#bgCanvas.is-moving { cursor: grabbing; }
+.bg-zoom { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 6px; }
+.bg-zoom .btn { box-shadow: 0 1px 4px rgba(20,24,40,.18); min-width: 34px; }
+.bg-under { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; }
+.bg-under .cr-hint { flex: 1 1 260px; }
+.bg-out {
+  display: block; max-width: 100%; border-radius: var(--r); border: 1px solid var(--line);
+  background-color: #fff;
+  background-image: linear-gradient(45deg, #e9ebf1 25%, transparent 25%, transparent 75%, #e9ebf1 75%), linear-gradient(45deg, #e9ebf1 25%, transparent 25%, transparent 75%, #e9ebf1 75%);
+  background-size: 16px 16px; background-position: 0 0, 8px 8px;
+}
+@media (max-width: 760px) {
+  .bg-ways { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 470px) {
+  .bg-zoom { right: 6px; bottom: 6px; gap: 4px; }
+  .bg-zoom .btn { padding: 5px 8px; }
+}
+
 /* Video frame capture */
 .v-why strong { display: block; margin-bottom: 4px; }
 .v-why ul { margin: 0; padding-left: 1.2em; }
@@ -2229,6 +2270,128 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
       <li>저장되는 사진은 <span class="ext">.jpg</span>이고 원본 크기 그대로입니다. 원본 파일은 바뀌지 않습니다.</li>
       <li>"모두 저장"은 모자이크를 넣지 않은 사진까지 올린 사진 전부를 ZIP 하나로 묶습니다.</li>
       <li>작은 얼굴은 굵기를 올려야 알아볼 수 없게 가려집니다. 저장 전에 확대해서 확인하세요.</li>
+    </ul>
+  </section>
+  <section class="panel" id="panel-bgremove" hidden>
+    <div>
+      <p class="eyebrow">사진</p>
+      <h2>배경 제거</h2>
+      <p class="sub">검은 배경처럼 한 가지 색으로 된 배경은 그 색을 골라 지우고, 사람이나 물건 사진은 AI로 배경을 지웁니다. 잘못 지워진 곳은 손가락이나 마우스로 문질러 살리거나 더 지울 수 있고, 결과는 배경이 투명한 <span class="ext">.png</span>로 저장됩니다.</p>
+    </div>
+    <div class="drop" id="bgDrop" role="group" aria-label="배경을 지울 사진 올리기">
+      <strong>사진을 여기에 끌어다 놓으세요</strong>
+      <span>PNG, JPG, WebP, HEIC 사진 한 장을 올립니다</span>
+      <button type="button" class="pick" id="bgPick">파일 선택</button>
+      <input type="file" id="bgInput" accept="image/*,.heic,.heif" hidden>
+    </div>
+    <div id="bgWork" class="panel" hidden>
+      <div class="bg-ways">
+        <div class="bg-box">
+          <h3>색으로 지우기</h3>
+          <p class="cr-hint">배경이 한 가지 색일 때 좋아요. 버튼을 누르거나, "색 찍기"를 고른 뒤 사진에서 지울 색을 눌러 주세요. 여러 색을 함께 지울 수도 있어요.</p>
+          <div class="cr-tools">
+            <button type="button" class="btn small" id="bgBlack">검은색 지우기</button>
+            <button type="button" class="btn small" id="bgWhite">흰색 지우기</button>
+            <button type="button" class="btn small" id="bgPickTool">사진에서 색 찍기</button>
+          </div>
+          <div class="bg-chips" id="bgChips" aria-live="polite"></div>
+          <div class="bg-sliders">
+            <div class="field">
+              <label class="label" for="bgTol">허용 범위</label>
+              <input type="range" id="bgTol" min="0" max="100" step="1" value="20">
+              <span class="val" id="bgTolV">20</span>
+            </div>
+            <div class="field">
+              <label class="label" for="bgSoft">가장자리 부드럽게</label>
+              <input type="range" id="bgSoft" min="0" max="100" step="1" value="35">
+              <span class="val" id="bgSoftV">35</span>
+            </div>
+          </div>
+          <div class="field">
+            <span class="label" id="bgScopeLabel">지우는 곳</span>
+            <div class="seg" role="radiogroup" aria-labelledby="bgScopeLabel">
+              <label><input type="radio" name="bgscope" value="link" checked><span>이어진 배경만</span></label>
+              <label><input type="radio" name="bgscope" value="all"><span>사진 전체</span></label>
+            </div>
+          </div>
+          <label class="check bg-check"><input type="checkbox" id="bgDecon" checked> 가장자리에 남은 배경색 빼기</label>
+        </div>
+        <div class="bg-box">
+          <h3>AI로 자동 지우기</h3>
+          <p class="cr-hint">사람, 동물, 물건처럼 주인공이 뚜렷한 사진에 좋아요. 처음 한 번은 AI 파일을 내려받느라 시간이 걸리고, 그다음부터는 빨라요. 사진은 기기 밖으로 나가지 않아요.</p>
+          <div class="field">
+            <span class="label" id="bgModelLabel">정확도</span>
+            <div class="seg" role="radiogroup" aria-labelledby="bgModelLabel">
+              <label><input type="radio" name="bgmodel" value="fast" checked><span>빠르게 (약 16MB)</span></label>
+              <label><input type="radio" name="bgmodel" value="fine"><span>꼼꼼하게 (약 55MB)</span></label>
+            </div>
+          </div>
+          <div class="cr-tools">
+            <button type="button" class="btn primary small" id="bgAi">AI로 배경 지우기</button>
+            <button type="button" class="btn small ghost" id="bgAiOff" hidden>AI 결과 빼기</button>
+          </div>
+          <div class="bg-progress" id="bgAiProg" hidden><div class="bg-progress-bar"><i id="bgAiBar"></i></div><span id="bgAiMsg"></span></div>
+          <div class="field" id="bgEdgeBox" hidden>
+            <label class="label" for="bgEdge">경계 또렷하게</label>
+            <input type="range" id="bgEdge" min="0" max="100" step="1" value="30">
+            <span class="val" id="bgEdgeV">30</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-toolbar">
+        <div class="seg wrap" role="radiogroup" aria-label="사진 위에서 쓸 도구" id="bgTools">
+          <label><input type="radio" name="bgtool" value="pick"><span>색 찍기</span></label>
+          <label><input type="radio" name="bgtool" value="keep" checked><span>살리기 브러시</span></label>
+          <label><input type="radio" name="bgtool" value="erase"><span>지우기 브러시</span></label>
+          <label><input type="radio" name="bgtool" value="move"><span>화면 옮기기</span></label>
+        </div>
+        <div class="field">
+          <label class="label" for="bgSize">브러시 크기</label>
+          <input type="range" id="bgSize" min="4" max="160" step="1" value="36">
+          <span class="bg-dot" aria-hidden="true"><i id="bgDot"></i></span>
+        </div>
+        <div class="cr-tools">
+          <button type="button" class="btn small" id="bgUndo" disabled>되돌리기</button>
+          <button type="button" class="btn small" id="bgRedo" disabled>다시 하기</button>
+          <button type="button" class="btn small ghost" id="bgReset">처음으로</button>
+        </div>
+      </div>
+      <div class="stage bg-stage" id="bgStage">
+        <canvas id="bgCanvas" width="2" height="2" aria-label="배경 제거 편집 화면. 고른 도구에 따라 색을 찍거나 브러시로 문지릅니다. 두 손가락으로 벌리면 확대됩니다." hidden></canvas>
+        <div class="stage-msg" id="bgMsg">사진을 불러오는 중…</div>
+        <div class="bg-zoom" id="bgZoomBox" hidden>
+          <button type="button" class="btn small" id="bgZoomOut" aria-label="축소">−</button>
+          <button type="button" class="btn small" id="bgZoomFit">맞춤</button>
+          <button type="button" class="btn small" id="bgZoomIn" aria-label="확대">＋</button>
+          <button type="button" class="btn small" id="bgPeek">원본 보기</button>
+        </div>
+      </div>
+      <div class="bg-under">
+        <p class="cr-hint" id="bgHint"></p>
+        <div class="field">
+          <span class="label" id="bgViewLabel">배경 보기</span>
+          <div class="seg" role="radiogroup" aria-labelledby="bgViewLabel">
+            <label><input type="radio" name="bgview" value="check" checked><span>체크무늬</span></label>
+            <label><input type="radio" name="bgview" value="white"><span>흰색</span></label>
+            <label><input type="radio" name="bgview" value="black"><span>검은색</span></label>
+            <label><input type="radio" name="bgview" value="green"><span>초록색</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="bar">
+        <div class="count" id="bgName"></div>
+        <label class="check"><input type="checkbox" id="bgTrim"> 투명한 여백 잘라내기</label>
+        <button type="button" class="btn ghost" id="bgOther">다른 사진 열기</button>
+        <button type="button" class="btn primary" id="bgSave">PNG로 저장</button>
+      </div>
+      <img id="bgOut" class="bg-out" alt="배경을 지운 결과 사진" hidden>
+    </div>
+    <ul class="foot">
+      <li>"이어진 배경만"은 누른 곳이나 사진 가장자리에서 이어진 배경만 지워서, 물체 안에 있는 같은 색은 덜 지워집니다. "사진 전체"는 그 색을 사진 어디에서든 모두 지웁니다.</li>
+      <li>물체 안까지 지워졌다면 "살리기 브러시"로 문질러 되살리고, 덜 지워진 곳은 "지우기 브러시"로 문지르세요. 두 손가락으로 벌리거나 마우스 휠을 굴리면 확대됩니다.</li>
+      <li>AI 기능은 처음 누를 때 AI 실행 파일과 모델 파일(빠르게 약 16MB, 꼼꼼하게 약 55MB)을 공개 저장소(jsDelivr CDN)에서 한 번 내려받습니다. 내려받는 것은 AI 파일뿐이고, 사진은 서버로 보내지 않고 이 기기에서만 처리합니다.</li>
+      <li>저장되는 파일은 배경이 투명한 <span class="ext">.png</span>입니다. 원본 파일은 바뀌지 않습니다.</li>
     </ul>
   </section>
   <!-- Ladder game -->
@@ -5546,6 +5709,771 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
   wireDrop($("crDrop"), $("crInput"), $("crPick"), openCrop);
   window.addEventListener("resize", function () { if (current === "crop") crLayout(); });
   crModeUI();
+
+  /* ================= Background remover ================= */
+  // Everything runs on this device. The colour remover and the brushes are plain canvas work;
+  // the AI option downloads onnxruntime-web and a U²-Net model (Apache-2.0, the same files rembg ships)
+  // from jsDelivr once, checks the model's SHA-256, and runs it here. The photo itself never leaves the page.
+  var BG = {
+    file: null, W: 0, H: 0,
+    src: null,        // Uint8ClampedArray RGBA of the photo
+    out: null,        // ImageData shown and saved (photo with the alpha applied)
+    outC: null, outX: null,
+    colorA: null,     // alpha from the colour remover (null = nothing removed)
+    colorN: null,     // which picked colour was nearest, for removing the colour fringe
+    aiRaw: null, aiA: null, // alpha from the AI (raw and with the edge setting)
+    keep: null, erase: null, // brush layers, 0..255
+    colors: [],       // { r, g, b, x, y } (x = -1: seeds come from the photo's border)
+    undo: [], redo: [],
+    view: { s: 1, x: 0, y: 0, fit: 1 }, dpr: 1, cssW: 0, cssH: 0,
+    tool: "keep", hover: null, ptrs: {}, stroke: null, pinch: null, pan: null, peek: false,
+    busy: false, aiBusy: false, sessions: {}, drawQ: false
+  };
+  var bgCanvas = $("bgCanvas"), bgCtx = bgCanvas.getContext("2d");
+  var BG_MAX = isIOS ? 8000000 : 16000000;
+  var ORT_BASE = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/";
+  var BG_HOSTS = ["https://cdn.jsdelivr.net/npm/", "https://unpkg.com/"];
+  var BG_MODELS = {
+    fast: { pkg: "@rmbg/model-u2netp@0.0.1", files: ["u2netp.onnx"], size: 4574861,
+      sha: "309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8" },
+    fine: { pkg: "@rmbg/model-silueta@0.0.1", files: ["silueta-1.onnx", "silueta-2.onnx", "silueta-3.onnx", "silueta-4.onnx", "silueta-5.onnx"], size: 44173029,
+      sha: "75da6c8d2f8096ec743d071951be73b4a8bc7b3e51d9a6625d63644f90ffeedb" }
+  };
+
+  function bgRadio(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ""; }
+
+  /* ---- alpha layers ---- */
+  function bgTolerance() { return +$("bgTol").value * 1.6; }
+  function bgSoftness() { return +$("bgSoft").value * 0.8 + 1; }
+
+  // Alpha from the picked colours: 0 inside the tolerance, a soft ramp after it, 255 beyond.
+  function bgComputeColor() {
+    var n = BG.W * BG.H, cs = BG.colors;
+    if (!cs.length) { BG.colorA = null; BG.colorN = null; return; }
+    var A = BG.colorA && BG.colorA.length === n ? BG.colorA : new Uint8Array(n);
+    var N = BG.colorN && BG.colorN.length === n ? BG.colorN : new Uint8Array(n);
+    var src = BG.src, tol = bgTolerance(), soft = bgSoftness();
+    var t2 = tol * tol, o = tol + soft, o2 = o * o, k = 255 / soft, m = cs.length;
+    var cr = cs.map(function (c) { return c.r; }), cg = cs.map(function (c) { return c.g; }), cb = cs.map(function (c) { return c.b; });
+    for (var i = 0, p = 0; i < n; i++, p += 4) {
+      var r = src[p], g = src[p + 1], b = src[p + 2], best = 1e9, bi = 0;
+      for (var j = 0; j < m; j++) {
+        var dr = r - cr[j], dg = g - cg[j], db = b - cb[j], d = dr * dr + dg * dg + db * db;
+        if (d < best) { best = d; bi = j; }
+      }
+      N[i] = bi;
+      A[i] = best <= t2 ? 0 : best >= o2 ? 255 : (Math.sqrt(best) - tol) * k;
+    }
+    if (bgRadio("bgscope") === "link") bgKeepLinked(A, N);
+    BG.colorA = A; BG.colorN = N;
+  }
+
+  // "이어진 배경만": keep only the removable pixels reached from a picked spot (or from the border).
+  function bgKeepLinked(A, N) {
+    var W = BG.W, H = BG.H, n = W * H;
+    var seen = new Uint8Array(n), q = new Int32Array(n), head = 0, tail = 0;
+    function seed(i) { if (!seen[i] && A[i] < 255) { seen[i] = 1; q[tail++] = i; } }
+    BG.colors.forEach(function (c, ci) {
+      if (c.x >= 0) {
+        // a few pixels around the tap, so a tap on a noisy pixel still starts the fill
+        for (var dy = -3; dy <= 3; dy++) for (var dx = -3; dx <= 3; dx++) {
+          var x = Math.min(W - 1, Math.max(0, c.x + dx)), y = Math.min(H - 1, Math.max(0, c.y + dy));
+          seed(y * W + x);
+        }
+      } else {
+        for (var x2 = 0; x2 < W; x2++) {
+          if (N[x2] === ci) seed(x2);
+          if (N[(H - 1) * W + x2] === ci) seed((H - 1) * W + x2);
+        }
+        for (var y2 = 0; y2 < H; y2++) {
+          if (N[y2 * W] === ci) seed(y2 * W);
+          if (N[y2 * W + W - 1] === ci) seed(y2 * W + W - 1);
+        }
+      }
+    });
+    while (head < tail) {
+      var i = q[head++], x3 = i % W;
+      if (x3 > 0) seed(i - 1);
+      if (x3 < W - 1) seed(i + 1);
+      if (i >= W) seed(i - W);
+      if (i < n - W) seed(i + W);
+    }
+    for (var k = 0; k < n; k++) if (!seen[k]) A[k] = 255;
+  }
+
+  function bgComputeAi() {
+    if (!BG.aiRaw) { BG.aiA = null; return; }
+    var raw = BG.aiRaw, n = raw.length, A = BG.aiA && BG.aiA.length === n ? BG.aiA : new Uint8Array(n);
+    var k = 1 + +$("bgEdge").value / 100 * 5;
+    for (var i = 0; i < n; i++) {
+      var v = (raw[i] - 127.5) * k + 127.5;
+      A[i] = v < 0 ? 0 : v > 255 ? 255 : v;
+    }
+    BG.aiA = A;
+  }
+
+  // Builds the shown/saved picture for one rectangle of the photo.
+  function bgCompose(x0, y0, x1, y1) {
+    var W = BG.W, src = BG.src, d = BG.out.data, cA = BG.colorA, cN = BG.colorN, aA = BG.aiA;
+    var K = BG.keep, E = BG.erase, decon = $("bgDecon").checked && cA, cs = BG.colors;
+    for (var y = y0; y < y1; y++) {
+      for (var x = x0, i = y * W + x0, p = i * 4; x < x1; x++, i++, p += 4) {
+        var c = cA ? cA[i] : 255, a = aA ? Math.min(c, aA[i]) : c, k = K[i], e = E[i];
+        if (k) a = a + k * (255 - a) / 255;
+        if (e) a = a * (255 - e) / 255;
+        var r = src[p], g = src[p + 1], b = src[p + 2];
+        if (decon && !k && c > 12 && c < 255 && c <= a + 1) {
+          // take the background colour back out of the half-transparent edge
+          var bc = cs[cN[i]], al = c / 255, inv = 1 - al;
+          r = (r - inv * bc.r) / al; g = (g - inv * bc.g) / al; b = (b - inv * bc.b) / al;
+        }
+        d[p] = r; d[p + 1] = g; d[p + 2] = b; d[p + 3] = a;
+      }
+    }
+    BG.outX.putImageData(BG.out, 0, 0, x0, y0, x1 - x0, y1 - y0);
+  }
+  function bgRebuild() {
+    if (!BG.src) return;
+    bgCompose(0, 0, BG.W, BG.H);
+    bgDraw();
+    bgInfo();
+  }
+  var bgColorT = 0;
+  function bgRecolor() {
+    // sliders fire often: work on the next frame only
+    if (bgColorT) return;
+    bgColorT = requestAnimationFrame(function () { bgColorT = 0; if (!BG.src) return; bgComputeColor(); bgRebuild(); });
+  }
+
+  /* ---- screen ---- */
+  var bgChecker = null;
+  function bgPattern() {
+    if (bgChecker) return bgChecker;
+    var c = document.createElement("canvas"); c.width = c.height = 16;
+    var x = c.getContext("2d");
+    x.fillStyle = "#ffffff"; x.fillRect(0, 0, 16, 16);
+    x.fillStyle = "#e3e6ee"; x.fillRect(0, 0, 8, 8); x.fillRect(8, 8, 8, 8);
+    bgChecker = bgCtx.createPattern(c, "repeat");
+    return bgChecker;
+  }
+  function bgLayout() {
+    if (!BG.src) return;
+    var stage = $("bgStage");
+    var cssW = Math.max(120, stage.clientWidth);
+    var maxH = Math.max(280, Math.min(window.innerHeight * 0.7, 760));
+    var cssH = Math.round(Math.min(maxH, Math.max(260, cssW * BG.H / BG.W)));
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var keepView = BG.cssW && BG.view.s !== BG.view.fit;
+    bgCanvas.style.height = cssH + "px";
+    bgCanvas.width = Math.round(cssW * dpr);
+    bgCanvas.height = Math.round(cssH * dpr);
+    BG.cssW = cssW; BG.cssH = cssH; BG.dpr = dpr;
+    BG.view.fit = Math.min((cssW - 16) / BG.W, (cssH - 16) / BG.H);
+    if (!keepView) bgFit(); else bgClamp();
+    bgDraw();
+  }
+  function bgFit() {
+    var v = BG.view;
+    v.s = v.fit;
+    v.x = (BG.cssW - BG.W * v.s) / 2;
+    v.y = (BG.cssH - BG.H * v.s) / 2;
+  }
+  // Keeps at least part of the photo on screen.
+  function bgClamp() {
+    var v = BG.view, w = BG.W * v.s, h = BG.H * v.s, m = 60;
+    v.x = Math.min(BG.cssW - m, Math.max(m - w, v.x));
+    v.y = Math.min(BG.cssH - m, Math.max(m - h, v.y));
+    if (w <= BG.cssW) v.x = Math.max(0, Math.min(BG.cssW - w, v.x));
+    if (h <= BG.cssH) v.y = Math.max(0, Math.min(BG.cssH - h, v.y));
+  }
+  function bgZoomAt(s, cx, cy) {
+    var v = BG.view;
+    s = Math.max(v.fit * 0.5, Math.min(s, Math.max(v.fit * 2, 24)));
+    var ix = (cx - v.x) / v.s, iy = (cy - v.y) / v.s;
+    v.s = s; v.x = cx - ix * s; v.y = cy - iy * s;
+    bgClamp(); bgDraw();
+  }
+  function bgDraw() {
+    if (BG.drawQ) return;
+    BG.drawQ = true;
+    requestAnimationFrame(bgPaint);
+  }
+  function bgPaint() {
+    BG.drawQ = false;
+    if (!BG.src) return;
+    var ctx = bgCtx, v = BG.view, dpr = BG.dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var w = BG.W * v.s, h = BG.H * v.s, look = bgRadio("bgview");
+    ctx.fillStyle = look === "white" ? "#ffffff" : look === "black" ? "#000000" : look === "green" ? "#00b140" : bgPattern();
+    ctx.fillRect(v.x, v.y, w, h);
+    ctx.imageSmoothingEnabled = v.s < 2;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(BG.peek ? BG.srcC : BG.outC, v.x, v.y, w, h);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(20,24,40,.18)";
+    ctx.strokeRect(v.x - 0.5, v.y - 0.5, w + 1, h + 1);
+    // brush outline
+    var hv = BG.hover;
+    if (hv && (BG.tool === "keep" || BG.tool === "erase") && !BG.pinch) {
+      var r = +$("bgSize").value / 2;
+      ctx.beginPath(); ctx.arc(hv.x, hv.y, r, 0, Math.PI * 2);
+      ctx.lineWidth = 2.5; ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.stroke();
+      ctx.lineWidth = 1.2; ctx.strokeStyle = BG.tool === "keep" ? "#12af71" : "#e5484d"; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(hv.x - 4, hv.y); ctx.lineTo(hv.x + 4, hv.y);
+      if (BG.tool === "keep") { ctx.moveTo(hv.x, hv.y - 4); ctx.lineTo(hv.x, hv.y + 4); }
+      ctx.stroke();
+    }
+  }
+
+  /* ---- brushes ---- */
+  function bgPoint(e) {
+    var r = bgCanvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+  function bgToImage(p) { return { x: (p.x - BG.view.x) / BG.view.s, y: (p.y - BG.view.y) / BG.view.s }; }
+  function bgStamp(cx, cy, r, keep) {
+    var W = BG.W, H = BG.H, K = BG.keep, E = BG.erase, st = BG.stroke;
+    var x0 = Math.max(0, Math.floor(cx - r)), x1 = Math.min(W, Math.ceil(cx + r + 1));
+    var y0 = Math.max(0, Math.floor(cy - r)), y1 = Math.min(H, Math.ceil(cy + r + 1));
+    if (x0 >= x1 || y0 >= y1) return;
+    var hard = r * 0.6, span = Math.max(0.5, r - hard), on = keep ? K : E, off = keep ? E : K;
+    for (var y = y0; y < y1; y++) {
+      var dy = y + 0.5 - cy;
+      for (var x = x0, i = y * W + x0; x < x1; x++, i++) {
+        var dx = x + 0.5 - cx, d = Math.sqrt(dx * dx + dy * dy);
+        if (d >= r) continue;
+        var c = d <= hard ? 255 : 255 * (r - d) / span;
+        if (c > on[i]) on[i] = c;
+        if (off[i]) off[i] = off[i] * (255 - c) / 255;
+      }
+    }
+    if (x0 < st.x0) st.x0 = x0; if (y0 < st.y0) st.y0 = y0;
+    if (x1 > st.x1) st.x1 = x1; if (y1 > st.y1) st.y1 = y1;
+    if (x0 < st.dx0) st.dx0 = x0; if (y0 < st.dy0) st.dy0 = y0;
+    if (x1 > st.dx1) st.dx1 = x1; if (y1 > st.dy1) st.dy1 = y1;
+  }
+  function bgStrokeTo(p) {
+    var st = BG.stroke, q = bgToImage(p), r = (+$("bgSize").value / 2) / BG.view.s;
+    var last = st.last, keep = st.keep;
+    if (!last) { bgStamp(q.x, q.y, r, keep); }
+    else {
+      var dx = q.x - last.x, dy = q.y - last.y, dist = Math.sqrt(dx * dx + dy * dy);
+      var step = Math.max(0.5, r * 0.3), n = Math.ceil(dist / step);
+      for (var i = 1; i <= n; i++) bgStamp(last.x + dx * i / n, last.y + dy * i / n, r, keep);
+    }
+    st.last = q;
+    if (!st.queued) {
+      st.queued = true;
+      requestAnimationFrame(function () {
+        st.queued = false;
+        if (st.dx1 > st.dx0) bgCompose(st.dx0, st.dy0, st.dx1, st.dy1);
+        st.dx0 = st.dy0 = 1e9; st.dx1 = st.dy1 = -1;
+        bgDraw();
+      });
+    }
+  }
+  function bgStrokeStart(p, keep) {
+    BG.stroke = { keep: keep, last: null, x0: 1e9, y0: 1e9, x1: -1, y1: -1, dx0: 1e9, dy0: 1e9, dx1: -1, dy1: -1,
+      k0: BG.keep.slice(), e0: BG.erase.slice() };
+    bgStrokeTo(p);
+  }
+  function bgRect(arr, x0, y0, x1, y1) {
+    var w = x1 - x0, out = new Uint8Array(w * (y1 - y0));
+    for (var y = y0; y < y1; y++) out.set(arr.subarray(y * BG.W + x0, y * BG.W + x1), (y - y0) * w);
+    return out;
+  }
+  function bgPutRect(arr, part, x0, y0, x1, y1) {
+    var w = x1 - x0;
+    for (var y = y0; y < y1; y++) arr.set(part.subarray((y - y0) * w, (y - y0 + 1) * w), y * BG.W + x0);
+  }
+  function bgStrokeEnd(cancel) {
+    var st = BG.stroke;
+    if (!st) return;
+    BG.stroke = null;
+    if (st.x1 <= st.x0) return;
+    if (cancel) {
+      bgPutRect(BG.keep, bgRect(st.k0, st.x0, st.y0, st.x1, st.y1), st.x0, st.y0, st.x1, st.y1);
+      bgPutRect(BG.erase, bgRect(st.e0, st.x0, st.y0, st.x1, st.y1), st.x0, st.y0, st.x1, st.y1);
+    } else {
+      bgPush({ kind: "brush", x0: st.x0, y0: st.y0, x1: st.x1, y1: st.y1,
+        k: bgRect(st.k0, st.x0, st.y0, st.x1, st.y1), e: bgRect(st.e0, st.x0, st.y0, st.x1, st.y1) });
+    }
+    bgCompose(st.x0, st.y0, st.x1, st.y1);
+    bgDraw(); bgInfo();
+  }
+
+  /* ---- undo ---- */
+  function bgState() { return { colors: BG.colors.slice(), aiRaw: BG.aiRaw }; }
+  function bgPush(entry) {
+    BG.undo.push(entry);
+    if (BG.undo.length > 40) BG.undo.shift();
+    BG.redo = [];
+    bgUndoUI();
+  }
+  // Swaps an entry with the current state and returns the entry that undoes the swap.
+  function bgSwap(en) {
+    if (en.kind === "brush") {
+      var back = { kind: "brush", x0: en.x0, y0: en.y0, x1: en.x1, y1: en.y1,
+        k: bgRect(BG.keep, en.x0, en.y0, en.x1, en.y1), e: bgRect(BG.erase, en.x0, en.y0, en.x1, en.y1) };
+      bgPutRect(BG.keep, en.k, en.x0, en.y0, en.x1, en.y1);
+      bgPutRect(BG.erase, en.e, en.x0, en.y0, en.x1, en.y1);
+      bgCompose(en.x0, en.y0, en.x1, en.y1);
+      bgDraw(); bgInfo();
+      return back;
+    }
+    var now = { kind: en.kind, st: bgState() };
+    if (en.kind === "all") { now.keep = BG.keep; now.erase = BG.erase; BG.keep = en.keep; BG.erase = en.erase; }
+    BG.colors = en.st.colors.slice();
+    BG.aiRaw = en.st.aiRaw;
+    bgComputeColor(); bgComputeAi(); bgChips(); bgAiUI(); bgRebuild();
+    return now;
+  }
+  function bgUndoUI() {
+    $("bgUndo").disabled = !BG.undo.length;
+    $("bgRedo").disabled = !BG.redo.length;
+  }
+  function bgUndo() { if (!BG.undo.length || BG.stroke) return; BG.redo.push(bgSwap(BG.undo.pop())); bgUndoUI(); }
+  function bgRedoFn() { if (!BG.redo.length || BG.stroke) return; BG.undo.push(bgSwap(BG.redo.pop())); bgUndoUI(); }
+  $("bgUndo").addEventListener("click", bgUndo);
+  $("bgRedo").addEventListener("click", bgRedoFn);
+  $("bgReset").addEventListener("click", function () {
+    if (!BG.src) return;
+    bgPush({ kind: "all", st: bgState(), keep: BG.keep, erase: BG.erase });
+    BG.keep = new Uint8Array(BG.W * BG.H); BG.erase = new Uint8Array(BG.W * BG.H);
+    BG.colors = []; BG.aiRaw = null;
+    bgComputeColor(); bgComputeAi(); bgChips(); bgAiUI(); bgRebuild();
+    toast("처음 사진으로 돌렸습니다. 되돌리기로 다시 가져올 수 있습니다.");
+  });
+  document.addEventListener("keydown", function (e) {
+    if (current !== "bgremove" || !BG.src || !(e.ctrlKey || e.metaKey)) return;
+    var t = e.target && e.target.tagName;
+    if (t === "INPUT" && e.target.type !== "range" && e.target.type !== "radio" && e.target.type !== "checkbox") return;
+    var key = (e.key || "").toLowerCase();
+    if (key === "z" && !e.shiftKey) { e.preventDefault(); bgUndo(); }
+    else if (key === "y" || (key === "z" && e.shiftKey)) { e.preventDefault(); bgRedoFn(); }
+  });
+
+  /* ---- colours ---- */
+  function bgHex(c) { return "#" + [c.r, c.g, c.b].map(function (v) { return (v < 16 ? "0" : "") + v.toString(16); }).join(""); }
+  function bgChips() {
+    var box = $("bgChips");
+    box.textContent = "";
+    BG.colors.forEach(function (c, i) {
+      var chip = document.createElement("span");
+      chip.className = "bg-chip";
+      var sw = document.createElement("i");
+      sw.style.background = bgHex(c);
+      var label = document.createElement("span");
+      label.textContent = c.name || bgHex(c).toUpperCase();
+      var x = document.createElement("button");
+      x.type = "button"; x.textContent = "×";
+      x.setAttribute("aria-label", (c.name || bgHex(c)) + " 지우기 취소");
+      x.addEventListener("click", function () {
+        bgPush({ kind: "colors", st: bgState() });
+        BG.colors.splice(i, 1);
+        bgChips(); bgComputeColor(); bgRebuild();
+      });
+      chip.appendChild(sw); chip.appendChild(label); chip.appendChild(x);
+      box.appendChild(chip);
+    });
+  }
+  function bgAddColor(c) {
+    if (BG.colors.length >= 8) { toast("색은 8가지까지 고를 수 있습니다."); return; }
+    bgPush({ kind: "colors", st: bgState() });
+    BG.colors.push(c);
+    bgChips(); bgComputeColor(); bgRebuild();
+    bgHintText();
+  }
+  function bgPreset(r, g, b, name) {
+    if (!BG.src) return;
+    for (var i = 0; i < BG.colors.length; i++) {
+      var o = BG.colors[i];
+      if (o.x < 0 && o.r === r && o.g === g && o.b === b) { toast(name + "은 이미 지우고 있습니다. 허용 범위로 조절해 보세요."); return; }
+    }
+    bgAddColor({ r: r, g: g, b: b, x: -1, y: -1, name: name });
+  }
+  $("bgBlack").addEventListener("click", function () { bgPreset(0, 0, 0, "검은색"); });
+  $("bgWhite").addEventListener("click", function () { bgPreset(255, 255, 255, "흰색"); });
+  $("bgPickTool").addEventListener("click", function () {
+    document.querySelector('input[name="bgtool"][value="pick"]').checked = true;
+    bgSetTool("pick");
+    if (BG.src) $("bgStage").scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
+  function bgPickAt(p) {
+    var q = bgToImage(p), x = Math.floor(q.x), y = Math.floor(q.y);
+    if (x < 0 || y < 0 || x >= BG.W || y >= BG.H) return;
+    // average a small patch so JPEG noise does not decide the colour
+    var r = 0, g = 0, b = 0, n = 0, src = BG.src;
+    for (var dy = -2; dy <= 2; dy++) for (var dx = -2; dx <= 2; dx++) {
+      var xx = x + dx, yy = y + dy;
+      if (xx < 0 || yy < 0 || xx >= BG.W || yy >= BG.H) continue;
+      var p4 = (yy * BG.W + xx) * 4;
+      r += src[p4]; g += src[p4 + 1]; b += src[p4 + 2]; n++;
+    }
+    bgAddColor({ r: Math.round(r / n), g: Math.round(g / n), b: Math.round(b / n), x: x, y: y });
+  }
+  [["bgTol", "bgTolV"], ["bgSoft", "bgSoftV"]].forEach(function (pr) {
+    $(pr[0]).addEventListener("input", function () { $(pr[1]).textContent = this.value; if (BG.colors.length) bgRecolor(); });
+  });
+  document.querySelectorAll('input[name="bgscope"]').forEach(function (r) {
+    r.addEventListener("change", function () { if (BG.colors.length) bgRecolor(); });
+  });
+  $("bgDecon").addEventListener("change", function () { if (BG.colorA) bgRebuild(); });
+
+  /* ---- tools, view ---- */
+  function bgSetTool(t) {
+    BG.tool = t;
+    bgCanvas.classList.toggle("is-pick", t === "pick");
+    bgCanvas.classList.toggle("is-move", t === "move");
+    bgHintText();
+    bgDraw();
+  }
+  function bgHintText() {
+    var t = BG.tool;
+    $("bgHint").textContent = t === "pick" ? "사진에서 지울 배경 색을 눌러 주세요. 누를 때마다 색이 하나씩 더해집니다."
+      : t === "keep" ? "지워진 곳 중에서 살릴 부분을 문지르세요. 물체 안의 같은 색이 지워졌을 때 쓰면 됩니다."
+      : t === "erase" ? "더 지울 곳을 문지르세요."
+      : "끌어서 사진을 옮깁니다. 확대는 두 손가락으로 벌리거나 마우스 휠, 오른쪽 아래 버튼으로 할 수 있습니다.";
+  }
+  document.querySelectorAll('input[name="bgtool"]').forEach(function (r) {
+    r.addEventListener("change", function () { bgSetTool(r.value); });
+  });
+  document.querySelectorAll('input[name="bgview"]').forEach(function (r) { r.addEventListener("change", bgDraw); });
+  function bgSizeDot() {
+    var d = Math.max(4, Math.min(40, +$("bgSize").value / 4 + 3));
+    $("bgDot").style.width = $("bgDot").style.height = d + "px";
+  }
+  $("bgSize").addEventListener("input", function () {
+    bgSizeDot();
+    if (!BG.hover && BG.src) BG.hover = { x: BG.cssW / 2, y: BG.cssH / 2, temp: true };
+    bgDraw();
+  });
+  $("bgSize").addEventListener("change", function () { if (BG.hover && BG.hover.temp) { BG.hover = null; bgDraw(); } });
+  $("bgZoomIn").addEventListener("click", function () { bgZoomAt(BG.view.s * 1.5, BG.cssW / 2, BG.cssH / 2); });
+  $("bgZoomOut").addEventListener("click", function () { bgZoomAt(BG.view.s / 1.5, BG.cssW / 2, BG.cssH / 2); });
+  $("bgZoomFit").addEventListener("click", function () { bgFit(); bgDraw(); });
+  (function () {
+    var b = $("bgPeek");
+    function on(e) { e.preventDefault(); BG.peek = true; bgDraw(); }
+    function off() { if (BG.peek) { BG.peek = false; bgDraw(); } }
+    b.addEventListener("pointerdown", on);
+    ["pointerup", "pointerleave", "pointercancel"].forEach(function (t) { b.addEventListener(t, off); });
+    b.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  })();
+
+  /* ---- pointer: one finger or mouse uses the tool, two fingers zoom and move ---- */
+  function bgPinchInfo() {
+    var ids = Object.keys(BG.ptrs), a = BG.ptrs[ids[0]], b = BG.ptrs[ids[1]];
+    return { mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2, d: Math.max(10, Math.hypot(a.x - b.x, a.y - b.y)) };
+  }
+  bgCanvas.addEventListener("pointerdown", function (e) {
+    if (!BG.src) return;
+    e.preventDefault();
+    var p = bgPoint(e);
+    BG.ptrs[e.pointerId] = p;
+    try { bgCanvas.setPointerCapture(e.pointerId); } catch (err) {}
+    var n = Object.keys(BG.ptrs).length;
+    if (n === 2) {
+      // second finger: this is a zoom, not a brush stroke
+      bgStrokeEnd(true);
+      BG.pan = null; BG.tap = null;
+      var pi = bgPinchInfo();
+      BG.pinch = { s: BG.view.s, x: BG.view.x, y: BG.view.y, mx: pi.mx, my: pi.my, d: pi.d };
+      BG.hover = null; bgDraw();
+      return;
+    }
+    if (n > 2) return;
+    BG.hover = e.pointerType === "mouse" ? p : null;
+    var mid = e.button === 1 || (e.pointerType === "mouse" && e.button === 2);
+    if (BG.tool === "move" || mid) {
+      BG.pan = { x: p.x, y: p.y, vx: BG.view.x, vy: BG.view.y };
+      bgCanvas.classList.add("is-moving");
+    } else if (BG.tool === "pick") {
+      BG.tap = { x: p.x, y: p.y, id: e.pointerId };
+    } else {
+      if (e.pointerType !== "mouse") BG.hover = p;
+      bgStrokeStart(p, BG.tool === "keep");
+    }
+  });
+  bgCanvas.addEventListener("pointermove", function (e) {
+    if (!BG.src) return;
+    var p = bgPoint(e);
+    if (BG.ptrs[e.pointerId]) BG.ptrs[e.pointerId] = p;
+    if (BG.pinch && Object.keys(BG.ptrs).length >= 2) {
+      var pi = bgPinchInfo(), pn = BG.pinch, v = BG.view;
+      var s = Math.max(v.fit * 0.5, Math.min(pn.s * pi.d / pn.d, Math.max(v.fit * 2, 24)));
+      var ix = (pn.mx - pn.x) / pn.s, iy = (pn.my - pn.y) / pn.s;
+      v.s = s; v.x = pi.mx - ix * s; v.y = pi.my - iy * s;
+      bgClamp(); bgDraw();
+      return;
+    }
+    if (BG.pan && BG.ptrs[e.pointerId]) {
+      BG.view.x = BG.pan.vx + p.x - BG.pan.x;
+      BG.view.y = BG.pan.vy + p.y - BG.pan.y;
+      bgClamp(); bgDraw();
+      return;
+    }
+    if (BG.tap && Math.hypot(p.x - BG.tap.x, p.y - BG.tap.y) > 10) BG.tap = null;
+    if (e.pointerType === "mouse" || BG.stroke) { BG.hover = p; bgDraw(); }
+    if (BG.stroke && BG.ptrs[e.pointerId]) bgStrokeTo(p);
+  });
+  function bgPointerEnd(e) {
+    if (!BG.ptrs[e.pointerId]) return;
+    delete BG.ptrs[e.pointerId];
+    var left = Object.keys(BG.ptrs).length;
+    if (BG.pinch) { if (left < 2) BG.pinch = null; if (left === 1) { var id = Object.keys(BG.ptrs)[0]; BG.pan = { x: BG.ptrs[id].x, y: BG.ptrs[id].y, vx: BG.view.x, vy: BG.view.y }; } else BG.pan = null; return; }
+    if (BG.pan) { BG.pan = null; bgCanvas.classList.remove("is-moving"); }
+    if (BG.tap && BG.tap.id === e.pointerId && e.type === "pointerup") bgPickAt(BG.tap);
+    BG.tap = null;
+    if (BG.stroke) bgStrokeEnd(e.type === "pointercancel");
+    if (e.pointerType !== "mouse") { BG.hover = null; bgDraw(); }
+  }
+  bgCanvas.addEventListener("pointerup", bgPointerEnd);
+  bgCanvas.addEventListener("pointercancel", bgPointerEnd);
+  bgCanvas.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse" && !BG.stroke) { BG.hover = null; bgDraw(); } });
+  bgCanvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  bgCanvas.addEventListener("wheel", function (e) {
+    if (!BG.src) return;
+    e.preventDefault();
+    var p = bgPoint(e), dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    bgZoomAt(BG.view.s * Math.exp(-dy * 0.0016), p.x, p.y);
+  }, { passive: false });
+
+  /* ---- AI ---- */
+  function bgAiUI() {
+    $("bgAiOff").hidden = !BG.aiRaw;
+    $("bgEdgeBox").hidden = !BG.aiRaw;
+    $("bgAi").disabled = BG.aiBusy || !BG.src;
+  }
+  function bgProg(frac, msg) {
+    $("bgAiProg").hidden = false;
+    $("bgAiBar").style.width = Math.round(Math.max(0, Math.min(1, frac)) * 100) + "%";
+    $("bgAiMsg").textContent = msg;
+  }
+  async function bgFetchModel(m, onBytes) {
+    var lastErr = null;
+    for (var h = 0; h < BG_HOSTS.length; h++) {
+      try {
+        var buf = new Uint8Array(m.size), off = 0;
+        for (var f = 0; f < m.files.length; f++) {
+          var res = await fetch(BG_HOSTS[h] + m.pkg + "/" + m.files[f]);
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          if (res.body && res.body.getReader) {
+            var rd = res.body.getReader();
+            for (;;) {
+              var c = await rd.read();
+              if (c.done) break;
+              if (off + c.value.length > buf.length) throw new Error("크기가 다름");
+              buf.set(c.value, off); off += c.value.length; onBytes(off);
+            }
+          } else {
+            var whole = new Uint8Array(await res.arrayBuffer());
+            if (off + whole.length > buf.length) throw new Error("크기가 다름");
+            buf.set(whole, off); off += whole.length; onBytes(off);
+          }
+        }
+        if (off !== m.size) throw new Error("크기가 다름");
+        if (window.crypto && crypto.subtle) {
+          var hash = new Uint8Array(await crypto.subtle.digest("SHA-256", buf));
+          var hex = Array.prototype.map.call(hash, function (v) { return (v < 16 ? "0" : "") + v.toString(16); }).join("");
+          if (hex !== m.sha) throw new Error("파일 확인 실패");
+        }
+        return buf;
+      } catch (e) { lastErr = e; off = 0; }
+    }
+    throw lastErr || new Error("내려받기 실패");
+  }
+  async function bgSession(kind) {
+    if (BG.sessions[kind]) return BG.sessions[kind];
+    var m = BG_MODELS[kind];
+    bgProg(0, "AI 실행 파일을 준비하는 중…");
+    await loadScript(ORT_BASE + "ort.wasm.min.js");
+    if (!window.ort) throw new Error("ort missing");
+    ort.env.wasm.wasmPaths = ORT_BASE;
+    ort.env.wasm.numThreads = 1;
+    var mb = function (n) { return (n / 1048576).toFixed(1); };
+    var bytes = await bgFetchModel(m, function (n) { bgProg(n / m.size * 0.9, "AI 모델 내려받는 중… " + mb(n) + " / " + mb(m.size) + "MB"); });
+    bgProg(0.92, "AI를 준비하는 중… (처음 한 번은 조금 걸려요)");
+    var s = await ort.InferenceSession.create(bytes, { executionProviders: ["wasm"], graphOptimizationLevel: "all" });
+    BG.sessions[kind] = s;
+    return s;
+  }
+  // U²-Net: 320×320 input scaled to 0..1 by the brightest value, ImageNet mean/std; first output is the mask.
+  async function bgRunAi(session) {
+    var S = 320, c = document.createElement("canvas");
+    c.width = c.height = S;
+    var x = c.getContext("2d", { willReadFrequently: true });
+    x.imageSmoothingQuality = "high";
+    x.drawImage(BG.srcC, 0, 0, S, S);
+    var px = x.getImageData(0, 0, S, S).data, n = S * S, mx = 1;
+    for (var i = 0; i < px.length; i++) if ((i & 3) !== 3 && px[i] > mx) mx = px[i];
+    var t = new Float32Array(3 * n), mean = [0.485, 0.456, 0.406], sd = [0.229, 0.224, 0.225];
+    for (var j = 0; j < n; j++) {
+      for (var ch = 0; ch < 3; ch++) t[ch * n + j] = (px[j * 4 + ch] / mx - mean[ch]) / sd[ch];
+    }
+    var feeds = {};
+    feeds[session.inputNames[0]] = new ort.Tensor("float32", t, [1, 3, S, S]);
+    var res = await session.run(feeds);
+    var out = res[session.outputNames[0]].data, lo = Infinity, hi = -Infinity;
+    for (var k = 0; k < n; k++) { if (out[k] < lo) lo = out[k]; if (out[k] > hi) hi = out[k]; }
+    var span = hi - lo || 1, mask = x.createImageData(S, S), md = mask.data;
+    for (var q = 0; q < n; q++) {
+      var v = (out[q] - lo) / span * 255;
+      md[q * 4] = md[q * 4 + 1] = md[q * 4 + 2] = v; md[q * 4 + 3] = 255;
+    }
+    x.putImageData(mask, 0, 0);
+    // scale the mask up to the photo
+    var big = document.createElement("canvas");
+    big.width = BG.W; big.height = BG.H;
+    var bx = big.getContext("2d", { willReadFrequently: true });
+    bx.imageSmoothingEnabled = true; bx.imageSmoothingQuality = "high";
+    bx.drawImage(c, 0, 0, BG.W, BG.H);
+    var bd = bx.getImageData(0, 0, BG.W, BG.H).data, A = new Uint8Array(BG.W * BG.H);
+    for (var r = 0, p = 0; r < A.length; r++, p += 4) A[r] = bd[p];
+    big.width = big.height = 1;
+    return A;
+  }
+  $("bgAi").addEventListener("click", async function () {
+    if (!BG.src || BG.aiBusy) return;
+    var kind = bgRadio("bgmodel"), file = BG.file;
+    BG.aiBusy = true; bgAiUI();
+    $("bgAi").textContent = "AI가 지우는 중…";
+    try {
+      var s = await bgSession(kind);
+      bgProg(0.96, "배경을 찾는 중…");
+      await new Promise(function (r) { setTimeout(r, 30); });
+      var A = await bgRunAi(s);
+      if (file !== BG.file) return;
+      bgPush({ kind: "ai", st: bgState() });
+      BG.aiRaw = A;
+      bgComputeAi(); bgRebuild();
+      bgProg(1, "다 됐어요. 덜 지워지거나 더 지워진 곳은 브러시로 손보세요.");
+      if (BG.tool === "pick" || BG.tool === "move") { document.querySelector('input[name="bgtool"][value="keep"]').checked = true; bgSetTool("keep"); }
+    } catch (e) {
+      var msg = String((e && e.message) || e);
+      bgProg(0, /파일 확인/.test(msg) ? "내려받은 AI 파일이 올바르지 않아 쓰지 않았습니다. 잠시 후 다시 해 보세요."
+        : /load failed|HTTP|fetch|network|내려받기/i.test(msg) ? "AI 파일을 내려받지 못했습니다. 인터넷 연결을 확인해 주세요."
+        : "이 기기에서 AI를 실행하지 못했습니다. 색으로 지우기와 브러시를 써 주세요.");
+    } finally {
+      BG.aiBusy = false; $("bgAi").textContent = "AI로 배경 지우기"; bgAiUI();
+    }
+  });
+  $("bgAiOff").addEventListener("click", function () {
+    if (!BG.aiRaw) return;
+    bgPush({ kind: "ai", st: bgState() });
+    BG.aiRaw = null; bgComputeAi(); bgAiUI(); bgRebuild();
+    $("bgAiProg").hidden = true;
+  });
+  $("bgEdge").addEventListener("input", function () {
+    $("bgEdgeV").textContent = this.value;
+    if (!BG.aiRaw || BG.edgeQ) return;
+    BG.edgeQ = requestAnimationFrame(function () { BG.edgeQ = 0; bgComputeAi(); bgRebuild(); });
+  });
+
+  /* ---- info, save ---- */
+  function bgInfo() {
+    if (!BG.src) return;
+    $("bgName").textContent = BG.file.name + " · " + BG.W + "×" + BG.H;
+  }
+  function bgTrimBox() {
+    var d = BG.out.data, W = BG.W, H = BG.H, x0 = W, y0 = H, x1 = -1, y1 = -1;
+    for (var y = 0; y < H; y++) {
+      var row = y * W * 4, any = false;
+      for (var x = 0; x < W; x++) if (d[row + x * 4 + 3] > 2) { any = true; if (x < x0) x0 = x; if (x > x1) x1 = x; }
+      if (any) { if (y < y0) y0 = y; y1 = y; }
+    }
+    return x1 < 0 ? null : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+  }
+  $("bgSave").addEventListener("click", async function () {
+    if (!BG.src || BG.busy) return;
+    var btn = $("bgSave");
+    BG.busy = true; btn.disabled = true; btn.textContent = "만드는 중…";
+    try {
+      await new Promise(function (r) { setTimeout(r, 30); });
+      var c = BG.outC, box = null;
+      if ($("bgTrim").checked) {
+        box = bgTrimBox();
+        if (!box) { toast("남은 부분이 없습니다. 살리기 브러시로 살려 주세요."); return; }
+        c = document.createElement("canvas");
+        c.width = box.w; c.height = box.h;
+        c.getContext("2d").drawImage(BG.outC, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
+      }
+      var blob = await canvasBlob(c, "image/png");
+      if (!blob) throw new Error("too large");
+      var name = baseName(BG.file.name) + "_배경제거.png";
+      if (manual) {
+        var out = $("bgOut");
+        out.src = await blobToDataUrl(blob);
+        out.hidden = false;
+        out.scrollIntoView({ block: "nearest" });
+      } else {
+        await saveFile(name, blob);
+      }
+    } catch (e) {
+      toast("저장하지 못했습니다. 사진 크기를 줄여 다시 해 보세요.");
+    } finally {
+      BG.busy = false; btn.disabled = false; btn.textContent = "PNG로 저장";
+    }
+  });
+  $("bgOther").addEventListener("click", function () { $("bgInput").click(); });
+
+  async function openBg(files) {
+    var list = await expandPhotos(files);
+    if (!list.length) return;
+    if (list.length > 1) toast("사진은 한 장씩 작업합니다. 첫 번째 사진을 열었습니다.");
+    var file = list[0];
+    $("bgWork").hidden = false;
+    $("bgOut").hidden = true;
+    bgCanvas.hidden = true; $("bgZoomBox").hidden = true;
+    $("bgMsg").hidden = false;
+    $("bgMsg").textContent = "사진을 불러오는 중…";
+    try {
+      var bmp = await decodeImage(file);
+      var W = bmp.width, H = bmp.height;
+      if (W * H > BG_MAX) {
+        var k = Math.sqrt(BG_MAX / (W * H));
+        W = Math.max(1, Math.floor(W * k)); H = Math.max(1, Math.floor(H * k));
+        toast("사진이 커서 " + W + "×" + H + "로 줄여서 열었습니다.");
+      }
+      var sc = document.createElement("canvas");
+      sc.width = W; sc.height = H;
+      var sx = sc.getContext("2d", { willReadFrequently: true });
+      sx.imageSmoothingQuality = "high";
+      sx.drawImage(bmp, 0, 0, W, H);
+      if (bmp.close) bmp.close();
+      var oc = document.createElement("canvas");
+      oc.width = W; oc.height = H;
+      BG.file = file; BG.W = W; BG.H = H;
+      BG.srcC = sc;
+      BG.src = sx.getImageData(0, 0, W, H).data;
+      BG.outC = oc; BG.outX = oc.getContext("2d");
+      BG.out = BG.outX.createImageData(W, H);
+      BG.keep = new Uint8Array(W * H); BG.erase = new Uint8Array(W * H);
+      BG.colors = []; BG.colorA = null; BG.colorN = null; BG.aiRaw = null; BG.aiA = null;
+      BG.undo = []; BG.redo = []; BG.cssW = 0; BG.stroke = null; BG.ptrs = {}; BG.pinch = null; BG.pan = null;
+      $("bgAiProg").hidden = true;
+      bgChips(); bgAiUI(); bgUndoUI();
+      $("bgMsg").hidden = true;
+      bgCanvas.hidden = false; $("bgZoomBox").hidden = false;
+      bgLayout();
+      bgRebuild();
+      $("bgSave").disabled = false;
+      // start with the colour picker so the first tap on the photo picks the background
+      document.querySelector('input[name="bgtool"][value="pick"]').checked = true;
+      bgSetTool("pick");
+      $("bgWork").scrollIntoView({ block: "start", behavior: "smooth" });
+    } catch (e) {
+      $("bgMsg").textContent = (e && e.userMessage) || "사진으로 열 수 없는 파일입니다.";
+      if (!BG.src) $("bgSave").disabled = true;
+    }
+  }
+  wireDrop($("bgDrop"), $("bgInput"), $("bgPick"), openBg);
+  window.addEventListener("resize", function () { if (current === "bgremove") bgLayout(); });
+  bgSizeDot();
+  bgSetTool("keep");
 
   /* ================= Audio ================= */
   var A = { buf: null, file: null, start: 0, end: 0, mode: "keep", peaks: null, ctx: null, src: null,
@@ -9366,6 +10294,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
   var TOOL_LIST = [
     { id: "heic",    name: "HEIC 변환",       desc: "아이폰 사진을 JPG로",       category: "photo",    tint: "blue",   icon: "image",   short: "변환", ready: true,  featured: true },
     { id: "mosaic",  name: "사진 모자이크",   desc: "개인정보 안전하게",         category: "photo",    tint: "orange", icon: "mosaic",  short: "모자이크", ready: true,  featured: true },
+    { id: "bgremove", name: "배경 제거",     desc: "색이나 AI로 배경을 투명하게", category: "photo", tint: "teal", icon: "bgremove", short: "배경 제거", ready: true },
     { id: "shrink",  name: "이미지 용량 줄이기", desc: "화질은 그대로, 용량만 작게", category: "photo",  tint: "green",  icon: "shrink",  short: "용량 줄이기", ready: true },
     { id: "crop",    name: "사진 자르기·크기 조절", desc: "모양 자르기, 표준 크기 맞춤", category: "photo", tint: "purple", icon: "crop", short: "자르기·크기", ready: true },
     { id: "pdf",     name: "PDF 용량 줄이기", desc: "파일 크기 가볍게",          category: "document", tint: "green",  icon: "file",    short: "PDF", ready: true,  featured: true },
@@ -9396,6 +10325,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     crop: '<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
     image: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 16-5.5-5.5L5 21"/>',
     shrink: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path d="m9 9 3 3 3-3M9 15l3-3 3 3"/>',
+    bgremove: '<path d="m3 21 11-11"/><path d="m12.5 8.5 3 3"/><path d="M17 2v4M15 4h4M20 9v3M18.5 10.5h3M9 3v2M8 4h2"/>',
     mosaic: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     file: '<path d="M6 2h8l5 5v15H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v6h6"/><path d="M8 14h8M8 18h5"/>',
     audio: '<path d="M3 10v4m4-8v12m4-15v18m4-12v6m4-10v14m4-12v10"/>',
@@ -9580,6 +10510,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     if (current === "audio") drawWave(); else stopAudio();
     if (current === "sign") sResize();
     if (current === "crop") crLayout();
+    if (current === "bgremove") bgLayout();
     if (current !== "merge") stopMerge();
     if (current !== "pitch") stopPitch();
     if (current !== "speed") stopSpeed(); else spDrawWave();
@@ -9722,6 +10653,7 @@ a.m-group-title .ico { width: 15px; height: 15px; stroke-width: 2.2; }
     if (current === "heic") heic.add(await expandPhotos(files));
     else if (current === "shrink") addShrink(files);
     else if (current === "crop") openCrop(files);
+    else if (current === "bgremove") openBg(files);
     else if (current === "pdf") addPdfs(files);
     else if (current === "pdfmerge") addPdfMerge(files);
     else if (current === "pdfsplit") openPdfSplit(files);
